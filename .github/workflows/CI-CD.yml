@@ -6,14 +6,11 @@ on:
   pull_request:
     branches: ["main"]
 
-permissions: write-all
-
 jobs:
   changes:
     runs-on: ubuntu-latest
     name: Detect file changes
-    permissions:
-      pull-requests: read
+    permissions: read-all
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}

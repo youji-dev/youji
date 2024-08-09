@@ -12,10 +12,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-	<AdditionalFiles Include="..\.codestyle\stylecop.json">
-	  <Link>stylecop.json</Link>
-	</AdditionalFiles>
-  </ItemGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="..\stylecop.json">
+			<Link>stylecop.json</Link>
+		</AdditionalFiles>
+	</ItemGroup>
+
 
 </Project>

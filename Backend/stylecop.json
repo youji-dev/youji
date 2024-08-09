@@ -1,0 +1,33 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DotNetAnalyzers/StyleCopAnalyzers/master/StyleCop.Analyzers/StyleCop.Analyzers/Settings/stylecop.schema.json",
+  "settings": {
+    "indentation": {
+      "indentationSize": 4,
+      "tabSize": 4,
+      "useTabs": false
+    },
+    "spacingRules": {},
+    "orderingRules": {
+      "elementOrder": [ "accessibility", "constant", "kind", "readonly", "static" ],
+      "usingDirectivesPlacement": "outsideNamespace"
+    },
+    "documentationRules": {
+      "documentInterfaces": true,
+      "companyName": "TicketSystem",
+      "documentPrivateElements": false,
+      "documentPrivateFields": false,
+      "documentationCulture": "en-US",
+      "xmlHeader": false
+    },
+    "layoutRules": {
+      "allowDoWhileOnClosingBrace": false,
+      "newlineAtEndOfFile": "allow"
+    },
+    "readabilityRules": {
+      "allowBuiltInTypeAliases": false
+    },
+    "namingRules": {
+      "allowCommonHungarianPrefixes": true
+    }
+  }
+}

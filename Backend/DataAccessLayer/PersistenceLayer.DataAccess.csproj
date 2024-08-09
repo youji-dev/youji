@@ -23,4 +23,15 @@
     </PackageReference>
   </ItemGroup>
 
+	<ItemGroup>
+		<AdditionalFiles Include="..\stylecop.json">
+			<Link>stylecop.json</Link>
+		</AdditionalFiles>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Repositories\" />
+	</ItemGroup>
+
+
 </Project>

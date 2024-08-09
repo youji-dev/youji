@@ -13,4 +13,16 @@
     </PackageReference>
   </ItemGroup>
 
+	<ItemGroup>
+		<AdditionalFiles Include="..\stylecop.json">
+			<Link>stylecop.json</Link>
+		</AdditionalFiles>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Common\Common.csproj" />
+	  <ProjectReference Include="..\DataAccessLayer\PersistenceLayer.DataAccess.csproj" />
+	</ItemGroup>
+
+
 </Project>

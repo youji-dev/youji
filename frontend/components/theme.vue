@@ -9,42 +9,8 @@
     <template #reference>
       <el-button
         @click="toggleTheme"
-        v-show="colorMode.preference === 'dark'"
         circle
-        :icon="Sunny"
-      ></el-button>
-    </template>
-  </el-popover>
-  <el-popover
-    placement="top-start"
-    :title="$t('colorMode')"
-    :width="200"
-    trigger="hover"
-    :content="$t(colorMode.preference)"
-  >
-    <template #reference>
-
-      <el-button
-        @click="toggleTheme"
-        v-show="colorMode.preference === 'light'"
-        circle
-        :icon="Moon"
-      ></el-button>
-    </template>
-  </el-popover>
-  <el-popover
-    placement="top-start"
-    :title="$t('colorMode')"
-    :width="200"
-    trigger="hover"
-    :content="$t(colorMode.preference)"
-  >
-    <template #reference>
-      <el-button
-        @click="toggleTheme"
-        v-show="colorMode.preference === 'system'"
-        circle
-        :icon="Monitor"
+        :icon="determineIcon()"
       ></el-button>
     </template>
   </el-popover>
@@ -67,6 +33,18 @@ const toggleTheme = () => {
     colorMode.preference = "light";
   }
 };
+
+function determineIcon() {
+  if (colorMode.preference === "light") {
+    return Moon;
+  } else if (colorMode.preference === "dark") {
+    return Sunny;
+  } else if (colorMode.preference === "system") {
+    return Monitor;
+  } else {
+    return Sunny;
+  }
+}
 </script>
 
 <style></style>

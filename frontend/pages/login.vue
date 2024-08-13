@@ -84,7 +84,7 @@ async function login() {
       password: form.value.password,
     });
     await authenticateUser(user.value);
-    if (authenticated) {
+    if (authenticated.value) {
       ElNotification({
         title: i18n.t("success"),
         message: i18n.t("authSuccess"),
@@ -93,6 +93,14 @@ async function login() {
       });
       loading.value = false;
       //router.push(localePath("/"));
+    } else {
+      loading.value = false;
+      ElNotification({
+        title: i18n.t("error"),
+        message: i18n.t("authError"),
+        type: "error",
+        duration: 5000,
+      });
     }
     authErrors.value.forEach(element => {
         ElMessage({

@@ -1,25 +1,108 @@
 <template>
   <!-- Route: /login -->
   <!-- Page for login mask -->
-  <el-form :model="form" label-width="auto" class="w-full h-lvh flex flex-col items-center justify-center">
-    <el-form-item class="w-1/4">
-      <el-input v-model="form.username" :placeholder="$t('username')" :prefix-icon="User" />
-    </el-form-item>
-    <el-form-item class="w-1/4">
-      <el-input v-model="form.password" :placeholder="$t('password')" :prefix-icon="Lock" />
-    </el-form-item>
-    <el-button type="primary" plain @click="login()">{{ $t('login') }}</el-button>
+  <el-form
+    :model="form"
+    label-width="auto"
+    class="w-full h-lvh flex items-center justify-center"
+  >
+    <div
+      class="w-full md:w-1/3 lg:1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark"
+    >
+      <el-divider content-position="left" border-style="dashed">
+        <el-text class="" size="large" type="">{{
+          $t("ticketSystem")
+        }}</el-text>
+      </el-divider>
+      <el-form-item class="w-full px-10 mt-3">
+        <el-input
+          v-model="form.username"
+          :placeholder="$t('username')"
+          :prefix-icon="User"
+          Text
+        />
+      </el-form-item>
+      <el-form-item class="w-full px-10">
+        <el-input
+          v-model="form.password"
+          :placeholder="$t('password')"
+          :prefix-icon="Lock"
+          Password
+          type="password"
+          show-password
+        >
+        </el-input>
+      </el-form-item>
+      <div class="flex items-center justify-between w-full">
+        <el-checkbox
+          v-model="form.remember"
+          :label="$t('rememberMe')"
+          class="mr-auto ml-10"
+          size="large"
+          style="font-weight: 400;"
+        />
+
+        <el-button
+          :loading="loading"
+          :loading-icon="Loading"
+          type="primary"
+          plain
+          round
+          @click="login()"
+          class="ml-auto mr-10"
+          >{{ $t("login") }}</el-button
+        >
+      </div>
+    </div>
   </el-form>
 </template>
 
 <script lang="ts" setup>
-import { Lock, User } from '@element-plus/icons-vue';
-let form = {
-  username: null,
-  password: null
-};
-function login() {
-  ElMessage("Processing...");
+import { Check, Loading, Lock, User } from "@element-plus/icons-vue";
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "~/stores/auth";
+const { authenticateUser } = useAuthStore();
+const { authenticated, authErrors } = storeToRefs(useAuthStore());
+const i18n = useI18n();
+const {
+  public: { COLORS },
+} = useRuntimeConfig();
+import { ElNotification } from "element-plus";
+
+let form = ref({
+  username: "",
+  password: "",
+  remember: false,
+});
+const loading = ref(false);
+
+async function login() {
+  loading.value = true;
+  try {
+    const user = ref({
+      name: form.value.username,
+      password: form.value.password,
+    });
+    await authenticateUser(user.value);
+    if (authenticated) {
+      ElNotification({
+        title: i18n.t("success"),
+        message: i18n.t("authSuccess"),
+        type: "success",
+        duration: 3000,
+      });
+      loading.value = false;
+      //router.push(localePath("/"));
+    }
+    authErrors.value.forEach(element => {
+        ElMessage({
+          type:"error",
+          message:element,
+        })
+      });
+  } catch (error) {
+    console.error(error);
+  }
 }
 </script>
 

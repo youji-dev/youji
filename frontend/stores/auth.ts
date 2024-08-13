@@ -3,12 +3,90 @@ import { defineStore } from 'pinia'
 // In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
 // All of these actions and variables can be used and called in our vue files.    
 
-export const useMyAuthStore = defineStore({
-  id: 'myAuthStore',
-  state: () => ({ 
-    // Variables
+interface UserPayloadInterface {
+  name: string;
+  password: string;
+}
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    authenticated: false,
+    name: '' as any,
+    loading: false,
+    csrfToken: '' as any, 
+    authErrors: [] as Array<string>,
   }),
   actions: {
-    // Actions
-  }
-})
+    async authenticateUser({ name, password }: UserPayloadInterface) {
+      const { public: { BACKEND_URL } } = useRuntimeConfig();
+      const { $locally } = useNuxtApp()
+      this.authErrors = [];
+      if (await this.getCsrfToken()) {
+        const { data, pending, error }: any = await useFetch(BACKEND_URL + "/api/login", {
+          body: {
+            name: name,
+            password: password,
+          },
+          method: 'post',
+          headers: { 'Content-Type': 'application/json'},
+        });
+        this.loading = pending;
+        if (error.value) {
+          console.log(error.value)
+          this.authErrors.push(error.value);
+        }
+        if (data.value) {
+          if (data.value.allowed) {
+            const token = useCookie('token'); 
+            token.value = data?.value?.token; 
+            this.authenticated = true; 
+            this.name = name;
+            $locally.setItem("username", name);
+          } else {
+            this.authErrors.push("wrongCredentials")
+          }
+
+        }
+      } else {
+        console.log("noCsrf")
+      }
+    },
+    async getCsrfToken() {
+      const { public: { BACKEND_URL } } = useRuntimeConfig();
+      const { data, pending, error }: any = await useFetch(BACKEND_URL + "/sanctum/csrf-cookie");
+      this.loading = pending;
+      if (error.value) {
+        console.log(error.value)
+        this.authErrors.push(error.value);
+        return false
+      } else {
+        return true;
+      }
+
+    },
+    async logUserOut() {
+      const { public: { BACKEND_URL } } = useRuntimeConfig();
+      const token = useCookie('token'); 
+      this.authenticated = false; 
+      const {data, error}: any = await useFetch(BACKEND_URL+ "/api/logout", {
+        method: "get",
+        headers: {
+          Authorization: "Bearer " + token.value, 
+          'Content-Type': 'application/json', 
+        }
+      });
+      console.log(error)
+      token.value = null;
+    },
+
+    checkIfTokenIsSet() {
+      const cookie = useCookie("token");
+      if (cookie.value !== "" && cookie.value !== null) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  },
+});
+
+// https://dev.to/rafaelmagalhaes/authentication-in-nuxt-3-375o

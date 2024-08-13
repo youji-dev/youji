@@ -7,7 +7,7 @@
     class="w-full h-lvh flex items-center justify-center"
   >
     <div
-      class="w-full md:w-1/3 lg:1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark"
+      class="w-full md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark"
     >
       <el-divider content-position="left" border-style="dashed">
         <el-text class="" size="large" type="">{{

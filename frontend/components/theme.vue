@@ -36,9 +36,9 @@ const toggleTheme = () => {
 
 function determineIcon() {
   if (colorMode.preference === "light") {
-    return Moon;
-  } else if (colorMode.preference === "dark") {
     return Sunny;
+  } else if (colorMode.preference === "dark") {
+    return Moon;
   } else if (colorMode.preference === "system") {
     return Monitor;
   } else {

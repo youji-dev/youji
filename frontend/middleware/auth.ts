@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
-  const { authenticated, name, csrfToken } = storeToRefs(useAuthStore());
+  const { authenticated, name } = storeToRefs(useAuthStore());
   const { $locally } = useNuxtApp();
   const localeRoute = useLocaleRoute();
   const { public: { AUTH_TOKEN_NAME } } = useRuntimeConfig()

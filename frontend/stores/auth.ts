@@ -18,7 +18,7 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {
       const {
-        public: { BACKEND_URL },
+        public: { BACKEND_URL, AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
       const { $locally } = useNuxtApp();
       this.authErrors = [];
@@ -40,7 +40,7 @@ export const useAuthStore = defineStore("auth", {
       }
       if (data.value) {
         if (data.value.allowed) {
-          const token = useCookie("token");
+          const token = useCookie(AUTH_TOKEN_NAME);
           token.value = data?.value?.token;
           this.authenticated = true;
           this.name = name;
@@ -53,9 +53,9 @@ export const useAuthStore = defineStore("auth", {
     },
     async logUserOut() {
       const {
-        public: { BACKEND_URL },
+        public: { BACKEND_URL, AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const token = useCookie("token");
+      const token = useCookie(AUTH_TOKEN_NAME);
       this.authenticated = false;
       const { data, error }: any = await useFetch(BACKEND_URL + "/api/logout", {
         method: "get",
@@ -69,13 +69,42 @@ export const useAuthStore = defineStore("auth", {
     },
 
     checkIfTokenIsSet() {
-      const cookie = useCookie("token");
+      const {
+        public: { AUTH_TOKEN_NAME },
+      } = useRuntimeConfig();
+      const cookie = useCookie(AUTH_TOKEN_NAME);
       if (cookie.value !== "" && cookie.value !== null) {
         return true;
       } else {
         return false;
       }
     },
+
+    async checkIfTokenIsValid() {
+      const {
+        public: { BACKEND_URL, AUTH_TOKEN_NAME },
+      } = useRuntimeConfig();
+      const cookie = useCookie(AUTH_TOKEN_NAME);
+      if (this.checkIfTokenIsSet()) {
+        const { data, error }: any = await useFetch(BACKEND_URL + "/api/check-token", {
+          method: "post",
+          headers: {
+            Authorization: "Bearer " + cookie.value,
+            "Content-Type": "application/json",
+          },
+        });
+        if(error) {
+          this.authErrors.push(error)
+        }
+        if (data.valid) {
+          return true;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
+    }
   },
 });
 

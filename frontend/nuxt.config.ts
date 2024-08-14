@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       BACKEND_URL: process.env.BACKEND_BASE_URL,
+      AUTH_TOKEN_NAME: "youji-auth-token",
       COLORS: {
         ACCENT_COLOR: "#409EFF",
         TEXT_LIGHT: "#303133",

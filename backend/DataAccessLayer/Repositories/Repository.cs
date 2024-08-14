@@ -1,39 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace PersistenceLayer.DataAccess.Repositories
 {
-    public class Repository<TEntity, TId>
+    /// <summary>
+    /// Represents the repository base class.
+    /// </summary>
+    /// <typeparam name="TEntity">Instance of <see cref="TEntity"/></typeparam>
+    /// <typeparam name="TId">Instance of <see cref="TId"/></typeparam>
+    public class Repository<TEntity, TId>(DataContext context)
+        where TEntity : class
     {
-        private readonly DataContext context;
+        /// <summary>
+        /// The context of data
+        /// </summary>
+        protected DataContext Context { get => context; }
 
-        public Repository(DataContext context)
+        /// <summary>
+        /// Gets the entity with the specific id.
+        /// </summary>
+        /// <param name="id">Instance of <see cref="TId"/></param>
+        /// <returns>The entity with the specific id.</returns>
+        public async virtual Task<TEntity?> GetAsync(TId id)
         {
-            this.context = context;
+            return await this.Context.Set<TEntity>().FindAsync(id);
         }
 
-        public virtual Task<TEntity> GetAsync(TId id)
+        /// <summary>
+        /// Find entity that matches the expression.
+        /// </summary>
+        /// <param name="expression">Instance of <see cref="Expression"/></param>
+        /// <returns>The entitis matches the expression.</returns>
+        public async virtual Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> expression)
         {
+            return await this.Context.Set<TEntity>().FindAsync(expression);
         }
 
-        public virtual TEntity FindAsync(Expression<Func<TEntity, bool>> expression)
+        /// <summary>
+        /// Adds an entity.
+        /// </summary>
+        /// <param name="entity">Instance of <see cref="TEntity"/></param>
+        /// 
+        public async virtual Task AddAsync(TEntity entity)
         {
+            await this.Context.Set<TEntity>().AddAsync(entity);
         }
 
-        public virtual Task<TEntity> AddAsync(TEntity entity)
+        public virtual void UpdateAsync(TEntity entity)
         {
+            this.Context.Set<TEntity>().Update(entity);
         }
 
-        public virtual Task UpdateAsync(TEntity entity)
+        public virtual void DeleteAsync(TEntity entity)
         {
-        }
-
-        public virtual Task DeleteAsync(TEntity entity)
-        {
+            this.Context.Set<TEntity>().Remove(entity);
         }
     }
 }

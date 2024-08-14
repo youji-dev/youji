@@ -1,11 +1,23 @@
 ﻿namespace PersistenceLayer.DataAccess.Entities
 {
+    /// <summary>
+    /// Represents the state of the tickets.
+    /// </summary>
     public class State
     {
-        public string Author { get; set; }
+        /// <summary>
+        /// The id of the state.
+        /// </summary>
+        public required string Id { get; set; }
 
-        public string Content { get; set; }
+        /// <summary>
+        /// The name of the state.
+        /// </summary>
+        public required string Name { get; set; }
 
-        public DateTime CreationDate { get; set; }
+        /// <summary>
+        /// The color of the state.
+        /// </summary>
+        public required string Color { get; set; }
     }
 }

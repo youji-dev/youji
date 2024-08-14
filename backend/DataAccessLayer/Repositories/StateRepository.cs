@@ -2,9 +2,9 @@
 
 namespace PersistenceLayer.DataAccess.Repositories
 {
-    public class TicketRepository : Repository<Ticket, Guid>
+    public class StateRepository : Repository<Ticket, Guid>
     {
-        public TicketRepository(DataContext context)
+        public StateRepository(DataContext context)
             : base(context)
         {
         }

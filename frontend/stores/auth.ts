@@ -73,11 +73,7 @@ export const useAuthStore = defineStore("auth", {
         public: { AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
       const cookie = useCookie(AUTH_TOKEN_NAME);
-      if (cookie.value !== "" && cookie.value !== null) {
-        return true;
-      } else {
-        return false;
-      }
+      return !!cookie.value
     },
 
     async checkIfTokenIsValid() {

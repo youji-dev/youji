@@ -10,26 +10,8 @@
 </template>
 
 <script lang="ts" setup>
-const colorMode = useColorMode();
 import Language from '~/components/language.vue';
 import Theme from '~/components/theme.vue';
-const { public: { COLORS } } = useRuntimeConfig();
-onNuxtReady( () => {
-  console.log(colorMode.value)
-  
-  // if (!document.documentElement.classList.contains(colorMode.value)) {
-  //   if (colorMode.value === "system") {
-  //     colorMode.value = "light";
-  //     if (!document.documentElement.classList.contains("light")) {
-  //       document.documentElement.classList.add("light")
-  //     }
-  //     return;
-  //   }
-  //   document.documentElement.classList.toggle("light");
-  //   document.documentElement.classList.toggle("dark");
-  // } 
-  // console.log(document.documentElement.classList);
-})
 </script>
 
 <style>

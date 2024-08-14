@@ -40,7 +40,7 @@ export const useAuthStore = defineStore("auth", {
       }
       if (data.value) {
         if (data.value.allowed) {
-          const token = useCookie(AUTH_TOKEN_NAME);
+          const token = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
           token.value = data?.value?.token;
           this.authenticated = true;
           this.name = name;
@@ -49,13 +49,12 @@ export const useAuthStore = defineStore("auth", {
           this.authErrors.push("wrongCredentials");
         }
       }
-      console.log(this.authenticated);
     },
     async logUserOut() {
       const {
         public: { BACKEND_URL, AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const token = useCookie(AUTH_TOKEN_NAME);
+      const token = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
       this.authenticated = false;
       const { data, error }: any = await useFetch(BACKEND_URL + "/api/logout", {
         method: "get",
@@ -72,7 +71,7 @@ export const useAuthStore = defineStore("auth", {
       const {
         public: { AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const cookie = useCookie(AUTH_TOKEN_NAME);
+      const cookie = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
       if (cookie.value !== "" && cookie.value !== null) {
         return true;
       } else {
@@ -84,7 +83,7 @@ export const useAuthStore = defineStore("auth", {
       const {
         public: { BACKEND_URL, AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const cookie = useCookie(AUTH_TOKEN_NAME);
+      const cookie = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
       if (this.checkIfTokenIsSet()) {
         const { data, error }: any = await useFetch(BACKEND_URL + "/api/check-token", {
           method: "post",

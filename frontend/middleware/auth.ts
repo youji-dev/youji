@@ -1,17 +1,23 @@
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
   const { authenticated, name, csrfToken } = storeToRefs(useAuthStore());
   const { $locally } = useNuxtApp();
   const localeRoute = useLocaleRoute();
-  const token = useCookie('token');
+  const { public: { AUTH_TOKEN_NAME } } = useRuntimeConfig()
+  const token = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
+  const { checkIfTokenIsValid } = useAuthStore()
 
   if (token.value) {
-    // TODO add method to check if token is valid
-      authenticated.value = true;
-      name.value = $locally.getItem("username");
-      csrfToken.value = $locally.getItem("csrfToken");
+      if (await checkIfTokenIsValid()) {
+        authenticated.value = true;
+        name.value = $locally.getItem("username");
+      } else {
+        authenticated.value = false;
+        token.value = null;
+      }
   }
 
   if (token.value && to?.name === 'login') {
+      abortNavigation();
       return navigateTo(localeRoute("/")?.fullPath);
   }
 

@@ -58,15 +58,12 @@
 </template>
 
 <script lang="ts" setup>
-import { Check, Loading, Lock, User } from "@element-plus/icons-vue";
+import { Loading, Lock, User } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/stores/auth";
 const { authenticateUser } = useAuthStore();
 const { authenticated, authErrors } = storeToRefs(useAuthStore());
 const i18n = useI18n();
-const {
-  public: { COLORS },
-} = useRuntimeConfig();
 import { ElNotification } from "element-plus";
 
 let form = ref({

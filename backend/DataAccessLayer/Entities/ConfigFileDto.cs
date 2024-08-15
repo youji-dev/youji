@@ -21,7 +21,7 @@
         public required string LDAPUri { get; set; }
 
         /// <summary>
-        /// 
+        /// The distinguished name of the user.
         /// </summary>
         public required string LDAPNBindDN { get; set; }
 
@@ -31,12 +31,7 @@
         public required string LDAPPassword { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public required string LDAPBaseDN { get; set; }
-
-        /// <summary>
-        /// 
+        /// The orginazional units that will ignored.
         /// </summary>
         public string? LDAPIgnoredOU { get; set; }
     }

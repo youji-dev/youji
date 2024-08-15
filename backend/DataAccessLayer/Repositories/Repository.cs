@@ -39,20 +39,35 @@ namespace PersistenceLayer.DataAccess.Repositories
         /// Adds an entity.
         /// </summary>
         /// <param name="entity">Instance of <see cref="TEntity"/></param>
-        /// 
-        public async virtual Task AddAsync(TEntity entity)
+        /// <returns>Represents an asynchronous <see cref="Task"/> that returns the added entity.</returns>
+        public async virtual Task<TEntity?> AddAsync(TEntity entity)
         {
-            await this.Context.Set<TEntity>().AddAsync(entity);
+            var entityEntry = await this.Context.Set<TEntity>().AddAsync(entity);
+            await this.Context.SaveChangesAsync();
+
+            return entityEntry.Entity;
         }
 
-        public virtual void UpdateAsync(TEntity entity)
+        /// <summary>
+        /// Updates an entity.
+        /// </summary>
+        /// <param name="entity">Instance of <see cref="TEntity"/></param>
+        /// <returns>Represents an asynchronous <see cref="Task"/> that does not return a value.</returns>
+        public async virtual Task UpdateAsync(TEntity entity)
         {
             this.Context.Set<TEntity>().Update(entity);
+            await this.Context.SaveChangesAsync();
         }
 
-        public virtual void DeleteAsync(TEntity entity)
+        /// <summary>
+        /// Deletes an entity.
+        /// </summary>
+        /// <param name="entity">Instance of <see cref="TEntity"/></param>
+        /// <returns>Represents an asynchronous <see cref="Task"/> that does not return a value.</returns>
+        public async virtual Task DeleteAsync(TEntity entity)
         {
             this.Context.Set<TEntity>().Remove(entity);
+            await this.Context.SaveChangesAsync();
         }
     }
 }

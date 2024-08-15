@@ -3,10 +3,10 @@
 namespace PersistenceLayer.DataAccess.Repositories
 {
     /// <summary>
-    /// Represents the repository of the state entity.
+    /// Represents the repository of the role assignment entity.
     /// </summary>
     /// <param name="context">Instance of <see cref="DataContext"/></param>
-    public class StateRepository(DataContext context) : Repository<Ticket, Guid>(context)
+    public class RoleAssignmentRepository(DataContext context) : Repository<RoleAssignment, Guid>(context)
     {
     }
 }

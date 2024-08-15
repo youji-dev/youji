@@ -2,11 +2,11 @@
 
 namespace PersistenceLayer.DataAccess.Repositories
 {
-    public class TicketCommentRepository : Repository<TicketComment, Guid>
+    /// <summary>
+    /// Represents the repository of the ticket comment entity.
+    /// </summary>
+    /// <param name="context">Instance of <see cref="DataContext"/></param>
+    public class TicketCommentRepository(DataContext context) : Repository<TicketComment, Guid>(context)
     {
-        public TicketCommentRepository(DataContext context) 
-            : base(context)
-        {
-        }
     }
 }

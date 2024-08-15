@@ -2,11 +2,11 @@
 
 namespace PersistenceLayer.DataAccess.Repositories
 {
-    public class TicketAttachmentRepository : Repository<Ticket, Guid>
+    /// <summary>
+    /// Represents the repository of the ticket attachment entity.
+    /// </summary>
+    /// <param name="context">Instance of <see cref="DataContext"/></param>
+    public class TicketAttachmentRepository(DataContext context) : Repository<Ticket, Guid>(context)
     {
-        public TicketAttachmentRepository(DataContext context) 
-            : base(context)
-        {
-        }
     }
 }

@@ -38,6 +38,7 @@ export default defineI18nConfig(() => ({
             dark: "Dark",
             light: "Light",
             system: "System",
+            serverError: "Internal server error",
         },
         de: {
             welcome: "Willkommen",
@@ -75,6 +76,7 @@ export default defineI18nConfig(() => ({
             dark: "Dunkel",
             light: "Hell",
             system: "System",
+            serverError: "Serverfehler",
         }
     }
 }))

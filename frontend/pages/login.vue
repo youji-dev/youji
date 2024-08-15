@@ -92,19 +92,23 @@ async function login() {
       //router.push(localePath("/"));
     } else {
       loading.value = false;
-      ElNotification({
+      if (authErrors.value.length > 0) {
+        ElNotification({
+        title: i18n.t("error"),
+        message: i18n.t("serverError"),
+        type: "error",
+        duration: 5000,
+      });
+      } else {
+        ElNotification({
         title: i18n.t("error"),
         message: i18n.t("authError"),
         type: "error",
         duration: 5000,
       });
+      }
+
     }
-    authErrors.value.forEach(element => {
-        ElMessage({
-          type:"error",
-          message:element,
-        })
-      });
   } catch (error) {
     console.error(error);
   }

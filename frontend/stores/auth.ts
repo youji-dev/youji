@@ -37,16 +37,15 @@ export const useAuthStore = defineStore("auth", {
       if (error.value) {
         console.log(error.value);
         this.authErrors.push(error.value);
+        console.log(error.value);
       }
       if (data.value) {
         if (data.value.allowed) {
-          const token = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
+          const token = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
           token.value = data?.value?.token;
           this.authenticated = true;
           this.name = name;
           $locally.setItem("username", name);
-        } else {
-          this.authErrors.push("wrongCredentials");
         }
       }
     },
@@ -54,7 +53,7 @@ export const useAuthStore = defineStore("auth", {
       const {
         public: { BACKEND_URL, AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const token = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
+      const token = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
       this.authenticated = false;
       const { data, error }: any = await useFetch(BACKEND_URL + "/api/logout", {
         method: "get",
@@ -63,7 +62,9 @@ export const useAuthStore = defineStore("auth", {
           "Content-Type": "application/json",
         },
       });
-      console.log(error);
+      if (error) {
+        console.log(error);
+      }
       token.value = null;
     },
 
@@ -71,7 +72,7 @@ export const useAuthStore = defineStore("auth", {
       const {
         public: { AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const cookie = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
+      const cookie = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
       return !!cookie.value
     },
 
@@ -79,7 +80,7 @@ export const useAuthStore = defineStore("auth", {
       const {
         public: { BACKEND_URL, AUTH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const cookie = useCookie(AUTH_TOKEN_NAME, {httpOnly: true, secure: true, sameSite: 'strict'});
+      const cookie = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
       if (this.checkIfTokenIsSet()) {
         const { data, error }: any = await useFetch(BACKEND_URL + "/api/check-token", {
           method: "post",
@@ -88,8 +89,9 @@ export const useAuthStore = defineStore("auth", {
             "Content-Type": "application/json",
           },
         });
-        if(error) {
+        if (error) {
           this.authErrors.push(error)
+          console.log(error);
         }
         if (data.valid) {
           return true;

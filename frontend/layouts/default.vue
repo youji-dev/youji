@@ -37,5 +37,21 @@ import Theme from '~/components/theme.vue';
     background-color: #FFFFFF;
   }
 
+  .text-dark {
+    color: #E5EAF3
+  }
+
+  .text-light {
+    color: #303133;
+  }
+
+  .logo-dark {
+    background-color: #E5EAF3
+  }
+
+  .logo-light {
+    background-color: #303133;
+  }
+
 }
 </style>

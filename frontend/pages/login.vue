@@ -1,4 +1,5 @@
 <template>
+  <!-- <component :is="Sidebar"></component> -->
   <!-- Route: /login -->
   <!-- Page for login mask -->
   <el-form
@@ -65,6 +66,7 @@ const { authenticateUser } = useAuthStore();
 const { authenticated, authErrors } = storeToRefs(useAuthStore());
 const i18n = useI18n();
 import { ElNotification } from "element-plus";
+import Sidebar from "~/components/sidebar.vue";
 
 let form = ref({
   username: "",

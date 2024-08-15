@@ -6,7 +6,7 @@
     public class RoleAssignment
     {
         /// <summary>
-        /// The the id of the user.
+        /// The id of the user.
         /// </summary>
         public string? UserId { get; set; }
 

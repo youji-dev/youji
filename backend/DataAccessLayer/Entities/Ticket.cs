@@ -36,7 +36,7 @@
         public DateTime CreationDate { get; set; }
 
         /// <summary>
-        /// The current state of the ticket.
+        /// The state of the ticket.
         /// </summary>
         public required State State { get; set; }
 

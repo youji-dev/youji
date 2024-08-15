@@ -40,12 +40,10 @@ namespace PersistenceLayer.DataAccess.Repositories
         /// </summary>
         /// <param name="entity">Instance of <see cref="TEntity"/></param>
         /// <returns>Represents an asynchronous <see cref="Task"/> that returns the added entity.</returns>
-        public async virtual Task<TEntity?> AddAsync(TEntity entity)
+        public async virtual Task AddAsync(TEntity entity)
         {
-            var entityEntry = await this.Context.Set<TEntity>().AddAsync(entity);
+            await this.Context.Set<TEntity>().AddAsync(entity);
             await this.Context.SaveChangesAsync();
-
-            return entityEntry.Entity;
         }
 
         /// <summary>

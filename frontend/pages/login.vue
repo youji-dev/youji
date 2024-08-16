@@ -1,5 +1,5 @@
 <template>
-  <!-- <component :is="Sidebar"></component> -->
+  <component :is="Sidebar"></component>
   <!-- Route: /login -->
   <!-- Page for login mask -->
   <el-form

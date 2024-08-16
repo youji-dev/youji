@@ -33,7 +33,6 @@ namespace PersistenceLayer.DataAccess
             services.AddScoped<BuildingRepository>();
             services.AddScoped<PriorityRepository>();
             services.AddScoped<RoleAssignmentRepository>();
-            services.AddScoped<ConfigurationRepository>();
             services.AddScoped<StateRepository>();
             services.AddScoped<TicketRepository>();
             services.AddScoped<TicketCommentRepository>();

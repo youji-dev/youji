@@ -1,4 +1,6 @@
-﻿namespace PersistenceLayer.DataAccess.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
     /// Represents the state of a ticket.
@@ -8,7 +10,8 @@
         /// <summary>
         /// The id of the state.
         /// </summary>
-        public required string Id { get; set; }
+        [Key]
+        public required Guid Id { get; set; }
 
         /// <summary>
         /// The name of the state.

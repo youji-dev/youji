@@ -1,7 +1,7 @@
 ﻿namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
-    /// Represents the configuration file to connect to LDAP.
+    /// Represents the configuration file
     /// </summary>
     public class ConfigFileDto
     {
@@ -11,17 +11,17 @@
         public required string JWTKey { get; set; }
 
         /// <summary>
-        /// The default connection
+        /// The database connection
         /// </summary>
         public required string DefaultConnection { get; set; }
 
         /// <summary>
-        /// The uri of LDAP as a <see langword="string"/>.
+        /// The uri of LDAP instance as a <see langword="string"/>.
         /// </summary>
         public required string LDAPUri { get; set; }
 
         /// <summary>
-        /// 
+        /// Distinguished name for user to authenticate as in the ldap server
         /// </summary>
         public required string LDAPNBindDN { get; set; }
 
@@ -31,12 +31,7 @@
         public required string LDAPPassword { get; set; }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public required string LDAPBaseDN { get; set; }
-
-        /// <summary>
-        /// 
+        /// The orginazional units that will ignored.
         /// </summary>
         public string? LDAPIgnoredOU { get; set; }
     }

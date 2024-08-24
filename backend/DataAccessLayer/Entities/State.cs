@@ -1,7 +1,7 @@
 ﻿namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
-    /// Represents the state of the tickets.
+    /// Represents the state of a ticket.
     /// </summary>
     public class State
     {

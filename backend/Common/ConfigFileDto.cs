@@ -1,4 +1,6 @@
-﻿namespace PersistenceLayer.DataAccess.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
     /// Represents the configuration file

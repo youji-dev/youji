@@ -1,4 +1,6 @@
-﻿namespace PersistenceLayer.DataAccess.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
     /// Represents the assignment of the roles.
@@ -8,6 +10,7 @@
         /// <summary>
         /// The id of the user.
         /// </summary>
+        [Key]
         public required string UserId { get; set; }
 
         /// <summary>

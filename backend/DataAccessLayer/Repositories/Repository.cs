@@ -44,8 +44,6 @@ namespace PersistenceLayer.DataAccess.Repositories
         {
             await this.Context.Set<TEntity>().AddAsync(entity);
             await this.Context.SaveChangesAsync();
-
-            return entityEntry.Entity;
         }
 
         /// <summary>

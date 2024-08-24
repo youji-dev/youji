@@ -1,4 +1,6 @@
-﻿namespace PersistenceLayer.DataAccess.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
     /// Represens the ticket priority.
@@ -8,6 +10,7 @@
         /// <summary>
         /// The name of the priority.
         /// </summary>
+        [Key]
         public required string Name { get; set; }
 
         /// <summary>

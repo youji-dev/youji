@@ -1,4 +1,6 @@
-﻿namespace PersistenceLayer.DataAccess.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
     /// Represents the comment at the ticket.
@@ -8,7 +10,8 @@
         /// <summary>
         /// The id of the comment.
         /// </summary>
-        public required string Id { get; set; }
+        [Key]
+        public required Guid Id { get; set; }
 
         /// <summary>
         /// The author of the comment.

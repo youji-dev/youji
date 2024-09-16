@@ -104,3 +104,7 @@ tab_width = 4
 indent_size = 4
 end_of_line = crlf
 dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_qualification_for_field = true:silent
+dotnet_style_qualification_for_property = true:silent
+dotnet_style_qualification_for_method = true:silent
+dotnet_style_qualification_for_event = true:silent

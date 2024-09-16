@@ -1,4 +1,4 @@
-<template>
+<template class="z-10">
   <el-popover
     placement="top-start"
     :title="$t('colorMode')"
@@ -31,6 +31,11 @@ const toggleTheme = () => {
     colorMode.preference = "system";
   } else if (colorMode.preference === "system") {
     colorMode.preference = "light";
+  }
+  if (colorMode.preference === "system") {
+    const prev = colorMode.value;
+    colorMode.preference = "dark" // Emit color mode changed event?
+    colorMode.preference= "system";
   }
 };
 

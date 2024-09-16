@@ -1,4 +1,4 @@
-<template>
+<template class="z-10">
   <el-popover placement="top" :width="100" trigger="click">
     <div v-for="availLocale in availableLocales" @click="switchLocale(availLocale.code)"
       class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">

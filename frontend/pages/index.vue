@@ -4,7 +4,6 @@
     <!-- Could contain things like statistics of all tickets or a list of tickets assigned to the authenticated user (maybe ordered by priority) -->
     <!-- If we decide to leave not include this, the index page should be /tickets/ (tickets/index.vue) -->
     <component :is="Sidebar"></component>
-
 </template>
 
 <script lang="ts" setup>

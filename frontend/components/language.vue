@@ -1,4 +1,4 @@
-<template class="z-10">
+<template class="z-50">
   <el-popover placement="top" :width="100" trigger="click">
     <div v-for="availLocale in availableLocales" @click="switchLocale(availLocale.code)"
       class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-const { locale, locales } = useI18n();
+const { locales } = useI18n();
 const router = useRouter();
 const i18n = useI18n();
 const localePath = useLocalePath();

@@ -10,6 +10,7 @@
 import Sidebar from '~/components/sidebar.vue';
 
 definePageMeta({
-    middleware: "auth"
+    middleware: "auth",
+    layout: "authenticated"
 })
 </script>

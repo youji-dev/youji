@@ -1,5 +1,4 @@
 <template>
-  <component :is="SidebarMobile"></component>
   <!-- Route: /login -->
   <!-- Page for login mask -->
   <el-form
@@ -11,9 +10,7 @@
       class="w-full md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark"
     >
       <el-divider content-position="left" border-style="dashed">
-        <el-text class="" size="large" type="">{{
-          $t("ticketSystem")
-        }}</el-text>
+        <el-text class="" size="large" type="">{{ $t("ticketSystem") }}</el-text>
       </el-divider>
       <el-form-item class="w-full px-10 mt-3">
         <el-input
@@ -40,7 +37,7 @@
           :label="$t('rememberMe')"
           class="mr-auto ml-10"
           size="large"
-          style="font-weight: 400;"
+          style="font-weight: 400"
         />
 
         <el-button
@@ -97,20 +94,19 @@ async function login() {
       loading.value = false;
       if (authErrors.value.length > 0) {
         ElNotification({
-        title: i18n.t("error"),
-        message: i18n.t("serverError"),
-        type: "error",
-        duration: 5000,
-      });
+          title: i18n.t("error"),
+          message: i18n.t("serverError"),
+          type: "error",
+          duration: 5000,
+        });
       } else {
         ElNotification({
-        title: i18n.t("error"),
-        message: i18n.t("authError"),
-        type: "error",
-        duration: 5000,
-      });
+          title: i18n.t("error"),
+          message: i18n.t("authError"),
+          type: "error",
+          duration: 5000,
+        });
       }
-
     }
   } catch (error) {
     console.error(error);

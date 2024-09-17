@@ -30,9 +30,28 @@ namespace Application.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<Ticket[]>> Get(string searchTerm, int skip, int take)
         {
-            var tickets = ticketRepo.GetAllAsync(tickets => tickets);
+            var tickets = await ticketRepo.GetAllAsync(
+                tickets =>
+                tickets.Where(
+                    ticket =>
+                    (ticket.Description != null && ticket.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    || (ticket.Building != null && ticket.Building.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    || (ticket.Room != null && ticket.Room.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    || (ticket.Priority != null && ticket.Priority.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    || ticket.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || ticket.Author.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || ticket.CreationDate.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                    || ticket.State.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                .Skip(skip)
+                .Take(take)
+                .Count() > 0);
 
-            return this.Ok();
+            if (tickets is null)
+            {
+                return this.BadRequest("Keine Tickets mit diesem Suchinhalt gefunden.");
+            }
+
+            return this.Ok(tickets);
         }
 
         [HttpGet("comments")]

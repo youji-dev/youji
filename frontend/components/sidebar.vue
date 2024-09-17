@@ -1,8 +1,6 @@
 <template>
   <div
     class="absolute px-6 py-3 left-0 top-0 h-full w-fit base-bg-light dark:base-bg-dark hidden md:block lg:block z-10"
-    @mouseenter="isCollapse = false"
-    @mouseleave="isCollapse = true"
   >
     <div class="flex items-center justify-start">
       <svg
@@ -27,8 +25,6 @@
     <el-menu
       default-active="2"
       class="el-menu-vertical-demo pt-5"
-      @open="handleOpen"
-      @close="handleClose"
       :collapse="false"
       style="border-right: 0px"
     >
@@ -53,13 +49,6 @@
 
 <script lang="ts" setup>
 import { Files, Plus } from "@element-plus/icons-vue";
-const isCollapse = ref(true);
-const handleOpen = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
-const handleClose = (key: string, keyPath: string[]) => {
-  console.log(key, keyPath);
-};
 </script>
 
 <style>

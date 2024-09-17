@@ -23,18 +23,13 @@ namespace PersistenceLayer.DataAccess.Entities
         public required string LDAPUri { get; set; }
 
         /// <summary>
-        /// Distinguished name for user to authenticate as in the ldap server
+        /// The BaseDN for all groups
         /// </summary>
-        public required string LDAPNBindDN { get; set; }
+        public required string LDAPBaseDN { get; set; }
 
         /// <summary>
-        /// The password for the LDAP connection.
+        /// Lifetime of maximum lifetime of a user session in minutes
         /// </summary>
-        public required string LDAPPassword { get; set; }
-
-        /// <summary>
-        /// The orginazional units that will ignored.
-        /// </summary>
-        public string? LDAPIgnoredOU { get; set; }
+        public int? SessionLifeTime { get; set; }
     }
 }

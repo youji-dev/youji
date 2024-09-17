@@ -42,5 +42,10 @@ namespace PersistenceLayer.DataAccess
         /// Database set of the comments table.
         /// </summary>
         public DbSet<TicketComment> Comments { get; set; }
+
+        /// <summary>
+        /// Database set of the refresh token table.
+        /// </summary>
+        public DbSet<RefreshToken> RefreshToken { get; set; }
     }
 }

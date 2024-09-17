@@ -21,5 +21,13 @@ namespace DomainLayer.BusinessLogic.PDF
 
             Document.Create(document.Compose).GeneratePdfAndShow();
         }
+
+        /// <summary>
+        /// Configure QuestPDF
+        /// </summary>
+        public static void Configure()
+        {
+            QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+        }
     }
 }

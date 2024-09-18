@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersistenceLayer.DataAccess.Entities;
+using PersistenceLayer.DataAccess.Entities.Configuration;
 
 namespace PersistenceLayer.DataAccess
 {
@@ -42,5 +43,22 @@ namespace PersistenceLayer.DataAccess
         /// Database set of the comments table.
         /// </summary>
         public DbSet<TicketComment> Comments { get; set; }
+
+        /// <inheritdoc/>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Addd the Postgres Extension for UUID generation
+            modelBuilder.HasPostgresExtension("uuid-ossp");
+
+            modelBuilder.ApplyConfiguration(new BuildingConfiguration());
+            modelBuilder.ApplyConfiguration(new PriorityConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleAssignmentConfiguration());
+            modelBuilder.ApplyConfiguration(new StateConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketConfiguration());
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

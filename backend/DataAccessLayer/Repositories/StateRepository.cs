@@ -6,7 +6,7 @@ namespace PersistenceLayer.DataAccess.Repositories
     /// Represents the repository of the state entity.
     /// </summary>
     /// <param name="context">Instance of <see cref="DataContext"/></param>
-    public class StateRepository(DataContext context) : Repository<Ticket, Guid>(context)
+    public class StateRepository(DataContext context) : Repository<State, Guid>(context)
     {
     }
 }

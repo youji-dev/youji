@@ -22,7 +22,7 @@ namespace DomainLayer.BusinessLogic.PDF
         public (string name, byte[] data)[]? Images { get; set; }
 
         /// <inheritdoc cref="Ticket.Building"/>
-        public Building? Building { get; set; }
+        public string? Building { get; set; }
 
         /// <inheritdoc cref="Ticket.Room"/>
         public string? Room { get; set; }
@@ -49,7 +49,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 Author = ticket.Author,
                 CreationDate = ticket.CreationDate,
                 Images = images,
-                Building = ticket.Building,
+                Building = ticket.Building?.Name,
                 Room = ticket.Room,
                 Object = ticket.Object,
             };

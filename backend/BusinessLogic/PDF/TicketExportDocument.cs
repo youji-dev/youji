@@ -77,55 +77,40 @@ namespace DomainLayer.BusinessLogic.PDF
                         .AlignRight();
                 });
 
-                col.Item().Row(row =>
+                col.Item().Row(innerRow =>
                 {
-                    row.Spacing(this.itemSpacing);
+                    innerRow.Spacing(this.itemSpacing);
 
-                    row.RelativeItem().Column(innerColumn =>
-                    {
-                        innerColumn.Spacing(this.itemSpacing);
+                    innerRow.RelativeItem().Text("Gebäude: ");
+                    innerRow.AutoItem().Text(this.model.Building?.Name ?? "-")
+                        .AlignRight();
+                });
 
-                        innerColumn.Item().Row(innerRow =>
-                        {
-                            innerRow.Spacing(this.itemSpacing);
+                col.Item().Row(innerRow =>
+                {
+                    innerRow.Spacing(this.itemSpacing);
 
-                            innerRow.RelativeItem().Text("Gebäude: ");
-                            innerRow.AutoItem().Text(this.model.Building?.Name ?? "-")
-                                .AlignRight();
-                        });
+                    innerRow.RelativeItem().Text("Raum: ");
+                    innerRow.AutoItem().Text(this.model.Room ?? "-")
+                        .AlignRight();
+                });
 
-                        innerColumn.Item().Row(innerRow =>
-                        {
-                            innerRow.Spacing(this.itemSpacing);
+                col.Item().Row(innerRow =>
+                {
+                    innerRow.Spacing(this.itemSpacing);
 
-                            innerRow.RelativeItem().Text("Raum: ");
-                            innerRow.AutoItem().Text(this.model.Room ?? "-")
-                                .AlignRight();
-                        });
-                    });
+                    innerRow.RelativeItem().Text("Gemeldet durch: ");
+                    innerRow.AutoItem().Text(this.model.Author)
+                        .AlignRight();
+                });
 
-                    row.RelativeItem().Column(innerColumn =>
-                    {
-                        innerColumn.Spacing(this.itemSpacing);
+                col.Item().Row(innerRow =>
+                {
+                    innerRow.Spacing(this.itemSpacing);
 
-                        innerColumn.Item().Row(innerRow =>
-                        {
-                            innerRow.Spacing(this.itemSpacing);
-
-                            innerRow.RelativeItem().Text("Gemeldet durch: ");
-                            innerRow.AutoItem().Text(this.model.Author)
-                                .AlignRight();
-                        });
-
-                        innerColumn.Item().Row(innerRow =>
-                        {
-                            innerRow.Spacing(this.itemSpacing);
-
-                            innerRow.RelativeItem(10).Text("Gemeldet am: ");
-                            innerRow.AutoItem().Text(this.model.CreationDate.ToShortDateString())
-                                .AlignRight();
-                        });
-                    });
+                    innerRow.RelativeItem(10).Text("Gemeldet am: ");
+                    innerRow.AutoItem().Text(this.model.CreationDate.ToShortDateString())
+                        .AlignRight();
                 });
             });
         }

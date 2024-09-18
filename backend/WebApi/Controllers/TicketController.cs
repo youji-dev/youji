@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 
@@ -36,10 +37,9 @@ namespace Application.WebApi.Controllers
         /// <param name="take">The count of taken elements as a <see langword="int"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
-        public async Task<ActionResult> Get(string searchTerm, int skip, int take)
+        public ActionResult Get(string searchTerm, int skip, int take)
         {
-            var tickets = await ticketRepo.GetAllAsync(
-                tickets =>
+            var tickets = ticketRepo.GetAllAsync(tickets =>
                 tickets.Where(
                     ticket =>
                     (ticket.Description != null && ticket.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
@@ -52,7 +52,8 @@ namespace Application.WebApi.Controllers
                     || ticket.State.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .Skip(skip)
                 .Take(take)
-                .Count() > 0);
+                .Count() > 0)
+                .First();
 
             if (tickets is null)
             {

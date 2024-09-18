@@ -17,9 +17,9 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <returns>An <see cref="ObjectResult"/> with all states.</returns>
         [HttpGet]
-        public async Task<ActionResult<State[]>> Get()
+        public ActionResult<State[]> Get()
         {
-            return this.Ok(await stateRepo.GetAllAsync(state => state.Count() > 0));
+            return this.Ok(stateRepo.GetAllAsync(state => state.Count() > 0));
         }
 
         /// <summary>

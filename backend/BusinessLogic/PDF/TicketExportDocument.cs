@@ -1,15 +1,19 @@
 ﻿using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
-using System.Globalization;
 
 namespace DomainLayer.BusinessLogic.PDF
 {
+    /// <summary>
+    /// QuestPDF document template for ticket export
+    /// </summary>
+    /// <param name="ticketExportModel">The model to use</param>
     public class TicketExportDocument(TicketExportModel ticketExportModel) : IDocument
     {
         private readonly TicketExportModel model = ticketExportModel;
 
         private readonly int pagePadding = 10;
-        private readonly int containerPadding = 20;
+        private readonly int horizontalPadding = 20;
+        private readonly int verticalPadding = 10;
         private readonly int itemSpacing = 10;
 
         private readonly float borderThickness = 0.5F;
@@ -18,7 +22,14 @@ namespace DomainLayer.BusinessLogic.PDF
         private readonly int largeFont = 20;
 
         /// <inheritdoc/>
-        public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+        public DocumentMetadata GetMetadata() => new ()
+        {
+            Author = "youji export",
+            Creator = "youji export",
+            Producer = "youji export",
+            Title = this.model.Title,
+            Subject = this.model.Title,
+        };
 
         /// <inheritdoc/>
         public DocumentSettings GetSettings() => DocumentSettings.Default;
@@ -41,7 +52,8 @@ namespace DomainLayer.BusinessLogic.PDF
         private void ComposeHeader(IContainer container)
         {
             container
-                .PaddingBottom(this.containerPadding)
+                .PaddingHorizontal(this.horizontalPadding)
+                .PaddingBottom(this.verticalPadding)
                 .Text(this.model.Title)
                 .FontSize(this.largeFont)
                 .Bold();
@@ -51,7 +63,7 @@ namespace DomainLayer.BusinessLogic.PDF
         {
             container.Column(column =>
             {
-                column.Spacing(this.containerPadding);
+                column.Spacing(this.itemSpacing);
 
                 column.Item().Element(this.ComposeMetadata);
                 column.Item().Element(this.ComposeDescription);
@@ -63,7 +75,8 @@ namespace DomainLayer.BusinessLogic.PDF
         {
             container
                 .Border(this.borderThickness)
-                .Padding(this.containerPadding)
+                .PaddingHorizontal(this.horizontalPadding)
+                .PaddingVertical(this.verticalPadding)
                 .Column(col =>
             {
                 col.Spacing(this.itemSpacing);
@@ -82,7 +95,7 @@ namespace DomainLayer.BusinessLogic.PDF
                     innerRow.Spacing(this.itemSpacing);
 
                     innerRow.RelativeItem().Text("Gebäude: ");
-                    innerRow.AutoItem().Text(this.model.Building?.Name ?? "-")
+                    innerRow.AutoItem().Text(this.model.Building ?? "-")
                         .AlignRight();
                 });
 
@@ -118,7 +131,8 @@ namespace DomainLayer.BusinessLogic.PDF
         private void ComposeDescription(IContainer container)
         {
             container
-                .Padding(this.containerPadding)
+                .PaddingHorizontal(this.horizontalPadding)
+                .PaddingVertical(this.verticalPadding)
                 .Text(this.model.Description);
         }
 
@@ -129,7 +143,8 @@ namespace DomainLayer.BusinessLogic.PDF
 
             container
                 .Border(this.borderThickness)
-                .Padding(this.containerPadding)
+                .PaddingHorizontal(this.horizontalPadding)
+                .PaddingVertical(this.verticalPadding)
                 .Inlined(inlined =>
                 {
                     inlined.Spacing(this.itemSpacing);
@@ -151,7 +166,8 @@ namespace DomainLayer.BusinessLogic.PDF
         private void ComposeFooter(IContainer container)
         {
             container
-                .PaddingTop(this.containerPadding)
+                .PaddingHorizontal(this.horizontalPadding)
+                .PaddingTop(this.verticalPadding)
                 .Text(DateTime.Now.ToLongDateString())
                 .FontSize(this.smallFont)
                 .AlignRight();

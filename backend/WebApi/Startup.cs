@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using DomainLayer.BusinessLogic.PDF;
+using Microsoft.OpenApi.Models;
 
 namespace Application.WebApi
 {
@@ -45,9 +46,9 @@ namespace Application.WebApi
         /// Adds logic services.
         /// </summary>
         /// <param name="services">Instance of <see cref="IServiceCollection"/>.</param>
-        /// <param name="configurationManager">Instance of <see cref="ConfigurationManager"/>.</param>
-        public static void AddLogicServices(this IServiceCollection services, ConfigurationManager configurationManager)
+        public static void AddLogicServices(this IServiceCollection services)
         {
+            services.AddScoped<ExportService>();
         }
     }
 }

@@ -1,3 +1,4 @@
+using Application.WebApi;
 using PersistenceLayer.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.AddInfrastructure(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddRepositories();
+
+builder.Services.AddLogicServices();
 
 var app = builder.Build();
 

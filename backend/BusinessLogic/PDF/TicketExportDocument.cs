@@ -8,8 +8,11 @@ namespace DomainLayer.BusinessLogic.PDF
     {
         private readonly TicketExportModel model = ticketExportModel;
 
-        private readonly int borderThickness = 1;
-        private readonly int padding = 20;
+        private readonly int pagePadding = 10;
+        private readonly int containerPadding = 20;
+        private readonly int itemSpacing = 10;
+
+        private readonly float borderThickness = 0.5F;
 
         private readonly int smallFont = 10;
         private readonly int largeFont = 20;
@@ -25,7 +28,7 @@ namespace DomainLayer.BusinessLogic.PDF
         {
             container.Page(page =>
             {
-                page.Margin(this.padding);
+                page.Margin(this.pagePadding);
 
                 page.Header().Element(this.ComposeHeader);
 
@@ -38,7 +41,7 @@ namespace DomainLayer.BusinessLogic.PDF
         private void ComposeHeader(IContainer container)
         {
             container
-                .PaddingBottom(this.padding)
+                .PaddingBottom(this.containerPadding)
                 .Text(this.model.Title)
                 .FontSize(this.largeFont)
                 .Bold();
@@ -48,7 +51,7 @@ namespace DomainLayer.BusinessLogic.PDF
         {
             container.Column(column =>
             {
-                column.Spacing(this.padding);
+                column.Spacing(this.containerPadding);
 
                 column.Item().Element(this.ComposeMetadata);
                 column.Item().Element(this.ComposeDescription);
@@ -58,17 +61,16 @@ namespace DomainLayer.BusinessLogic.PDF
 
         private void ComposeMetadata(IContainer container)
         {
-            int spacing = 10;
-
-            container.Border(this.borderThickness)
-                .Padding(this.padding)
+            container
+                .Border(this.borderThickness)
+                .Padding(this.containerPadding)
                 .Column(col =>
             {
-                col.Spacing(spacing);
+                col.Spacing(this.itemSpacing);
 
                 col.Item().Row(row =>
                 {
-                    row.Spacing(spacing);
+                    row.Spacing(this.itemSpacing);
 
                     row.RelativeItem().Text("Betroffenes Objekt: ");
                     row.AutoItem().Text(this.model.Object ?? "-")
@@ -77,15 +79,15 @@ namespace DomainLayer.BusinessLogic.PDF
 
                 col.Item().Row(row =>
                 {
-                    row.Spacing(spacing);
+                    row.Spacing(this.itemSpacing);
 
                     row.RelativeItem().Column(innerColumn =>
                     {
-                        innerColumn.Spacing(spacing);
+                        innerColumn.Spacing(this.itemSpacing);
 
                         innerColumn.Item().Row(innerRow =>
                         {
-                            innerRow.Spacing(spacing);
+                            innerRow.Spacing(this.itemSpacing);
 
                             innerRow.RelativeItem().Text("Gebäude: ");
                             innerRow.AutoItem().Text(this.model.Building?.Name ?? "-")
@@ -94,7 +96,7 @@ namespace DomainLayer.BusinessLogic.PDF
 
                         innerColumn.Item().Row(innerRow =>
                         {
-                            innerRow.Spacing(spacing);
+                            innerRow.Spacing(this.itemSpacing);
 
                             innerRow.RelativeItem().Text("Raum: ");
                             innerRow.AutoItem().Text(this.model.Room ?? "-")
@@ -104,11 +106,11 @@ namespace DomainLayer.BusinessLogic.PDF
 
                     row.RelativeItem().Column(innerColumn =>
                     {
-                        innerColumn.Spacing(spacing);
+                        innerColumn.Spacing(this.itemSpacing);
 
                         innerColumn.Item().Row(innerRow =>
                         {
-                            innerRow.Spacing(spacing);
+                            innerRow.Spacing(this.itemSpacing);
 
                             innerRow.RelativeItem().Text("Gemeldet durch: ");
                             innerRow.AutoItem().Text(this.model.Author)
@@ -117,7 +119,7 @@ namespace DomainLayer.BusinessLogic.PDF
 
                         innerColumn.Item().Row(innerRow =>
                         {
-                            innerRow.Spacing(spacing);
+                            innerRow.Spacing(this.itemSpacing);
 
                             innerRow.RelativeItem(10).Text("Gemeldet am: ");
                             innerRow.AutoItem().Text(this.model.CreationDate.ToShortDateString())
@@ -130,20 +132,33 @@ namespace DomainLayer.BusinessLogic.PDF
 
         private void ComposeDescription(IContainer container)
         {
-            container.Border(this.borderThickness)
-                .Padding(this.padding)
+            container
+                .Padding(this.containerPadding)
                 .Text(this.model.Description);
         }
 
         private void ComposeImages(IContainer container)
         {
-            container.Border(this.borderThickness)
-                .Padding(this.padding)
-                .Row(row =>
+            if (this.model.Images is null || this.model.Images.Length == 0)
+                return;
+
+            container
+                .Border(this.borderThickness)
+                .Padding(this.containerPadding)
+                .Inlined(inlined =>
                 {
-                    foreach (var image in model.Attachments)
+                    inlined.Spacing(this.itemSpacing);
+
+                    for (int i = 0; i < this.model.Images.Length; i++)
                     {
-                        row.RelativeItem().Image(model.Attachments[0].Binary);
+                        inlined.Item()
+                            .Column(col =>
+                            {
+                                col.Item().Height(100).Image(this.model.Images[i].data);
+                                col.Item().Text(this.model.Images[i].name)
+                                    .FontSize(this.smallFont)
+                                    .AlignCenter();
+                            });
                     }
                 });
         }
@@ -151,7 +166,7 @@ namespace DomainLayer.BusinessLogic.PDF
         private void ComposeFooter(IContainer container)
         {
             container
-                .PaddingTop(this.padding)
+                .PaddingTop(this.containerPadding)
                 .Text(DateTime.Now.ToLongDateString())
                 .FontSize(this.smallFont)
                 .AlignRight();

@@ -16,8 +16,10 @@ namespace DomainLayer.BusinessLogic.PDF
         /// <inheritdoc cref="Ticket.CreationDate"/>
         public DateTime CreationDate { get; set; }
 
-        /// <inheritdoc cref="Ticket.Attachments"/>
-        public TicketAttachment[]? Attachments { get; set; }
+        /// <summary>
+        /// <see cref="Ticket.Attachments"/> filtered to only include images
+        /// </summary>
+        public (string name, byte[] data)[]? Images { get; set; }
 
         /// <inheritdoc cref="Ticket.Building"/>
         public Building? Building { get; set; }
@@ -35,13 +37,18 @@ namespace DomainLayer.BusinessLogic.PDF
         /// <returns>A new <see cref="TicketExportModel"/></returns>
         public static TicketExportModel FromTicket(Ticket ticket)
         {
+            var images = ticket.Attachments?
+                .Where(attachment => ((string[])["webp", "png", "jpeg", "jfif"]).Contains(attachment.FileType))
+                .Select(attachment => (attachment.Name, attachment.Binary))
+                .ToArray();
+
             return new ()
             {
                 Title = ticket.Title,
                 Description = ticket.Description,
                 Author = ticket.Author,
                 CreationDate = ticket.CreationDate,
-                Attachments = ticket.Attachments,
+                Images = images,
                 Building = ticket.Building,
                 Room = ticket.Room,
                 Object = ticket.Object,

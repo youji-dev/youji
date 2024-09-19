@@ -19,7 +19,7 @@ namespace DomainLayer.BusinessLogic.PDF
         /// <summary>
         /// <see cref="Ticket.Attachments"/> filtered to only include images
         /// </summary>
-        public (string name, byte[] data)[]? Images { get; set; }
+        public ImageData[] Images { get; set; } = [];
 
         /// <inheritdoc cref="Ticket.Building"/>
         public string? Building { get; set; }
@@ -37,9 +37,9 @@ namespace DomainLayer.BusinessLogic.PDF
         /// <returns>A new <see cref="TicketExportModel"/></returns>
         public static TicketExportModel FromTicket(Ticket ticket)
         {
-            var images = ticket.Attachments?
+            var images = ticket.Attachments
                 .Where(attachment => ((string[])["webp", "png", "jpeg", "jfif"]).Contains(attachment.FileType))
-                .Select(attachment => (attachment.Name, attachment.Binary))
+                .Select(attachment => new ImageData(attachment.Name, attachment.Binary))
                 .ToArray();
 
             return new ()

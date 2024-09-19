@@ -2,6 +2,9 @@
 
 namespace DomainLayer.BusinessLogic.PDF
 {
+    /// <summary>
+    /// Provides functions relating to pdf exports
+    /// </summary>
     public class ExportService
     {
         /// <summary>
@@ -13,22 +16,16 @@ namespace DomainLayer.BusinessLogic.PDF
             QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
         }
 
-        public byte[] ExportAsPDF(TicketExportModel model)
+        /// <summary>
+        /// Export a ticket to pdf
+        /// </summary>
+        /// <param name="model">The ticket model to use for the document</param>
+        /// <returns>The generated pdf as binary</returns>
+        public byte[] Export(TicketExportModel model)
         {
             TicketExportDocument document = new (model);
 
             return Document.Create(document.Compose).GeneratePdf();
-        }
-
-        /// <summary>
-        /// Debug method
-        /// </summary>
-        /// <param name="model"></param>
-        public void Show(TicketExportModel model)
-        {
-            TicketExportDocument document = new(model);
-
-            Document.Create(document.Compose).GeneratePdfAndShow();
         }
     }
 }

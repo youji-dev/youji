@@ -44,10 +44,15 @@ namespace PersistenceLayer.DataAccess
         /// </summary>
         public DbSet<TicketComment> Comments { get; set; }
 
+        /// <summary>
+        /// Database set of the refresh token table.
+        /// </summary>
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         /// <inheritdoc/>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Addd the Postgres Extension for UUID generation
+            // Adds the Postgres Extension for UUID generation
             modelBuilder.HasPostgresExtension("uuid-ossp");
 
             modelBuilder.ApplyConfiguration(new BuildingConfiguration());
@@ -57,6 +62,7 @@ namespace PersistenceLayer.DataAccess
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketConfiguration());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

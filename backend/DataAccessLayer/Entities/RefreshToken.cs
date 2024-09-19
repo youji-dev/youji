@@ -19,7 +19,7 @@ namespace PersistenceLayer.DataAccess.Entities
         public required string Token { get; set; }
 
         /// <summary>
-        /// UserId the token belongs to
+        /// UserId that the token belongs to
         /// </summary>
         public required string UserId { get; set; }
 

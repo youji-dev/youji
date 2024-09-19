@@ -78,7 +78,7 @@ namespace Application.WebApi
                         ValidateAudience = false,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = "ticket-system_backend",
+                        ValidIssuer = "youji",
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSignKey)),
                     };
                 });

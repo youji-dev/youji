@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Common.Enums;
 using LdapForNet;
 using LdapForNet.Native;
 using Microsoft.EntityFrameworkCore;
@@ -26,7 +27,7 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// <returns>A short living JWT AccessToken</returns>
         public string CreateAccessToken(RoleAssignment roleAssignment)
         {
-            var jwtKey = configuration["JWTKey"] ?? throw new InvalidOperationException();
+            var jwtKey = configuration["JWTKey"] ?? throw new InvalidOperationException("JWT Key cant be empty");
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -37,7 +38,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                     new Claim("role", roleAssignment.Type.ToString()),
                 },
                 expires: DateTime.UtcNow.AddMinutes(15),
-                issuer: "ticket-system_backend",
+                issuer: "youji",
                 signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -52,10 +53,10 @@ namespace DomainLayer.BusinessLogic.Authentication
             var refreshToken = Guid.NewGuid().ToString();
             await refreshTokenRepository.AddAsync(new RefreshToken
             {
-                Id = default(Guid),
+                Id = default,
                 UserId = roleAssignment.UserId,
                 Token = refreshToken,
-                CreationDateTime = DateTime.Now.ToUniversalTime(),
+                CreationDateTime = DateTime.UtcNow,
             });
             return refreshToken;
         }
@@ -65,13 +66,14 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// </summary>
         /// <param name="token">Token to be verified</param>
         /// <returns><see cref="RoleAssignment"/> if valid</returns>
-        /// <exception cref="NotImplementedException">Thrown if provided refresh token is invalid</exception>
+        /// <exception cref="UnauthorizedAccessException">Thrown if provided refresh token is invalid</exception>
         public async Task<RoleAssignment> VerifyRefreshToken(string token)
         {
-            var sessionLifetime = int.Parse(configuration["SessionLifeTime"] ?? throw new InvalidOperationException());
+            var sessionLifetime = int.Parse(configuration["SessionLifeTime"] ??
+                                            throw new InvalidOperationException("SessionLifeTime cant be empty"));
 
             var refreshTokenEntry = await refreshTokenRepository.Find(x =>
-                    x.Token == token && x.CreationDateTime.ToLocalTime() >= DateTime.Now.AddMinutes(0 - sessionLifetime))
+                    x.Token == token && x.CreationDateTime.ToUniversalTime() >= DateTime.UtcNow.AddMinutes(0 - sessionLifetime))
                 .FirstOrDefaultAsync();
 
             if (refreshTokenEntry is null)
@@ -91,9 +93,9 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// create if the user logs in for the first time</returns>
         public async Task<RoleAssignment> LdapLogin(string username, string password)
         {
-            var host = configuration["LDAPHost"] ?? throw new InvalidOperationException();
-            var port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException());
-            var baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException();
+            var host = configuration["LDAPHost"] ?? throw new InvalidOperationException("LDAPHost");
+            var port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException("LDAPPort"));
+            var baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException("LDAPBaseDN");
 
             var connection = new LdapConnection();
 
@@ -129,7 +131,7 @@ namespace DomainLayer.BusinessLogic.Authentication
             var newAssignment = new RoleAssignment
             {
                 UserId = username.ToLowerInvariant(),
-                Type = 0,
+                Type = (int)Roles.Teacher,
             };
 
             await roleAssignmentRepository.AddAsync(newAssignment);

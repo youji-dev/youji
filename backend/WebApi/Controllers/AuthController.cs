@@ -19,8 +19,9 @@ namespace Application.WebApi.Controllers
         /// <param name="loginRequestDto">Credentials provided by user</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
         /// <returns>A token pair if authentication succeeds</returns>
-        [HttpPost]
-        [Route("login")]
+        [ProducesResponseType(type: typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(
             [FromBody] LoginRequestDto loginRequestDto,
             [FromServices] AuthenticationService authenticationService)
@@ -52,8 +53,9 @@ namespace Application.WebApi.Controllers
         /// <param name="refreshRequestDto">Refresh token provided by client</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
         /// <returns>A token pair if refresh token validation succeeds</returns>
-        [HttpPost]
-        [Route("refresh")]
+        [ProducesResponseType(type: typeof(LoginResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpPost("refresh")]
         public async Task<ActionResult<LoginResponseDto>> Refresh(
             [FromBody] RefreshRequestDto refreshRequestDto,
             [FromServices] AuthenticationService authenticationService)
@@ -81,9 +83,10 @@ namespace Application.WebApi.Controllers
         /// Route used to verify if the accessToken is valid
         /// </summary>
         /// <returns>20</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Authorize]
-        [HttpGet]
-        [Route("verify-token")]
+        [HttpGet("verify-token")]
         public ActionResult VerifyToken()
         {
             return this.NoContent();

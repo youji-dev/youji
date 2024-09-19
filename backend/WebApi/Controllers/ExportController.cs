@@ -21,7 +21,12 @@ namespace Application.WebApi.Controllers
             TicketExportModel model = TicketExportModel.FromTicket(ticket);
             byte[] pdf = exportService.ExportAsPDF(model);
 
-            return new FileContentResult(pdf, "application/pdf");
+            FileContentResult result = new (pdf, "application/octet-stream")
+            {
+                FileDownloadName = $"Export_{ticket.Title.Replace(" ", "-")}_{DateTime.Now:yyyy-MM-dd}_{DateTime.Now.Ticks}.pdf",
+            };
+
+            return result;
         }
     }
 }

@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.InteropServices.JavaScript;
 using System.Security.Claims;
 using System.Text;
 using LdapForNet;
@@ -27,7 +26,7 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// <returns>A short living JWT AccessToken</returns>
         public string CreateAccessToken(RoleAssignment roleAssignment)
         {
-            string jwtKey = configuration["JWTKey"] ?? throw new InvalidOperationException();
+            var jwtKey = configuration["JWTKey"] ?? throw new InvalidOperationException();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -38,6 +37,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                     new Claim("role", roleAssignment.Type.ToString()),
                 },
                 expires: DateTime.UtcNow.AddMinutes(15),
+                issuer: "ticket-system_backend",
                 signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -47,31 +47,39 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// </summary>
         /// <param name="roleAssignment">User and role that the RefreshToken will be generated for</param>
         /// <returns>A RefreshToken</returns>
-        public async string CreateRefreshToken(RoleAssignment roleAssignment)
+        public async Task<string> CreateRefreshToken(RoleAssignment roleAssignment)
         {
             var refreshToken = Guid.NewGuid().ToString();
             await refreshTokenRepository.AddAsync(new RefreshToken
             {
                 Id = default(Guid),
                 UserId = roleAssignment.UserId,
-                Type = roleAssignment.Type,
-                CreatedAt = DateTime.Now,
                 Token = refreshToken,
-                CreationDateTime = DateTime.Now
+                CreationDateTime = DateTime.Now.ToUniversalTime(),
             });
             return refreshToken;
-            throw new NotImplementedException();
         }
 
         /// <summary>
         /// Verify if a RefreshToken is valid
         /// </summary>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public string VerifyRefreshToken(string token)
+        /// <param name="token">Token to be verified</param>
+        /// <returns><see cref="RoleAssignment"/> if valid</returns>
+        /// <exception cref="NotImplementedException">Thrown if provided refresh token is invalid</exception>
+        public async Task<RoleAssignment> VerifyRefreshToken(string token)
         {
-            throw new NotImplementedException();
+            var sessionLifetime = int.Parse(configuration["SessionLifeTime"] ?? throw new InvalidOperationException());
+
+            var refreshTokenEntry = await refreshTokenRepository.Find(x =>
+                    x.Token == token && x.CreationDateTime.ToLocalTime() >= DateTime.Now.AddMinutes(0 - sessionLifetime))
+                .FirstOrDefaultAsync();
+
+            if (refreshTokenEntry is null)
+                throw new UnauthorizedAccessException("Invalid refresh token");
+
+            await refreshTokenRepository.DeleteAsync(refreshTokenEntry);
+
+            return await this.GetOrCreateRoleAssignment(refreshTokenEntry.UserId);
         }
 
         /// <summary>
@@ -83,9 +91,9 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// create if the user logs in for the first time</returns>
         public async Task<RoleAssignment> LdapLogin(string username, string password)
         {
-            string host = configuration["LDAPHost"] ?? throw new InvalidOperationException();
-            int port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException());
-            string baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException();
+            var host = configuration["LDAPHost"] ?? throw new InvalidOperationException();
+            var port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException());
+            var baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException();
 
             var connection = new LdapConnection();
 
@@ -97,17 +105,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                     $"CN={username},{baseDn}",
                     password);
 
-                var assignmentList = await roleAssignmentRepository.Find(x => x.UserId == username.ToLowerInvariant()).ToListAsync();
-                if (assignmentList.Count != 0)
-                    return assignmentList[0];
-
-                var roleAssignment = new RoleAssignment
-                {
-                    UserId = username.ToLowerInvariant(),
-                    Type = 0,
-                };
-                await roleAssignmentRepository.AddAsync(roleAssignment);
-                return roleAssignment;
+                return await this.GetOrCreateRoleAssignment(username.ToLowerInvariant());
             }
             catch (LdapException ex)
             {
@@ -117,6 +115,25 @@ namespace DomainLayer.BusinessLogic.Authentication
             {
                 connection.Dispose();
             }
+        }
+
+        private async Task<RoleAssignment> GetOrCreateRoleAssignment(string username)
+        {
+            var assignment = await roleAssignmentRepository
+                .Find(x => x.UserId.Equals(username))
+                .FirstOrDefaultAsync();
+
+            if (assignment is not null)
+                return assignment;
+
+            var newAssignment = new RoleAssignment
+            {
+                UserId = username.ToLowerInvariant(),
+                Type = 0,
+            };
+
+            await roleAssignmentRepository.AddAsync(newAssignment);
+            return newAssignment;
         }
     }
 }

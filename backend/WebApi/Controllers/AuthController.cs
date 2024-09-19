@@ -32,7 +32,7 @@ namespace Application.WebApi.Controllers
                     loginRequestDto.Password);
 
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
-                var refreshToken = authenticationService.CreateRefreshToken(roleAssignment);
+                var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
 
                 return this.Ok(new LoginResponseDto()
                 {
@@ -50,26 +50,43 @@ namespace Application.WebApi.Controllers
         /// Route used to refresh a session by exchanging a refresh token for a new token pair
         /// </summary>
         /// <param name="refreshRequestDto">Refresh token provided by client</param>
-        /// <returns></returns>
+        /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
+        /// <returns>A token pair if refresh token validation succeeds</returns>
         [HttpPost]
         [Route("refresh")]
-        public ActionResult Refresh(
-            [FromBody] RefreshRequestDto refreshRequestDto)
+        public async Task<ActionResult<LoginResponseDto>> Refresh(
+            [FromBody] RefreshRequestDto refreshRequestDto,
+            [FromServices] AuthenticationService authenticationService)
         {
-            return Ok();
+            try
+            {
+                RoleAssignment roleAssignment = await authenticationService.VerifyRefreshToken(refreshRequestDto.RefreshToken);
+
+                var accessToken = authenticationService.CreateAccessToken(roleAssignment);
+                var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
+
+                return this.Ok(new LoginResponseDto()
+                {
+                    AccessToken = accessToken,
+                    RefreshToken = refreshToken,
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return this.Unauthorized();
+            }
         }
 
         /// <summary>
         /// Route used to verify if the accessToken is valid
         /// </summary>
-        /// <returns></returns>
+        /// <returns>20</returns>
         [Authorize]
         [HttpGet]
         [Route("verify-token")]
         public ActionResult VerifyToken()
         {
-            // TODO: ADD AUTH
-            return Ok();
+            return this.NoContent();
         }
     }
 }

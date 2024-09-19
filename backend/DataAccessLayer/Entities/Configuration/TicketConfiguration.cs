@@ -15,6 +15,12 @@ namespace PersistenceLayer.DataAccess.Entities.Configuration
                 .HasColumnType("uuid")
                 .HasDefaultValueSql("uuid_generate_v4()")
                 .IsRequired();
+
+            builder.Navigation(x => x.Building).AutoInclude();
+            builder.Navigation(x => x.State).AutoInclude();
+            builder.Navigation(x => x.Priority).AutoInclude();
+            builder.Navigation(x => x.Attachments).AutoInclude();
+            builder.Navigation(x => x.Comments).AutoInclude();
         }
     }
 }

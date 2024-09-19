@@ -2,6 +2,9 @@
 
 namespace DomainLayer.BusinessLogic.PDF
 {
+    /// <summary>
+    /// Model for PDF export document
+    /// </summary>
     public record TicketExportModel
     {
         /// <inheritdoc cref="Ticket.Title"/>
@@ -39,10 +42,14 @@ namespace DomainLayer.BusinessLogic.PDF
         {
             var images = ticket.Attachments
                 .Where(attachment => ((string[])["webp", "png", "jpeg", "jfif"]).Contains(attachment.FileType))
-                .Select(attachment => new ImageData(attachment.Name, attachment.Binary))
+                .Select(attachment => new ImageData()
+                {
+                    FileName = attachment.Name,
+                    Data = attachment.Binary,
+                })
                 .ToArray();
 
-            return new ()
+            return new()
             {
                 Title = ticket.Title,
                 Description = ticket.Description,

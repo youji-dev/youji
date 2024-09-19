@@ -22,7 +22,7 @@ namespace DomainLayer.BusinessLogic.PDF
         private readonly int largeFont = 20;
 
         /// <inheritdoc/>
-        public DocumentMetadata GetMetadata() => new ()
+        public DocumentMetadata GetMetadata() => new()
         {
             Author = "youji export",
             Creator = "youji export",

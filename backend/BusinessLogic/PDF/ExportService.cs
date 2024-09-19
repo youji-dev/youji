@@ -23,7 +23,7 @@ namespace DomainLayer.BusinessLogic.PDF
         /// <returns>The generated pdf as binary</returns>
         public byte[] Export(TicketExportModel model)
         {
-            TicketExportDocument document = new (model);
+            TicketExportDocument document = new(model);
 
             return Document.Create(document.Compose).GeneratePdf();
         }

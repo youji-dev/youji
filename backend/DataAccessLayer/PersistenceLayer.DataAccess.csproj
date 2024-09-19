@@ -33,10 +33,5 @@
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Compile Remove="Migrations\20240918102422_Init.cs" />
-	  <Compile Remove="Migrations\20240918102422_Init.Designer.cs" />
-	</ItemGroup>
-
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PersistenceLayer.DataAccess.Entities;
+using PersistenceLayer.DataAccess.Entities.Configuration;
 
 namespace PersistenceLayer.DataAccess
 {
@@ -43,9 +44,21 @@ namespace PersistenceLayer.DataAccess
         /// </summary>
         public DbSet<TicketComment> Comments { get; set; }
 
-        /// <summary>
-        /// Database set of the refresh token table.
-        /// </summary>
-        public DbSet<RefreshToken> RefreshToken { get; set; }
+        /// <inheritdoc/>
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Addd the Postgres Extension for UUID generation
+            modelBuilder.HasPostgresExtension("uuid-ossp");
+
+            modelBuilder.ApplyConfiguration(new BuildingConfiguration());
+            modelBuilder.ApplyConfiguration(new PriorityConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleAssignmentConfiguration());
+            modelBuilder.ApplyConfiguration(new StateConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());
+            modelBuilder.ApplyConfiguration(new TicketConfiguration());
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

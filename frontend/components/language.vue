@@ -22,7 +22,6 @@
 const { locales } = useI18n();
 const router = useRouter();
 const i18n = useI18n();
-const localePath = useLocalePath();
 const switchLocalePath = useSwitchLocalePath();
 const colorMode = useColorMode();
 const { public: { TEXT_LIGHT, TEXT_DARK } } = useRuntimeConfig();

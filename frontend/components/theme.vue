@@ -21,21 +21,16 @@ import { Monitor, Moon, Sunny } from "@element-plus/icons-vue";
 
 const colorMode = useColorMode();
 const toggleTheme = () => {
-  document.documentElement.classList.add(
-    colorMode.value === "dark" ? "light" : "dark"
-  );
   document.documentElement.classList.remove(colorMode.value);
   if (colorMode.preference === "light") {
     colorMode.preference = "dark";
+    document.documentElement.classList.add("dark");
   } else if (colorMode.preference === "dark") {
     colorMode.preference = "system";
+    document.documentElement.classList.add(colorMode.value);
   } else if (colorMode.preference === "system") {
     colorMode.preference = "light";
-  }
-  if (colorMode.preference === "system") {
-    const prev = colorMode.value;
-    colorMode.preference = "dark" // Emit color mode changed event?
-    colorMode.preference= "system";
+    document.documentElement.classList.add("light");
   }
 };
 

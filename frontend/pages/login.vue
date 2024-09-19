@@ -56,6 +56,9 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  layout: "base"
+});
 import { Loading, Lock, User } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/stores/auth";

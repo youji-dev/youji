@@ -1,5 +1,4 @@
 <template>
-  <component :is="Sidebar"></component>
   <div>
     <!-- Route: /tickets/[ticketId] -->
     <!-- Page for detail view of a ticket -->

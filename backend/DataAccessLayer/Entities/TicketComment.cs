@@ -11,7 +11,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the comment.
         /// </summary>
         [Key]
-        public required Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// The author of the comment.

@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using Common.Helper;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -11,7 +13,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the attachment.
         /// </summary>
         [Key]
-        public required Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// The binaries of the attachment.

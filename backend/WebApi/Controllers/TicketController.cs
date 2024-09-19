@@ -12,18 +12,18 @@ namespace Application.WebApi.Controllers
     /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/></param>
     [Route("api/[controller]")]
     [ApiController]
-    public class TicketController(
-        TicketRepository ticketRepo,
-        TicketCommentRepository commentRepo,
-        TicketAttachmentRepository attachmentRepo) : Controller
+    public class TicketController : Controller
     {
         /// <summary>
         /// Gets a ticket by a specific ticket id.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="id">The specific ticket id.</param>
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet]
-        public async Task<ActionResult> Get(string id)
+        public async Task<ActionResult> Get(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] string id)
         {
             return this.Ok(await ticketRepo.GetAsync(new Guid(id)));
         }
@@ -31,12 +31,17 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Gets a ticket filtert by a specific search term.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
         /// <param name="skip">The count of skipped elements as a <see langword="int"/>.</param>
         /// <param name="take">The count of taken elements as a <see langword="int"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
-        public ActionResult Get(string searchTerm, int skip, int take)
+        public ActionResult Get(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] string searchTerm,
+            [FromBody] int skip,
+            [FromBody] int take)
         {
             var tickets = ticketRepo.GetAllAsync(tickets =>
                 tickets.Where(
@@ -65,14 +70,17 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Gets the comments of the ticket with the specific id.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketComment"/> from the specific <see cref="Ticket"/>.</returns>
         [HttpGet("comments")]
-        public async Task<ActionResult> GetComments(string ticketId)
+        public async Task<ActionResult> GetComments(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] string ticketId)
         {
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
-            TicketComment[]? ticketComments = ticket?.Comments;
+            ICollection<TicketComment>? ticketComments = ticket?.Comments;
 
             return this.Ok(ticketComments);
         }
@@ -80,14 +88,17 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Gets the attachments of the ticket with the specific id.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketAttachment"/> from the specific <see cref="Ticket"/>.</returns>
         [HttpGet("attachments")]
-        public async Task<ActionResult> GetAttachments(string ticketId)
+        public async Task<ActionResult> GetAttachments(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] string ticketId)
         {
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
-            TicketAttachment[]? ticketAttachments = ticket?.Attachments;
+            ICollection<TicketAttachment>? ticketAttachments = ticket?.Attachments;
 
             return this.Ok(ticketAttachments);
         }
@@ -95,10 +106,13 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Adds a new ticket entity.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="ticket">Instance of <see cref="Ticket"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added ticket entity.</returns>
         [HttpPost]
-        public async Task<ActionResult> Post(Ticket ticket)
+        public async Task<ActionResult> Post(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] Ticket ticket)
         {
             await ticketRepo.AddAsync(ticket);
 
@@ -108,11 +122,17 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Adds a new comment entity of a specific ticket.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
+        /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="comment">Instance of <see cref="TicketComment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("comment")]
-        public async Task<ActionResult> PostComment(string ticketId, TicketComment comment)
+        public async Task<ActionResult> PostComment(
+            [FromServices] TicketRepository ticketRepo,
+            [FromServices] TicketCommentRepository commentRepo,
+            string ticketId,
+            TicketComment comment)
         {
             await commentRepo.AddAsync(comment);
 
@@ -133,11 +153,17 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Adds a new attachment entity of a specific ticket.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
+        /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="attachment">Instance of <see cref="TicketAttachment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
         [HttpPost("attachment")]
-        public async Task<ActionResult> PostAttachment(string ticketId, TicketAttachment attachment)
+        public async Task<ActionResult> PostAttachment(
+            [FromServices] TicketRepository ticketRepo,
+            [FromServices] TicketAttachmentRepository attachmentRepo,
+            [FromBody] string ticketId,
+            [FromBody] TicketAttachment attachment)
         {
             await attachmentRepo.AddAsync(attachment);
 
@@ -158,10 +184,13 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Updates the specific ticket.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="ticket">Instance of <see cref="Ticket"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
-        public async Task<ActionResult> Put(Ticket ticket)
+        public async Task<ActionResult> Put(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] Ticket ticket)
         {
             await ticketRepo.UpdateAsync(ticket);
             return this.Ok(ticket);
@@ -170,10 +199,13 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Deletes the ticket with the specific id.
         /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="id">The specific id of the ticket that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
-        public async Task<ActionResult> Delete(string id)
+        public async Task<ActionResult> Delete(
+            [FromServices] TicketRepository ticketRepo,
+            [FromBody] string id)
         {
             var deleteTicket = await ticketRepo.GetAsync(new Guid(id));
 

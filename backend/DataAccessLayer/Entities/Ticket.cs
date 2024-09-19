@@ -11,7 +11,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the ticket.
         /// </summary>
         [Key]
-        public required Guid Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// The title of the ticket:
@@ -46,12 +46,12 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// An array of all comments on the ticket.
         /// </summary>
-        public TicketComment[]? Comments { get; set; }
+        public ICollection<TicketComment>? Comments { get; set; }
 
         /// <summary>
         /// An array of all attachements on the ticket.
         /// </summary>
-        public TicketAttachment[]? Attachments { get; set; }
+        public ICollection<TicketAttachment>? Attachments { get; set; }
 
         /// <summary>
         /// The building where the issue of the ticket was located.

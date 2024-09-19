@@ -10,14 +10,16 @@ namespace Application.WebApi.Controllers
     /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
     [Route("api/[controller]")]
     [ApiController]
-    public class RoleAssignmentController(RoleAssignmentRepository roleAssignmentRepo) : ControllerBase
+    public class RoleAssignmentController : ControllerBase
     {
         /// <summary>
         /// Gets all role assignments.
         /// </summary>
+        /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all role assignments.</returns>
         [HttpGet]
-        public ActionResult<RoleAssignment[]> Get()
+        public ActionResult<RoleAssignment[]> Get(
+            [FromServices] RoleAssignmentRepository roleAssignmentRepo)
         {
             return this.Ok(roleAssignmentRepo.GetAllAsync(roleAssignment => roleAssignment.Count() > 0));
         }
@@ -25,10 +27,13 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Adds a new role assignment entity.
         /// </summary>
+        /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
         /// <param name="roleAssignment">Instance of <see cref="RoleAssignment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added role assignment entity.</returns>
         [HttpPost]
-        public async Task<ActionResult<RoleAssignment[]>> Post(RoleAssignment roleAssignment)
+        public async Task<ActionResult<RoleAssignment[]>> Post(
+            [FromServices] RoleAssignmentRepository roleAssignmentRepo,
+            [FromBody] RoleAssignment roleAssignment)
         {
             await roleAssignmentRepo.AddAsync(roleAssignment);
             return this.Ok(roleAssignment);
@@ -37,10 +42,13 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Updates the specific role assignment.
         /// </summary>
+        /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
         /// <param name="id">Instance of <see cref="RoleAssignment"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated role assignment.</returns>
         [HttpDelete]
-        public async Task<ActionResult<RoleAssignment[]>> Delete(string id)
+        public async Task<ActionResult<RoleAssignment[]>> Delete(
+            [FromServices] RoleAssignmentRepository roleAssignmentRepo,
+            string id)
         {
             var deleteRoleAssignment = await roleAssignmentRepo.GetAsync(new Guid(id));
 

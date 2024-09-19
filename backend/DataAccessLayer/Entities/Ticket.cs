@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -46,12 +47,12 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// An array of all comments on the ticket.
         /// </summary>
-        public TicketComment[]? Comments { get; set; }
+        public Collection<TicketComment>? Comments { get; set; }
 
         /// <summary>
         /// An array of all attachements on the ticket.
         /// </summary>
-        public TicketAttachment[]? Attachments { get; set; }
+        public Collection<TicketAttachment>? Attachments { get; set; }
 
         /// <summary>
         /// The building where the issue of the ticket was located.

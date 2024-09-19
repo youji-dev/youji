@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Common.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 
@@ -112,8 +113,20 @@ namespace Application.WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult> Post(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] Ticket ticket)
+            [FromServices] StateRepository stateRepo,
+            [FromServices] PriorityRepository priorityRepo,
+            [FromBody] ITicket ticketData)
         {
+            Ticket ticket = new Ticket
+            {
+                Title = ticketData.Title,
+                Author = ticketData.Author,
+                CreationDate = ticketData.CreationDate,
+                State = await stateRepo.GetAsync(ticketData.StateId),
+                Description = ticketData.Description,
+                Priority = await priorityRepo.GetAllAsync(priorities => priorities.Where(priority => priority.Name == ticketData.PriorityName)),
+            };
+
             await ticketRepo.AddAsync(ticket);
 
             return this.Ok(ticket);

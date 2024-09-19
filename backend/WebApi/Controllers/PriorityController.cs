@@ -58,23 +58,23 @@ namespace Application.WebApi.Controllers
         /// Deletes the priority with the specific id.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="id">The specific id of the priority that will deleted.</param>
+        /// <param name="name">The specific id of the priority that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
         public async Task<ActionResult<Priority[]>> Delete(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] string id)
+            [FromBody] string name)
         {
-            var deletePriority = await priorityRepo.GetAsync(new Guid(id));
+            var deletePriority = await priorityRepo.GetAsync(name);
 
             if (deletePriority is null)
             {
-                return this.BadRequest($"Eine Priorität mit der ID '{id}' existiert nicht.");
+                return this.BadRequest($"Eine Priorität mit der ID '{name}' existiert nicht.");
             }
 
             await priorityRepo.DeleteAsync(deletePriority);
 
-            return this.Ok($"Die Priorität mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"Die Priorität mit der ID '{name}' wurde gelöscht.");
         }
     }
 }

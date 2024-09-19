@@ -41,8 +41,8 @@ namespace Application.WebApi.Controllers
         public ActionResult Get(
             [FromServices] TicketRepository ticketRepo,
             [FromBody] string searchTerm,
-            [FromBody] int skip,
-            [FromBody] int take)
+            [FromQuery] int skip,
+            [FromQuery] int take)
         {
             var tickets = ticketRepo.GetAllAsync(tickets =>
                 tickets.Where(
@@ -56,8 +56,7 @@ namespace Application.WebApi.Controllers
                     || ticket.CreationDate.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
                     || ticket.State.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .Skip(skip)
-                .Take(take)
-                .Count() > 0)
+                .Take(take) != null)
                 .First();
 
             if (tickets is null)
@@ -108,23 +107,34 @@ namespace Application.WebApi.Controllers
         /// Adds a new ticket entity.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="ticket">Instance of <see cref="Ticket"/></param>
+        /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
+        /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
+        /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
+        /// <param name="ticketData">Instance of <see cref="TicketDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added ticket entity.</returns>
         [HttpPost]
         public async Task<ActionResult> Post(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] ITicket ticketData)
+            [FromServices] BuildingRepository buildingRepo,
+            [FromBody] TicketDTO ticketData)
         {
-            Ticket ticket = new Ticket
+            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var building = await buildingRepo.GetAsync(ticketData.BuildingId);
+            var priorityName = await priorityRepo.GetAsync(ticketData.PriorityName);
+
+            Ticket ticket = new ()
             {
                 Title = ticketData.Title,
                 Author = ticketData.Author,
                 CreationDate = ticketData.CreationDate,
-                State = await stateRepo.GetAsync(ticketData.StateId),
+                State = state,
                 Description = ticketData.Description,
-                Priority = await priorityRepo.GetAllAsync(priorities => priorities.Where(priority => priority.Name == ticketData.PriorityName)),
+                Priority = priorityName,
+                Building = building,
+                Object = ticketData.Object,
+                Room = ticketData.Room,
             };
 
             await ticketRepo.AddAsync(ticket);
@@ -144,8 +154,8 @@ namespace Application.WebApi.Controllers
         public async Task<ActionResult> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
-            string ticketId,
-            TicketComment comment)
+            [FromQuery] string ticketId,
+            [FromBody] TicketComment comment)
         {
             await commentRepo.AddAsync(comment);
 
@@ -175,7 +185,7 @@ namespace Application.WebApi.Controllers
         public async Task<ActionResult> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
-            [FromBody] string ticketId,
+            [FromQuery] string ticketId,
             [FromBody] TicketAttachment attachment)
         {
             await attachmentRepo.AddAsync(attachment);

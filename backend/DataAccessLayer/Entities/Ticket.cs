@@ -41,7 +41,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The state of the ticket.
         /// </summary>
-        public required State State { get; set; }
+        public State? State { get; set; }
 
         /// <summary>
         /// An array of all comments on the ticket.

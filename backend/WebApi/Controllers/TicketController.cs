@@ -21,10 +21,10 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="id">The specific ticket id.</param>
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
-        [HttpGet]
+        [HttpGet("{id}")]
         public async Task<ActionResult> Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] string id)
+            [FromRoute] string id)
         {
             return this.Ok(await ticketRepo.GetAsync(new Guid(id)));
         }
@@ -40,24 +40,24 @@ namespace Application.WebApi.Controllers
         [HttpGet("search")]
         public ActionResult Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] string searchTerm,
+            [FromBody] string[] searchTerm,
             [FromQuery] int skip,
             [FromQuery] int take)
         {
             var tickets = ticketRepo.GetAllAsync(tickets =>
                 tickets.Where(
                     ticket =>
-                    (ticket.Description != null && ticket.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                    || (ticket.Building != null && ticket.Building.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                    || (ticket.Room != null && ticket.Room.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                    || (ticket.Priority != null && ticket.Priority.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                    || ticket.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                    || ticket.Author.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                    || ticket.CreationDate.ToString().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-                    || ticket.State.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    ((ticket.Description != null) && searchTerm.Any(term => ticket.Description.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    || ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    || ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    || ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    || searchTerm.Any(term => ticket.Title.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    || searchTerm.Any(term => ticket.Author.Contains(term, StringComparison.OrdinalIgnoreCase))
+                    || searchTerm.Any(term => ticket.CreationDate.ToString().Contains(term, StringComparison.OrdinalIgnoreCase))
+                    || searchTerm.Any(term => ticket.State.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
                 .Skip(skip)
                 .Take(take) != null)
-                .First();
+                .Single();
 
             if (tickets is null)
             {
@@ -73,10 +73,10 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketComment"/> from the specific <see cref="Ticket"/>.</returns>
-        [HttpGet("comments")]
+        [HttpGet("{ticketId}/comments")]
         public async Task<ActionResult> GetComments(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] string ticketId)
+            [FromRoute] string ticketId)
         {
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
@@ -91,10 +91,10 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketAttachment"/> from the specific <see cref="Ticket"/>.</returns>
-        [HttpGet("attachments")]
+        [HttpGet("{ticketId}/attachments")]
         public async Task<ActionResult> GetAttachments(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] string ticketId)
+            [FromRoute] string ticketId)
         {
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
@@ -122,7 +122,7 @@ namespace Application.WebApi.Controllers
         {
             var state = await stateRepo.GetAsync(ticketData.StateId);
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
-            var priorityName = await priorityRepo.GetAsync(ticketData.PriorityName);
+            var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
             Ticket ticket = new ()
             {
@@ -131,7 +131,7 @@ namespace Application.WebApi.Controllers
                 CreationDate = ticketData.CreationDate,
                 State = state,
                 Description = ticketData.Description,
-                Priority = priorityName,
+                Priority = priority,
                 Building = building,
                 Object = ticketData.Object,
                 Room = ticketData.Room,
@@ -150,11 +150,11 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="comment">Instance of <see cref="TicketComment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
-        [HttpPost("comment")]
+        [HttpPost("{ticketId}/comment")]
         public async Task<ActionResult> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
-            [FromQuery] string ticketId,
+            [FromRoute] string ticketId,
             [FromBody] TicketComment comment)
         {
             await commentRepo.AddAsync(comment);
@@ -181,11 +181,11 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="attachment">Instance of <see cref="TicketAttachment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
-        [HttpPost("attachment")]
+        [HttpPost("{ticketId}/attachment")]
         public async Task<ActionResult> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
-            [FromQuery] string ticketId,
+            [FromRoute] string ticketId,
             [FromBody] TicketAttachment attachment)
         {
             await attachmentRepo.AddAsync(attachment);
@@ -208,14 +208,38 @@ namespace Application.WebApi.Controllers
         /// Updates the specific ticket.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="ticket">Instance of <see cref="Ticket"/>.</param>
+        /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
+        /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
+        /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
+        /// <param name="ticketData">Instance of <see cref="TicketDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         public async Task<ActionResult> Put(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] Ticket ticket)
+            [FromServices] StateRepository stateRepo,
+            [FromServices] PriorityRepository priorityRepo,
+            [FromServices] BuildingRepository buildingRepo,
+            [FromBody] TicketDTO ticketData)
         {
+            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var building = await buildingRepo.GetAsync(ticketData.BuildingId);
+            var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
+
+            Ticket ticket = new ()
+            {
+                Title = ticketData.Title,
+                Author = ticketData.Author,
+                CreationDate = ticketData.CreationDate,
+                State = state,
+                Description = ticketData.Description,
+                Priority = priority,
+                Building = building,
+                Object = ticketData.Object,
+                Room = ticketData.Room,
+            };
+
             await ticketRepo.UpdateAsync(ticket);
+
             return this.Ok(ticket);
         }
 
@@ -223,14 +247,14 @@ namespace Application.WebApi.Controllers
         /// Deletes the ticket with the specific id.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="id">The specific id of the ticket that will deleted.</param>
+        /// <param name="ticketId">The specific id of the ticket that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete]
+        [HttpDelete("{ticketId}")]
         public async Task<ActionResult> Delete(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] string id)
+            [FromRoute] string ticketId)
         {
-            var deleteTicket = await ticketRepo.GetAsync(new Guid(id));
+            var deleteTicket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (deleteTicket is null)
             {
@@ -239,7 +263,7 @@ namespace Application.WebApi.Controllers
 
             await ticketRepo.DeleteAsync(deleteTicket);
 
-            return this.Ok($"Das Ticket mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"Das Ticket mit der ID '{ticketId}' wurde gelöscht.");
         }
     }
 }

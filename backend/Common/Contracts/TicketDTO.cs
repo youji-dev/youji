@@ -15,7 +15,7 @@
         /// <summary>
         /// The priority of the ticket
         /// </summary>
-        public required string PriorityName { get; set; }
+        public required int PriorityValue { get; set; }
 
         /// <summary>
         /// The author of the ticket.

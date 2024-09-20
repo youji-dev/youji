@@ -8,14 +8,14 @@ namespace PersistenceLayer.DataAccess.Entities
     public class Priority
     {
         /// <summary>
-        /// The name of the priority.
-        /// </summary>
-        [Key]
-        public required string Name { get; set; }
-
-        /// <summary>
         /// The value of the priority.
         /// </summary>
+        [Key]
         public required int Value { get; set; }
+
+        /// <summary>
+        /// The name of the priority.
+        /// </summary>
+        public required string Name { get; set; }
     }
 }

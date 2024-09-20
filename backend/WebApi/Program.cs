@@ -14,9 +14,9 @@ builder.Services.AddSwaggerConfiguration();
 builder.Services.AddInfrastructure(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 
-builder.Services.AddLogicServices(builder.Configuration);
-
 builder.Services.AddRepositories();
+
+builder.Services.AddLogicServices(builder.Configuration);
 
 builder.Services.AddAuthenticationConfiguration(builder.Configuration);
 

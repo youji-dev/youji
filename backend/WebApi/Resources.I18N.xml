@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<I18N>
+	<Entry>
+		<Key>Affected object</Key>
+		<Value lang="en">Affected object</Value>
+		<Value lang="de">Betroffenes Objekt</Value>
+	</Entry>
+	<Entry>
+		<Key>Building</Key>
+		<Value lang="en">Building</Value>
+		<Value lang="de">Gebäude</Value>
+	</Entry>
+	<Entry>
+		<Key>Room</Key>
+		<Value lang="en">Room</Value>
+		<Value lang="de">Raum</Value>
+	</Entry>
+	<Entry>
+		<Key>Reported by</Key>
+		<Value lang="en">Reported by</Value>
+		<Value lang="de">Gemeldet von</Value>
+	</Entry>
+	<Entry>
+		<Key>Reported on</Key>
+		<Value lang="en">Reported on</Value>
+		<Value lang="de">Gemeldet am</Value>
+	</Entry>
+</I18N>

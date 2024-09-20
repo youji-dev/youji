@@ -1,9 +1,9 @@
-﻿using System.Text;
+using DomainLayer.BusinessLogic.PDF;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PersistenceLayer.DataAccess.Repositories;
-using AuthenticationService = DomainLayer.BusinessLogic.Authentication.AuthenticationService;
+using DomainLayer.BusinessLogic.Authentication;
 
 namespace Application.WebApi
 {
@@ -53,10 +53,8 @@ namespace Application.WebApi
         /// <param name="configurationManager">Instance of <see cref="ConfigurationManager"/>.</param>
         public static void AddLogicServices(this IServiceCollection services, ConfigurationManager configurationManager)
         {
+            services.AddScoped<ExportService>();
             services.AddScoped<AuthenticationService>();
-
-            services.AddScoped<RefreshTokenRepository>();
-            services.AddScoped<RoleAssignmentRepository>();
         }
 
         /// <summary>

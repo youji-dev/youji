@@ -47,12 +47,12 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// An array of all comments on the ticket.
         /// </summary>
-        public Collection<TicketComment>? Comments { get; set; }
+        public Collection<TicketComment> Comments { get; set; } = [];
 
         /// <summary>
         /// An array of all attachements on the ticket.
         /// </summary>
-        public Collection<TicketAttachment>? Attachments { get; set; }
+        public Collection<TicketAttachment> Attachments { get; set; } = [];
 
         /// <summary>
         /// The building where the issue of the ticket was located.

@@ -28,7 +28,6 @@ namespace DomainLayer.BusinessLogic.PDF
             Creator = "youji export",
             Producer = "youji export",
             Title = this.model.Title,
-            Subject = this.model.Title,
         };
 
         /// <inheritdoc/>

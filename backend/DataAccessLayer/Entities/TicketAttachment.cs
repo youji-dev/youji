@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace PersistenceLayer.DataAccess.Entities
@@ -12,7 +13,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the attachment.
         /// </summary>
         [Key]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         /// <summary>
         /// The binaries of the attachment.
@@ -28,5 +29,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The file type of the attachment.
         /// </summary>
         public required string FileType { get; set; }
+
+        public required Guid TicketId { get; set; }
     }
 }

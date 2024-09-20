@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -11,7 +12,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the comment.
         /// </summary>
         [Key]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         /// <summary>
         /// The author of the comment.
@@ -27,5 +28,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The date and time when the comment was created.
         /// </summary>
         public required DateTime CreationDate { get; set; }
+
+        public required Guid TicketId { get; set; }
     }
 }

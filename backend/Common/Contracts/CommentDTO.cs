@@ -1,5 +1,8 @@
 ﻿namespace Common.Contracts
 {
+    /// <summary>
+    /// Represents a comment data transfer object.
+    /// </summary>
     public class CommentDTO
     {
         /// <summary>
@@ -16,10 +19,5 @@
         /// The date and time when the comment was created.
         /// </summary>
         public required DateTime CreationDate { get; set; }
-
-        /// <summary>
-        /// The ticket id where the comment will binded
-        /// </summary>
-        public required Guid TicketId { get; set; }
     }
 }

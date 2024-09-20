@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -11,7 +13,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the ticket.
         /// </summary>
         [Key]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
 
         /// <summary>
         /// The title of the ticket:
@@ -26,6 +28,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The priority of the ticket
         /// </summary>
+        [DeleteBehavior(DeleteBehavior.SetNull)]
         public Priority? Priority { get; set; }
 
         /// <summary>
@@ -41,21 +44,25 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The state of the ticket.
         /// </summary>
-        public State? State { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public required State State { get; set; }
 
         /// <summary>
         /// An array of all comments on the ticket.
         /// </summary>
-        public ICollection<TicketComment>? Comments { get; set; }
+        [DeleteBehavior(DeleteBehavior.ClientCascade)]
+        public Collection<TicketComment>? Comments { get; set; }
 
         /// <summary>
         /// An array of all attachements on the ticket.
         /// </summary>
-        public ICollection<TicketAttachment>? Attachments { get; set; }
+        [DeleteBehavior(DeleteBehavior.ClientCascade)]
+        public Collection<TicketAttachment>? Attachments { get; set; }
 
         /// <summary>
         /// The building where the issue of the ticket was located.
         /// </summary>
+        [DeleteBehavior(DeleteBehavior.SetNull)]
         public Building? Building { get; set; }
 
         /// <summary>

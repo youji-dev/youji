@@ -1,9 +1,12 @@
 ﻿namespace Common.Contracts
 {
+    /// <summary>
+    /// Represents a ticket data transfer object.
+    /// </summary>
     public class TicketDTO
     {
         /// <summary>
-        /// The title of the ticket:
+        /// The title of the ticket.
         /// </summary>
         public required string Title { get; set; }
 

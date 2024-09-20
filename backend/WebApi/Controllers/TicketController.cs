@@ -148,7 +148,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="commentData">Instance of <see cref="TicketComment"/></param>
+        /// <param name="commentData">Instance of <see cref="CommentDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
         public async Task<ActionResult> PostComment(
@@ -157,25 +157,26 @@ namespace Application.WebApi.Controllers
             [FromRoute] string ticketId,
             [FromBody] CommentDTO commentData)
         {
-            TicketComment comment = new ()
-            {
-                Author = commentData.Author,
-                Content = commentData.Content,
-                CreationDate = commentData.CreationDate,
-            };
-
-            await commentRepo.AddAsync(comment);
-
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (ticket is null)
             {
                 return this.NotFound();
-            }
+            };
 
-            ticket.Comments?.Add(comment);
+            TicketComment comment = new ()
+            {
+                Author = commentData.Author,
+                Content = commentData.Content,
+                CreationDate = commentData.CreationDate,
+                TicketId = new Guid(ticketId),
+            };
 
-            await ticketRepo.UpdateAsync(ticket);
+            await commentRepo.AddAsync(comment);
+
+            //ticket.Comments?.Add(comment);
+
+            //await ticketRepo.UpdateAsync(ticket);
 
             return this.Ok(comment);
         }
@@ -186,27 +187,38 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="attachment">Instance of <see cref="TicketAttachment"/></param>
+        /// <param name="attachmentFile">Instance of <see cref="IFormFile"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
         [HttpPost("{ticketId}/attachment")]
         public async Task<ActionResult> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromRoute] string ticketId,
-            [FromBody] TicketAttachment attachment)
+            IFormFile attachmentFile)
         {
-            await attachmentRepo.AddAsync(attachment);
-
-            Ticket? ticket = ticketRepo.GetAsync(new Guid(ticketId)).Result;
+            Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (ticket is null)
             {
                 return this.NotFound();
-            }
+            };
 
-            ticket.Attachments = [.. ticket.Attachments, attachment];
+            using MemoryStream stream = new ();
+            await attachmentFile.CopyToAsync(stream);
 
-            await ticketRepo.UpdateAsync(ticket);
+            TicketAttachment attachment = new ()
+            {
+                Name = attachmentFile.FileName,
+                Binary = stream.ToArray(),
+                FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
+                TicketId = new Guid(ticketId),
+            };
+
+            await attachmentRepo.AddAsync(attachment);
+
+            //ticket.Attachments?.Add(attachment);
+
+            //await ticketRepo.UpdateAsync(ticket);
 
             return this.Ok(attachment);
         }

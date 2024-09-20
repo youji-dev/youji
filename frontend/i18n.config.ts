@@ -47,6 +47,15 @@ export default defineI18nConfig(() => ({
             tickets: "Tickets",
             searchVerb: "Search",
             title: "Title",
+            status: "Status",
+            user: "User",
+            building: "Building",
+            room: "Room",
+            priority: "Priority",
+            priority_1: "High",
+            priority_2: "Normal",
+            priority_3: "Low",
+            createDate: "Create date",
         },
         de: {
             welcome: "Willkommen",
@@ -93,6 +102,15 @@ export default defineI18nConfig(() => ({
             tickets: "Tickets",
             searchVerb: "Suchen",
             title: "Titel",
+            status: "Status",
+            user: "Benutzer",
+            building: "Gebäude",
+            room: "Raum",
+            priority: "Priorität",
+            priority_1: "Hoch",
+            priority_2: "Normal",
+            priority_3: "Niedrig",
+            createDate: "Erstellungsdatum",
         }
     }
 }))

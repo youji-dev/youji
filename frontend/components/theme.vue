@@ -1,19 +1,10 @@
 <template>
-  <el-popover
-    placement="top-start"
-    :title="$t('colorMode')"
-    :width="200"
-    trigger="hover"
-    :content="$t(colorMode.preference)"
-  >
-    <template #reference>
       <el-button
         @click="toggleTheme"
         circle
+        type="primary"
         :icon="determineIcon()"
       ></el-button>
-    </template>
-  </el-popover>
 </template>
 
 <script lang="ts" setup>

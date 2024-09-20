@@ -1,13 +1,12 @@
 <template>
     <div class="page-bg-light dark:page-bg-dark w-full min-h-[100vh] max-h-full flex">
-      <div class="fixed right-5 bottom-5">
+      <div class="fixed right-5 bottom-5 z-50">
         <Theme />
         <Language />
       </div>
       <Sidebar />
       <SidebarMobile />
       <slot />
-      <div class="fixed right-5 bottom-5"></div>
     </div>
   </template>
   

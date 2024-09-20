@@ -1,7 +1,7 @@
 <template>
   <div class="page-bg-light dark:page-bg-dark">
     <!-- This file will be used as default layout on every page. It is typically used for backgrounds, navbars, ... -->
-    <div class="fixed right-5 bottom-5">
+    <div class="fixed right-5 bottom-5 z-50">
       <Theme/>
       <Language/>
     </div>

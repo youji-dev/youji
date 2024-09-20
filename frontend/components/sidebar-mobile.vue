@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute px-6 py-3 left-0 top-0 h-full w-full bg-transparent block md:hidden"
+    class="absolute px-6 py-3 left-0 top-0 h-full w-full bg-transparent block md:hidden z-10"
     :class="{ 'max-h-fit': !drawer }"
   >
     <div class="flex items-center justify-between w-full">
@@ -16,11 +16,11 @@
       v-model="drawer"
       :title="$t('navigation')"
       :direction="'ltr'"
-      style="min-width: 60%"
+      style="min-width: 60%; max-height: 100vh"
     >
       <template #header="{}" style="margin-bottom: 0"> </template>
-
-      <el-menu default-active="2" class="el-menu-vertical-demo">
+      <template #body style="overflow-y: hidden"></template>
+      <el-menu default-active="2" class="el-menu-vertical-demo pt-5" style="height: calc(100vh - 120px)">
         <div>
           <el-menu-item index="2">
             <el-icon>

@@ -30,9 +30,9 @@ namespace PersistenceLayer.DataAccess.Repositories
         /// </summary>
         /// <param name="expression">Instance of <see cref="Expression"/></param>
         /// <returns>The entitis matches the expression.</returns>
-        public async virtual Task<TEntity?> FindAsync(Expression<Func<TEntity, bool>> expression)
+        public virtual IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
         {
-            return await this.Context.Set<TEntity>().FindAsync(expression);
+            return this.Context.Set<TEntity>().Where(expression);
         }
 
         /// <summary>

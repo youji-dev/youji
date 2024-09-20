@@ -1,4 +1,5 @@
-﻿using QuestPDF.Fluent;
+﻿using I18N.DotNet;
+using QuestPDF.Fluent;
 
 namespace DomainLayer.BusinessLogic.PDF
 {
@@ -20,10 +21,11 @@ namespace DomainLayer.BusinessLogic.PDF
         /// Export a ticket to pdf
         /// </summary>
         /// <param name="model">The ticket model to use for the document</param>
+        /// <param name="localizer">The localizer to use for the export; if omitted default values are used</param>
         /// <returns>The generated pdf as binary</returns>
-        public byte[] Export(TicketExportModel model)
+        public byte[] Export(TicketExportModel model, Localizer? localizer = null)
         {
-            TicketExportDocument document = new(model);
+            TicketExportDocument document = new(model, localizer);
 
             return Document.Create(document.Compose).GeneratePdf();
         }

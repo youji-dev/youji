@@ -1,4 +1,5 @@
-﻿using QuestPDF.Fluent;
+﻿using I18N.DotNet;
+using QuestPDF.Fluent;
 using QuestPDF.Infrastructure;
 
 namespace DomainLayer.BusinessLogic.PDF
@@ -6,10 +7,10 @@ namespace DomainLayer.BusinessLogic.PDF
     /// <summary>
     /// QuestPDF document template for ticket export
     /// </summary>
-    /// <param name="ticketExportModel">The model to use</param>
-    public class TicketExportDocument(TicketExportModel ticketExportModel) : IDocument
+    public class TicketExportDocument : IDocument
     {
-        private readonly TicketExportModel model = ticketExportModel;
+        private readonly TicketExportModel model;
+        private readonly Dictionary<string, string> localizationTable;
 
         private readonly int pagePadding = 10;
         private readonly int horizontalPadding = 20;
@@ -20,6 +21,24 @@ namespace DomainLayer.BusinessLogic.PDF
 
         private readonly int smallFont = 10;
         private readonly int largeFont = 20;
+
+        /// <summary>
+        /// Initializes new instance of <see cref="TicketExportDocument"/>
+        /// </summary>
+        /// <param name="ticketExportModel">The model to use</param>
+        /// <param name="localizer">The localizer to use; if omitted default values are used</param>
+        public TicketExportDocument(TicketExportModel ticketExportModel, Localizer? localizer = null)
+        {
+            this.model = ticketExportModel;
+            this.localizationTable = new()
+            {
+                { "Affected object", localizer?.Localize("Affected object") ?? "Affected object" },
+                { "Building", localizer?.Localize("Building") ?? "Building" },
+                { "Room", localizer?.Localize("Room") ?? "Room" },
+                { "Reported by", localizer?.Localize("Reported by") ?? "Reported by" },
+                { "Reported on", localizer?.Localize("Reported on") ?? "Reported on" },
+            };
+        }
 
         /// <inheritdoc/>
         public DocumentMetadata GetMetadata() => new()
@@ -84,7 +103,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     row.Spacing(this.itemSpacing);
 
-                    row.RelativeItem().Text("Betroffenes Objekt: ");
+                    row.RelativeItem().Text($"{this.localizationTable["Affected object"]}: ");
                     row.AutoItem().Text(this.model.Object ?? "-")
                         .AlignRight();
                 });
@@ -93,7 +112,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text("Gebäude: ");
+                    innerRow.RelativeItem().Text($"{this.localizationTable["Building"]}: ");
                     innerRow.AutoItem().Text(this.model.Building ?? "-")
                         .AlignRight();
                 });
@@ -102,7 +121,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text("Raum: ");
+                    innerRow.RelativeItem().Text($"{this.localizationTable["Room"]}: ");
                     innerRow.AutoItem().Text(this.model.Room ?? "-")
                         .AlignRight();
                 });
@@ -111,7 +130,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text("Gemeldet durch: ");
+                    innerRow.RelativeItem().Text($"{this.localizationTable["Reported by"]}: ");
                     innerRow.AutoItem().Text(this.model.Author)
                         .AlignRight();
                 });
@@ -120,7 +139,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem(10).Text("Gemeldet am: ");
+                    innerRow.RelativeItem(10).Text($"{this.localizationTable["Reported on"]}: ");
                     innerRow.AutoItem().Text(this.model.CreationDate.ToShortDateString())
                         .AlignRight();
                 });

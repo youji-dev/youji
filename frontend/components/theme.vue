@@ -1,4 +1,4 @@
-<template class="z-50">
+<template>
   <el-popover
     placement="top-start"
     :title="$t('colorMode')"

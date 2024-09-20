@@ -6,12 +6,4 @@
 </template>
 
 <script lang="ts" setup>
-import Sidebar from '~/components/sidebar.vue';
-
-definePageMeta({
-    middleware: "auth",
-    layout: "authenticated"
-})
 </script>
-
-<style></style>

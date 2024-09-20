@@ -45,6 +45,8 @@ export default defineI18nConfig(() => ({
             logout: "Logout",
             settings: "Settings",
             tickets: "Tickets",
+            searchVerb: "Search",
+            title: "Title",
         },
         de: {
             welcome: "Willkommen",
@@ -83,12 +85,14 @@ export default defineI18nConfig(() => ({
             light: "Hell",
             system: "System",
             serverError: "Serverfehler",
-            createTicket: "Ticket erstellen",
+            createTicket: "Neues Ticket",
             ticketOverview: "Ticketübersicht",
             navigation: "Navigation",
             logout: "Abmelden",
             settings: "Einstellungen",
             tickets: "Tickets",
+            searchVerb: "Suchen",
+            title: "Titel",
         }
     }
 }))

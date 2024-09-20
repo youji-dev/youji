@@ -10,7 +10,7 @@
       class="w-full md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark"
     >
       <el-divider content-position="left" border-style="dashed">
-        <el-text class="" size="large" type="">{{ $t("ticketSystem") }}</el-text>
+        <el-text size="large">{{ $t("ticketSystem") }}</el-text>
       </el-divider>
       <el-form-item class="w-full px-10 mt-3">
         <el-input
@@ -66,8 +66,6 @@ const { authenticateUser } = useAuthStore();
 const { authenticated, authErrors } = storeToRefs(useAuthStore());
 const i18n = useI18n();
 import { ElNotification } from "element-plus";
-import Sidebar from "~/components/sidebar.vue";
-import SidebarMobile from "~/components/sidebar-mobile.vue";
 
 let form = ref({
   username: "",

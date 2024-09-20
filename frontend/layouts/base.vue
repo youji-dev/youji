@@ -1,11 +1,11 @@
 <template>
   <div class="page-bg-light dark:page-bg-dark">
     <!-- This file will be used as default layout on every page. It is typically used for backgrounds, navbars, ... -->
-    <slot />
     <div class="fixed right-5 bottom-5">
-      <component :is="Theme"></component>
-      <component :is="Language"></component>
+      <Theme/>
+      <Language/>
     </div>
+    <slot />
   </div>
 </template>
 

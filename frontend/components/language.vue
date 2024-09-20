@@ -1,4 +1,4 @@
-<template class="z-50">
+<template>
   <el-popover placement="top" :width="100" trigger="click">
     <div v-for="availLocale in availableLocales" @click="switchLocale(availLocale.code)"
       class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">
@@ -21,7 +21,6 @@
 <script lang="ts" setup>
 const { locales } = useI18n();
 const router = useRouter();
-const i18n = useI18n();
 const switchLocalePath = useSwitchLocalePath();
 const colorMode = useColorMode();
 const { public: { TEXT_LIGHT, TEXT_DARK } } = useRuntimeConfig();
@@ -32,10 +31,6 @@ const availableLocales = computed(() => {
 const switchLocale = (localeKey: string) => {
   console.log(localeKey)
   router.push(switchLocalePath(localeKey));
-  ElMessage({
-    type:"success",
-    message: i18n.t("localeSwitched")
-  })
 };
 </script>
 

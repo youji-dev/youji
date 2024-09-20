@@ -11,6 +11,7 @@ export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
     name: "" as any,
+    role: 0 as number,
     loading: false,
     csrfToken: "" as any,
     authErrors: [] as Array<string>,
@@ -18,87 +19,132 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {
       const {
-        public: { BACKEND_URL, AUTH_TOKEN_NAME },
+        public: { BACKEND_URL, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const { $locally } = useNuxtApp();
+
       this.authErrors = [];
-      const { data, pending, error }: any = await useFetch(
-        BACKEND_URL + "/api/login",
-        {
-          body: {
-            name: name,
-            password: password,
-          },
-          method: "post",
-          headers: { "Content-Type": "application/json" },
+
+      try {
+        const { data, pending, error }: any = await useFetch(
+          `${BACKEND_URL}/Auth/login`,
+          {
+            body: {
+              username: name,
+              password,
+            },
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        this.loading = pending;
+
+        if (error.value) {
+          console.error(error.value);
+          this.authErrors.push(error.value);
+          return;
         }
-      );
-      this.loading = pending;
-      if (error.value) {
-        console.log(error.value);
-        this.authErrors.push(error.value);
-        console.log(error.value);
-      }
-      if (data.value) {
-        if (data.value.allowed) {
-          const token = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
-          token.value = data?.value?.token;
-          this.authenticated = true;
-          this.name = name;
-          $locally.setItem("username", name);
+
+        if (!data.value) {
+          console.error("missing data");
+          this.authErrors.push("missing data");
+          return;
         }
+
+        const accessToken = useCookie(ACCESS_TOKEN_NAME, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        });
+
+        const refreshToken = useCookie(REFRESH_TOKEN_NAME, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        });
+
+        accessToken.value = data.value.accessToken;
+        refreshToken.value = data.value.refreshToken;
+
+        this.authenticated = true;
+      } catch (error) {
+        console.error(error);
       }
     },
-    async logUserOut() {
+    async refreshAccessToken() {
       const {
-        public: { BACKEND_URL, AUTH_TOKEN_NAME },
+        public: { BACKEND_URL, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME },
       } = useRuntimeConfig();
-      const token = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
-      this.authenticated = false;
-      const { data, error }: any = await useFetch(BACKEND_URL + "/api/logout", {
-        method: "get",
-        headers: {
-          Authorization: "Bearer " + token.value,
-          "Content-Type": "application/json",
-        },
-      });
-      if (error) {
-        console.log(error);
+
+      try {
+        const accessToken = useCookie(ACCESS_TOKEN_NAME, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        });
+
+        const refreshToken = useCookie(REFRESH_TOKEN_NAME, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        });
+
+        const { data, pending, error }: any = await useFetch(
+          `${BACKEND_URL}/Auth/refresh`,
+          {
+            body: {
+              refreshToken: refreshToken.value,
+            },
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        this.loading = pending;
+
+        if (error.value) {
+          console.error(error.value);
+          this.authErrors.push(error.value);
+          this.authenticated = false;
+          return;
+        }
+
+        if (!data.value) {
+          console.error("missing data");
+          this.authErrors.push("missing data");
+          this.authenticated = false;
+          return;
+        }
+
+
+        accessToken.value = data.value.accessToken;
+        refreshToken.value = data.value.refreshToken;
+
+        this.authenticated = true;
+      } catch (error) {
+        console.error(error);
+        this.authenticated = false;
       }
-      token.value = null;
+
+    },
+    logUserOut() {
+      this.authenticated = false;
+      useCookie(useRuntimeConfig().public.ACCESS_TOKEN_NAME).value = null;
+      useCookie(useRuntimeConfig().public.REFRESH_TOKEN_NAME).value = null;
     },
 
     checkIfTokenIsSet() {
-      const {
-        public: { AUTH_TOKEN_NAME },
-      } = useRuntimeConfig();
-      const cookie = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
-      return !!cookie.value
+      return !!useCookie(useRuntimeConfig().public.REFRESH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' }).value;
     },
 
-    async checkIfTokenIsValid() {
-      const {
-        public: { BACKEND_URL, AUTH_TOKEN_NAME },
-      } = useRuntimeConfig();
-      const cookie = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
-      if (this.checkIfTokenIsSet()) {
-        const { data, error }: any = await useFetch(BACKEND_URL + "/api/check-token", {
-          method: "post",
-          headers: {
-            Authorization: "Bearer " + cookie.value,
-            "Content-Type": "application/json",
-          },
-        });
-        if (error) {
-          this.authErrors.push(error)
-          console.log(error);
-        }
-        if (data.valid) {
-          return true;
-        } else {
-          return false;
-        }
-      } else {
+    async checkIfTokenIsValid(): Promise<boolean> {
+      const { $api } = useNuxtApp();
+      if (!this.checkIfTokenIsSet()) return false;
+
+      try {
+        await $api("Auth/verify-token");
+        return true;
+      } catch {
         return false;
       }
     }

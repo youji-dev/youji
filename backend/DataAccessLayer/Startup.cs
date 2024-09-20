@@ -37,6 +37,7 @@ namespace PersistenceLayer.DataAccess
             services.AddScoped<TicketRepository>();
             services.AddScoped<TicketCommentRepository>();
             services.AddScoped<TicketAttachmentRepository>();
+            services.AddScoped<RefreshTokenRepository>();
         }
     }
 }

@@ -19,14 +19,14 @@ namespace Application.WebApi.Controllers
         /// Gets a ticket by a specific ticket id.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="id">The specific ticket id.</param>
+        /// <param name="ticketId">The specific ticket id.</param>
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
-        [HttpGet("{id}")]
+        [HttpGet("{ticketId}")]
         public async Task<ActionResult> Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromRoute] string id)
+            [FromRoute] string ticketId)
         {
-            return this.Ok(await ticketRepo.GetAsync(new Guid(id)));
+            return this.Ok(await ticketRepo.GetAsync(new Guid(ticketId)));
         }
 
         /// <summary>
@@ -51,10 +51,10 @@ namespace Application.WebApi.Controllers
                     || ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
                     || ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.Contains(term, StringComparison.OrdinalIgnoreCase)))
                     || ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    || ((ticket.State != null) && searchTerm.Any(term => ticket.State.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
                     || searchTerm.Any(term => ticket.Title.Contains(term, StringComparison.OrdinalIgnoreCase))
                     || searchTerm.Any(term => ticket.Author.Contains(term, StringComparison.OrdinalIgnoreCase))
-                    || searchTerm.Any(term => ticket.CreationDate.ToString().Contains(term, StringComparison.OrdinalIgnoreCase))
-                    || searchTerm.Any(term => ticket.State.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                    || searchTerm.Any(term => ticket.CreationDate.ToString().Contains(term, StringComparison.OrdinalIgnoreCase)))
                 .Skip(skip)
                 .Take(take) != null)
                 .Single();
@@ -148,15 +148,22 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="comment">Instance of <see cref="TicketComment"/></param>
+        /// <param name="commentData">Instance of <see cref="TicketComment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
         public async Task<ActionResult> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] string ticketId,
-            [FromBody] TicketComment comment)
+            [FromBody] CommentDTO commentData)
         {
+            TicketComment comment = new ()
+            {
+                Author = commentData.Author,
+                Content = commentData.Content,
+                CreationDate = commentData.CreationDate,
+            };
+
             await commentRepo.AddAsync(comment);
 
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
@@ -166,7 +173,7 @@ namespace Application.WebApi.Controllers
                 return this.NotFound();
             }
 
-            ticket.Comments = [.. ticket.Comments, comment];
+            ticket.Comments?.Add(comment);
 
             await ticketRepo.UpdateAsync(ticket);
 

@@ -29,6 +29,14 @@ namespace PersistenceLayer.DataAccess.Entities
         /// </summary>
         public required DateTime CreationDate { get; set; }
 
+        /// <summary>
+        /// The id of the related ticket.
+        /// </summary>
         public required Guid TicketId { get; set; }
+
+        /// <summary>
+        /// The refernce type of the relatet tickets.
+        /// </summary>
+        public Ticket? Ticket { get; set; }
     }
 }

@@ -28,7 +28,6 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The priority of the ticket
         /// </summary>
-        [DeleteBehavior(DeleteBehavior.SetNull)]
         public Priority? Priority { get; set; }
 
         /// <summary>
@@ -44,25 +43,21 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The state of the ticket.
         /// </summary>
-        [DeleteBehavior(DeleteBehavior.Restrict)]
         public required State State { get; set; }
 
         /// <summary>
         /// An array of all comments on the ticket.
         /// </summary>
-        [DeleteBehavior(DeleteBehavior.ClientCascade)]
         public Collection<TicketComment>? Comments { get; set; }
 
         /// <summary>
         /// An array of all attachements on the ticket.
         /// </summary>
-        [DeleteBehavior(DeleteBehavior.ClientCascade)]
         public Collection<TicketAttachment>? Attachments { get; set; }
 
         /// <summary>
         /// The building where the issue of the ticket was located.
         /// </summary>
-        [DeleteBehavior(DeleteBehavior.SetNull)]
         public Building? Building { get; set; }
 
         /// <summary>

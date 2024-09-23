@@ -39,7 +39,7 @@ namespace Application.WebApi.Controllers
             if (!string.IsNullOrWhiteSpace(lang))
             {
                 localizer = new();
-                localizer.LoadXML(Assembly.GetExecutingAssembly(), "Resources.I18N.xml", CultureInfo.GetCultureInfo(lang));
+                localizer.LoadXML(Assembly.GetExecutingAssembly(), "Resources/Resources.I18N.xml", CultureInfo.GetCultureInfo(lang));
             }
 
             TicketExportModel model = TicketExportModel.FromTicket(ticket);

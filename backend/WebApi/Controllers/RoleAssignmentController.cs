@@ -21,7 +21,7 @@ namespace Application.WebApi.Controllers
         public ActionResult<RoleAssignment[]> Get(
             [FromServices] RoleAssignmentRepository roleAssignmentRepo)
         {
-            return this.Ok(roleAssignmentRepo.GetAllAsync(roleAssignment => roleAssignment.Count() > 0));
+            return this.Ok(roleAssignmentRepo.GetAllAsync(roleAssignment => roleAssignment != null));
         }
 
         /// <summary>

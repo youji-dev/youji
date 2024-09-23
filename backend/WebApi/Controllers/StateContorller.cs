@@ -21,7 +21,7 @@ namespace Application.WebApi.Controllers
         public ActionResult<State[]> Get(
             [FromServices] StateRepository stateRepo)
         {
-            return this.Ok(stateRepo.GetAllAsync(state => state.Count() > 0));
+            return this.Ok(stateRepo.GetAllAsync(state => state != null));
         }
 
         /// <summary>

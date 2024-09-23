@@ -21,7 +21,7 @@ namespace Application.WebApi.Controllers
         public ActionResult<Building[]> Get(
             [FromServices] BuildingRepository buildingRepo)
         {
-            return this.Ok(buildingRepo.GetAllAsync(building => building.Count() > 0));
+            return this.Ok(buildingRepo.GetAllAsync(building => building != null));
         }
 
         /// <summary>

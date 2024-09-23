@@ -1,7 +1,9 @@
 ﻿using Common.Contracts;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Application.WebApi.Controllers
 {
@@ -40,24 +42,24 @@ namespace Application.WebApi.Controllers
         [HttpGet("search")]
         public ActionResult Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromBody] string[] searchTerm,
+            [FromQuery] string[] searchTerm,
             [FromQuery] int skip,
             [FromQuery] int take)
         {
-            var tickets = ticketRepo.GetAllAsync(tickets =>
-                tickets.Where(
-                    ticket =>
-                    ((ticket.Description != null) && searchTerm.Any(term => ticket.Description.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                    || ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                    || ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                    || ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                    || ((ticket.State != null) && searchTerm.Any(term => ticket.State.Name.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                    || searchTerm.Any(term => ticket.Title.Contains(term, StringComparison.OrdinalIgnoreCase))
-                    || searchTerm.Any(term => ticket.Author.Contains(term, StringComparison.OrdinalIgnoreCase))
-                    || searchTerm.Any(term => ticket.CreationDate.ToString().Contains(term, StringComparison.OrdinalIgnoreCase)))
+            var tickets = ticketRepo.GetAllAsync(ticket =>
+                searchTerm.Any(term => EF.Functions.Collate(ticket.Description, "und-x-icu").Contains(term))
+                //|| ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.Contains(term)))
+                //|| ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.Contains(term)))
+                //|| ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.Contains(term)))
+                //|| ((ticket.State != null) && searchTerm.Any(term => ticket.State.Name.Contains(term)))
+                //|| searchTerm.Any(term => ticket.Title.Contains(term))
+                //|| searchTerm.Any(term => ticket.Author.Contains(term))
+                //|| searchTerm.Any(term => ticket.CreationDate.ToString().Contains(term))
+                )
+                .ToList()
                 .Skip(skip)
-                .Take(take) != null)
-                .Single();
+                .Take(take);
+
 
             if (tickets is null)
             {
@@ -201,7 +203,7 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
             {
                 return this.NotFound();
-            };
+            }
 
             using MemoryStream stream = new ();
             await attachmentFile.CopyToAsync(stream);

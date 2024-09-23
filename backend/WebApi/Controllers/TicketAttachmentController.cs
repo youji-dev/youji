@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Repositories;
-using PersistenceLayer.DataAccess.Entities;
 
 namespace Application.WebApi.Controllers
 {

@@ -39,9 +39,9 @@ namespace PersistenceLayer.DataAccess.Repositories
         /// </summary>
         /// <param name="expression">Instance of <see cref="Expression"/></param>
         /// <returns>All entities matches the expression.</returns>
-        public virtual IQueryable<TEntity[]?> GetAllAsync(Expression<Func<TEntity[], bool>> expression)
+        public virtual List<TEntity> GetAllAsync(Expression<Func<TEntity, bool>> expression)
         {
-            return this.Context.Set<TEntity[]>().Where(expression);
+            return this.Context.Set<TEntity>().Where(expression).ToList();
         }
 
         /// <summary>

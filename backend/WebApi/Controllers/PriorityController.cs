@@ -21,7 +21,7 @@ namespace Application.WebApi.Controllers
         public ActionResult<Priority[]> Get(
             [FromServices] PriorityRepository priorityRepo)
         {
-            return this.Ok(priorityRepo.GetAllAsync(priority => priority.Count() > 0));
+            return this.Ok(priorityRepo.GetAllAsync(priority => priority != null));
         }
 
         /// <summary>

@@ -396,3 +396,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/backend/DataAccessLayer/Migrations/20240923084246_add case insensitive.cs
+/backend/DataAccessLayer/Migrations/20240923085346_add case insensitive2.cs

@@ -6,6 +6,9 @@ using PersistenceLayer.DataAccess.Entities;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
+    /// <summary>
+    /// Provides methods for mailing
+    /// </summary>
     public class MailingService(IConfiguration configuration)
     {
         private readonly string mailSenderName = configuration.GetValueOrThrow("SenderName", ["Mail"]);
@@ -14,6 +17,12 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly int mailServerPort = int.Parse(configuration.GetValueOrThrow("SmtpPort", ["Mail"]));
         private readonly bool useSsl = bool.Parse(configuration.GetValueOrThrow("UseSsl", ["Mail"]));
 
+        /// <summary>
+        /// Generate a mail body for a changed ticket
+        /// </summary>
+        /// <param name="newTicket">New version of the ticket</param>
+        /// <param name="oldTicket">Old version of the ticket</param>
+        /// <returns>The generated mail body</returns>
         public BodyBuilder GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
         {
             MailBodyBuilder builder = new();
@@ -85,6 +94,13 @@ namespace DomainLayer.BusinessLogic.Mailing
             return builder.Complete();
         }
 
+        /// <summary>
+        /// Send a mail
+        /// </summary>
+        /// <param name="recipient">The mail recipient</param>
+        /// <param name="subject">The mail subject</param>
+        /// <param name="body">The mail body</param>
+        /// <returns>A task representing the asynchronous operation</returns>
         public async Task Send(MailboxAddress recipient, string subject, BodyBuilder body)
         {
             MimeMessage message = new();
@@ -96,10 +112,10 @@ namespace DomainLayer.BusinessLogic.Mailing
 
             using SmtpClient client = new();
 
-            client.Connect(this.mailServerAddress, this.mailServerPort, this.useSsl);
+            await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
 
-            client.Send(message);
-            client.Disconnect(true);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
         }
     }
 }

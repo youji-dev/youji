@@ -1,15 +1,11 @@
-﻿using I18N.DotNet;
-using MimeKit;
-using PersistenceLayer.DataAccess.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+﻿using MimeKit;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
+    /// <summary>
+    /// Builder class for E-Mail BodyBuilder
+    /// </summary>
     public class MailBodyBuilder
     {
         private readonly int maxLineWidth = 80;
@@ -17,6 +13,9 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly StringBuilder htmlBuilder = new();
         private readonly StringBuilder plainTextBuilder = new();
 
+        /// <summary>
+        /// Initializes new instance of <see cref="MailBodyBuilder"/>
+        /// </summary>
         public MailBodyBuilder()
         {
             this.htmlBuilder
@@ -31,38 +30,56 @@ namespace DomainLayer.BusinessLogic.Mailing
                 ");
         }
 
+        /// <summary>
+        /// Completes the mail body
+        /// </summary>
+        /// <returns>The generated body</returns>
         public BodyBuilder Complete()
         {
             this.htmlBuilder.AppendLine("</div>");
 
-            BodyBuilder builder = new();
-
-            builder.HtmlBody = this.htmlBuilder.ToString();
-            builder.TextBody = this.plainTextBuilder.ToString();
+            BodyBuilder builder = new()
+            {
+                HtmlBody = this.htmlBuilder.ToString(),
+                TextBody = this.plainTextBuilder.ToString(),
+            };
 
             return builder;
         }
 
+        /// <summary>
+        /// Adds a heading
+        /// </summary>
+        /// <param name="content">The text content</param>
+        /// <param name="level">The heading level</param>
         public void AddHeading(string content, int level = 1)
         {
             this.htmlBuilder
                 .AppendLine($"<h{level}>{content}</h{level}>");
 
             this.plainTextBuilder
-                .AppendLine(this.BreakStringToMaxLineWidth(content))
+                .AppendLine(this.FormatForPlainText(content))
                 .AppendLine();
         }
 
+        /// <summary>
+        /// Adds a paragraph
+        /// </summary>
+        /// <param name="content">The text content</param>
         public void AddParagraph(string content)
         {
             this.htmlBuilder
                 .AppendLine($"<p>{content}</p>");
 
             this.plainTextBuilder
-                .AppendLine("\t" + this.BreakStringToMaxLineWidth(content))
+                .AppendLine("\t" + this.FormatForPlainText(content))
                 .AppendLine();
         }
 
+        /// <summary>
+        /// Adds an unordered list
+        /// </summary>
+        /// <param name="items">The items in the list</param>
         public void AddUnorderedList(IEnumerable<string> items)
         {
             this.htmlBuilder.AppendLine("<ul>");
@@ -78,7 +95,7 @@ namespace DomainLayer.BusinessLogic.Mailing
             this.plainTextBuilder.AppendLine();
         }
 
-        private string BreakStringToMaxLineWidth(string s)
+        private string FormatForPlainText(string s, bool indent = false)
         {
             StringBuilder limitedString = new();
 
@@ -87,7 +104,7 @@ namespace DomainLayer.BusinessLogic.Mailing
                 int charactersInLine = Math.Min(s.Length, this.maxLineWidth);
                 string line = string.Join(string.Empty, s.Take(charactersInLine));
 
-                limitedString.AppendLine(line);
+                limitedString.AppendLine($"{(indent ? "\t" : string.Empty)}{line}");
                 s = s.Remove(0, charactersInLine);
             }
             while (s.Length > 0);

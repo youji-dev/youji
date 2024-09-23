@@ -1,4 +1,6 @@
 ﻿using MimeKit;
+using MimeKit.Utils;
+using System.Reflection;
 using System.Text;
 
 namespace DomainLayer.BusinessLogic.Mailing
@@ -12,22 +14,19 @@ namespace DomainLayer.BusinessLogic.Mailing
 
         private readonly StringBuilder htmlBuilder = new();
         private readonly StringBuilder plainTextBuilder = new();
+        private readonly BodyBuilder bodyBuilder = new();
 
         /// <summary>
         /// Initializes new instance of <see cref="MailBodyBuilder"/>
         /// </summary>
         public MailBodyBuilder()
         {
+            this.AddStyling();
+            this.AddBranding();
+
             this.htmlBuilder
-                .AppendLine("<div class=\"container\">")
-                .AppendLine(
-                    $@"
-<style>
-    .container {{
-        max-width: {this.maxLineWidth}ch
-    }}
-</style>
-                ");
+                .AppendLine("<div class\"container\">")
+                .AppendLine("<div class=\"content\">");
         }
 
         /// <summary>
@@ -36,15 +35,14 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <returns>The generated body</returns>
         public BodyBuilder Complete()
         {
-            this.htmlBuilder.AppendLine("</div>");
+            this.htmlBuilder
+                .AppendLine("</div>")
+                .AppendLine("</div>");
 
-            BodyBuilder builder = new()
-            {
-                HtmlBody = this.htmlBuilder.ToString(),
-                TextBody = this.plainTextBuilder.ToString(),
-            };
+            this.bodyBuilder.HtmlBody = this.htmlBuilder.ToString();
+            this.bodyBuilder.TextBody = this.plainTextBuilder.ToString();
 
-            return builder;
+            return this.bodyBuilder;
         }
 
         /// <summary>
@@ -93,6 +91,57 @@ namespace DomainLayer.BusinessLogic.Mailing
 
             this.htmlBuilder.AppendLine("</ul>");
             this.plainTextBuilder.AppendLine();
+        }
+
+        private void AddStyling()
+        {
+            this.htmlBuilder.AppendLine(
+                    $@"
+<style>
+    .container {{
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }}
+
+    .logo {{
+        position: absolute;
+        top: 10;
+        right: 10;
+        width: 100px;
+        height: 100px;
+    }}
+
+    .content {{
+        max-width: {this.maxLineWidth}ch;
+        font-family: sans-serif;
+    }}
+
+    h1, h2, h3, h4, h5, h6, p, li {{
+        font-family: inherit;
+    }}
+</style>
+                ");
+        }
+
+        private void AddBranding()
+        {
+            Assembly? assembly = Assembly.GetEntryAssembly();
+            if (assembly is null)
+                return;
+
+            string logoResourceName = assembly
+                .GetManifestResourceNames()
+                .Single(name => name.EndsWith("Logo.svg"));
+
+            var logo = this.bodyBuilder.LinkedResources.Add(
+                "Logo.svg",
+                assembly.GetManifestResourceStream(logoResourceName));
+
+            logo.ContentId = MimeUtils.GenerateMessageId();
+
+            this.htmlBuilder
+                .AppendLine($@"<img class='logo' src='cid:{logo.ContentId}'/>");
         }
 
         private string FormatForPlainText(string s, bool indent = false)

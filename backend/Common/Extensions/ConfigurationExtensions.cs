@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace Common.Helpers
+namespace Common.Extensions
 {
     /// <summary>
     /// Provides helper methods for interacting with the app configuration

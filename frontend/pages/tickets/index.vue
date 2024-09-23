@@ -24,13 +24,14 @@
       </div>
       <el-table
         v-if="!loading"
-        :data="data"
+        :data="filterTableData"
         :height="tableDimensions['height']"
         :width="tableDimensions['width']"
         style="width: 100%"
+        :default-sort="{ prop: 'create_date', order: 'descending' }"
       >
         <el-table-column prop="id" :label="$t('id')" width="180" sortable />
-        <el-table-column prop="name" :label="$t('name')" width="180" sortable />
+        <el-table-column prop="name" :label="$t('username')" width="180" sortable />
         <el-table-column prop="title.title" :label="$t('title')" sortable />
         <el-table-column
           prop="status.text"
@@ -67,9 +68,9 @@ const parsedStatusOptions = ref([]) as Ref<Array<any>>;
 const { fetchStatusOptions } = useTicketsStore();
 const loading = ref(true);
 interface Ticket {
-  id: string;
+  id: number;
   name: string;
-  title: string;
+  title: {title: string, id: number};
   status: { text: string; color: string };
   building: string;
   room: string;
@@ -93,10 +94,10 @@ const dataGenerator = () => ({
   building: "Hauptgebäude",
   room: "222",
   priority: "3",
-  create_date: "20.09.2024",
+  create_date: (id % 2 === 0) ? "20.09.2024" : "21.09.2024",
 });
 
-const data = ref([] as Array<{}>);
+const data = ref([] as Array<Ticket>);
 onMounted(async () => {
   data.value = Array.from({ length: 200 }).map(dataGenerator);
   getTableDimensions();
@@ -107,6 +108,19 @@ onMounted(async () => {
 const filterTag = (value: string, row: Ticket) => {
   return row.status.text === value;
 };
+const filterTableData = computed(() =>
+  data.value.filter(
+    (data) =>
+      !search.value ||
+      data.name.toLowerCase().includes(search.value.toLowerCase()) ||
+      data.building.toLowerCase().includes(search.value.toLowerCase()) ||
+      data.room.toLowerCase().includes(search.value.toLowerCase()) ||
+      data.id.toString().includes(search.value.toLowerCase()) ||
+      data.priority.toLowerCase().includes(search.value.toLowerCase()) ||
+      data.title.title.toLowerCase().includes(search.value.toLowerCase()) ||
+      data.status.text.toLowerCase().includes(search.value.toLowerCase()) 
+  )
+);
 function getTableDimensions() {
   const element = document.getElementById("table_container");
   if (element) {

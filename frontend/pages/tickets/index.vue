@@ -19,13 +19,40 @@
       class="w-full h-[100%] overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md"
       id="table_container"
     >
-      <el-table-v2
-        :columns="columns"
+      <div v-if="loading" class="w-full h-full p-10">
+        <el-skeleton :rows="23" animated />
+      </div>
+      <el-table
+        v-if="!loading"
         :data="data"
-        :width="tableDimensions.width"
-        :height="tableDimensions.height"
-      />
+        :height="tableDimensions['height']"
+        :width="tableDimensions['width']"
+        style="width: 100%"
+      >
+        <el-table-column prop="id" :label="$t('id')" width="180" sortable />
+        <el-table-column prop="name" :label="$t('name')" width="180" sortable />
+        <el-table-column prop="title.title" :label="$t('title')" sortable />
+        <el-table-column
+          prop="status.text"
+          :label="$t('status')"
+          :filters="parsedStatusOptions"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+          sortable
+        >
+          <template #default="scope">
+            <el-tag :type="scope.row.status.color">
+              {{ $t(scope.row.status.text) }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="building" :label="$t('building')" sortable />
+        <el-table-column prop="room" :label="$t('room')" sortable />
+        <el-table-column prop="priority" :label="$t('priority')" sortable />
+        <el-table-column prop="create_date" :label="$t('createDate')" sortable />
+      </el-table>
     </div>
+    <el-pagination layout="prev, pager, next" :total="1000" />
   </div>
 </template>
 
@@ -34,121 +61,71 @@ import { Search } from "@element-plus/icons-vue";
 import { ref } from "vue";
 const search = ref("");
 const i18n = useI18n();
-import { ElButton, ElTag, ElTooltip, TableV2FixedDir } from "element-plus";
-import type { Column } from "element-plus";
-const localeRoute = useLocaleRoute();
+import { ElTag } from "element-plus";
+const { statusOptions } = storeToRefs(useTicketsStore());
+const parsedStatusOptions = ref([]) as Ref<Array<any>>;
+const { fetchStatusOptions } = useTicketsStore();
+const loading = ref(true);
+interface Ticket {
+  id: string;
+  name: string;
+  title: string;
+  status: { text: string; color: string };
+  building: string;
+  room: string;
+  priority: string;
+  create_date: string;
+}
+
 const tableDimensions = ref({
   width: 0,
   height: 0,
 });
 let id = 0;
 const dataGenerator = () => ({
-  id: `random-id-${++id}`,
+  id: ++id,
   name: "Tom",
-  title: {title: "Test Ticket", id: id},
-  status: {text: "Offen", color: "primary"},
+  title: { title: "Test Ticket", id: id },
+  status: {
+    text: id % 2 === 0 ? "Neu" : "Abgeschlossen",
+    color: id % 2 === 0 ? "primary" : "success",
+  },
   building: "Hauptgebäude",
   room: "222",
   priority: "3",
-  create_date: "20.09.2024"
-});
-const columns: Ref<Column<any>[]> = ref([]);
-const data = ref([] as Array<{}>);
-onMounted(() => {
-  tableDimensions.value = getTableDimensions();
-  columns.value = [
-  {
-    key: "title",
-    title: i18n.t("title"),
-    dataKey: "title",
-    width: (tableDimensions.value.width / 16) * 2,
-    fixed: TableV2FixedDir.LEFT,
-    cellRenderer: ({ cellData: title }) => (
-      <ElTooltip content={title}>
-        {
-          <a href={localeRoute("/tickets/"+ title.id)?.fullPath } class="flex items-center">
-            {title.title}
-          </a>
-        }
-      </ElTooltip>
-    ),
-  },
-  {
-    key: "status",
-    title: i18n.t("status"),
-    dataKey: "status",
-    width: (tableDimensions.value.width / 16) * 2,
-    align: "center",
-    cellRenderer: ({ cellData: status }) => <el-tag type="primary" plain>{status.text}</el-tag>,
-  },
-  {
-    key: "name",
-    title: i18n.t("user"),
-    dataKey: "name",
-    width: (tableDimensions.value.width / 16) * 2,
-    align: "center",
-    cellRenderer: ({ cellData: name }) => <span>{name}</span>,
-  },
-  {
-    key: "building",
-    title: i18n.t("building"),
-    dataKey: "building",
-    width: (tableDimensions.value.width / 16) * 2,
-    align: "center",
-    cellRenderer: ({ cellData: building }) => <span>{building}</span>,
-  },
-  {
-    key: "room",
-    title: i18n.t("room"),
-    dataKey: "room",
-    width: (tableDimensions.value.width / 16) * 2,
-    align: "center",
-    cellRenderer: ({ cellData: room }) => <span>{room}</span>,
-  },
-  {
-    key: "priority",
-    title: i18n.t("priority"),
-    dataKey: "priority",
-    width: (tableDimensions.value.width / 16) * 2,
-    align: "center",
-    cellRenderer: ({ cellData: priority }) => <span>{priority + " - " + i18n.t("priority_" + priority)}</span>,
-  },
-  {
-    key: "create_date",
-    title: i18n.t("createDate"),
-    dataKey: "create_date",
-    width: (tableDimensions.value.width / 16) * 2,
-    align: "center",
-    cellRenderer: ({ cellData: create_date }) => <span>{create_date}</span>,
-  },
-  {
-    key: "operations",
-    title: "Operations",
-    cellRenderer: () => (
-      <>
-        <ElButton size="small" type="primary" round>Edit</ElButton>
-      </>
-    ),
-    width: 150,
-    align: "center",
-  },
-];
-data.value = Array.from({ length: 200 }).map(dataGenerator);
+  create_date: "20.09.2024",
 });
 
+const data = ref([] as Array<{}>);
+onMounted(async () => {
+  data.value = Array.from({ length: 200 }).map(dataGenerator);
+  getTableDimensions();
+  await fetchStatusOptions();
+  parseStatusOptions();
+  loading.value = false;
+});
+const filterTag = (value: string, row: Ticket) => {
+  return row.status.text === value;
+};
 function getTableDimensions() {
   const element = document.getElementById("table_container");
   if (element) {
-    return {
-      width: element.offsetWidth,
-      height: element.offsetHeight,
-    };
+    tableDimensions.value.width = element.offsetWidth;
+    tableDimensions.value.height = element.offsetHeight;
+    return;
   } else {
-    return {
-      width: 1000,
-      height: 1000,
-    };
+    tableDimensions.value.width = 1000;
+    tableDimensions.value.height = 1000;
   }
+}
+
+function parseStatusOptions() {
+  statusOptions.value.forEach((element) => {
+    parsedStatusOptions.value.push({
+      text: element.text,
+      value: element.text,
+    });
+  });
 }
 </script>
 

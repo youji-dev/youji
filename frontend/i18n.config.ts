@@ -56,6 +56,10 @@ export default defineI18nConfig(() => ({
             priority_2: "Normal",
             priority_3: "Low",
             createDate: "Create date",
+            open: "Open",
+            new: "New",
+            wip: "In progress",
+            done: "Done"
         },
         de: {
             welcome: "Willkommen",
@@ -111,6 +115,10 @@ export default defineI18nConfig(() => ({
             priority_2: "Normal",
             priority_3: "Niedrig",
             createDate: "Erstellungsdatum",
+            open: "Offen",
+            new: "Neu",
+            wip: "In Arbeit",
+            done: "Abgeschlossen"
         }
     }
 }))

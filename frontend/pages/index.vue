@@ -4,11 +4,16 @@
     <!-- Could contain things like statistics of all tickets or a list of tickets assigned to the authenticated user (maybe ordered by priority) -->
     <!-- If we decide to leave not include this, the index page should be /tickets/ (tickets/index.vue) -->
     <component :is="Sidebar"></component>
+    <el-button class="m-5 flex justify-center" @click="makeRequest">Make Request</el-button>
 
 </template>
 
 <script lang="ts" setup>
 import Sidebar from '~/components/sidebar.vue';
+
+const makeRequest = () => {
+    useAuthStore().checkIfTokenIsValid();
+} 
 
 definePageMeta({
     middleware: "auth"

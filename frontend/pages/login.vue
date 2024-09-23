@@ -67,6 +67,8 @@ const { authenticated, authErrors } = storeToRefs(useAuthStore());
 const i18n = useI18n();
 import { ElNotification } from "element-plus";
 import Sidebar from "~/components/sidebar.vue";
+const localePath = useLocaleRoute();
+const router = useRouter();
 
 let form = ref({
   username: "",
@@ -91,7 +93,7 @@ async function login() {
         duration: 3000,
       });
       loading.value = false;
-      //router.push(localePath("/"));
+      router.push(localePath("/")?.fullPath as string);
     } else {
       loading.value = false;
       if (authErrors.value.length > 0) {

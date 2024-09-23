@@ -19,7 +19,7 @@ export const useTicketsStore = defineStore("tickets", {
                 },
                 {
                     text: 'In Arbeit',
-                    color: "warn"
+                    color: "warning"
                 },
                 {
                     text: "Abgeschlossen",

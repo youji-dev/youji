@@ -27,7 +27,7 @@
         :data="filterTableData"
         :height="tableDimensions['height']"
         :width="tableDimensions['width']"
-        style="width: 100%"
+        class="overflow-x-scroll"
         :default-sort="{ prop: 'create_date', order: 'descending' }"
       >
         <el-table-column prop="id" :label="$t('id')" width="180" sortable />
@@ -39,12 +39,28 @@
           :filters="parsedStatusOptions"
           :filter-method="filterTag"
           filter-placement="bottom-end"
+          width="300"
           sortable
         >
           <template #default="scope">
-            <el-tag :type="scope.row.status.color">
-              {{ $t(scope.row.status.text) }}
-            </el-tag>
+            <div class="flex justtify-around items-center">
+              <el-select
+                class="w-2/3 mx-1"
+                v-model="scope.row.status"
+                value-key="text"
+                @change="updateTicketStatus(scope.row.id, scope.row.status)"
+              >
+                <el-option
+                  v-for="option in statusOptions"
+                  :key="option.text"
+                  :label="option.text"
+                  :value="option"
+                ></el-option>
+              </el-select>
+              <el-tag class="w-1/3 mx-1" :type="scope.row.status.color" disable-transitions>
+                {{ $t(scope.row.status.text) }}
+              </el-tag>
+            </div>
           </template>
         </el-table-column>
         <el-table-column prop="building" :label="$t('building')" sortable />
@@ -61,16 +77,17 @@
 import { Search } from "@element-plus/icons-vue";
 import { ref } from "vue";
 const search = ref("");
-const i18n = useI18n();
 import { ElTag } from "element-plus";
+import type { Status } from "~/stores/tickets";
 const { statusOptions } = storeToRefs(useTicketsStore());
 const parsedStatusOptions = ref([]) as Ref<Array<any>>;
 const { fetchStatusOptions } = useTicketsStore();
 const loading = ref(true);
+const i18n = useI18n();
 interface Ticket {
   id: number;
   name: string;
-  title: {title: string, id: number};
+  title: { title: string; id: number };
   status: { text: string; color: string };
   building: string;
   room: string;
@@ -94,7 +111,7 @@ const dataGenerator = () => ({
   building: "Hauptgebäude",
   room: "222",
   priority: "3",
-  create_date: (id % 2 === 0) ? "20.09.2024" : "21.09.2024",
+  create_date: id % 2 === 0 ? "20.09.2024" : "21.09.2024",
 });
 
 const data = ref([] as Array<Ticket>);
@@ -118,7 +135,7 @@ const filterTableData = computed(() =>
       data.id.toString().includes(search.value.toLowerCase()) ||
       data.priority.toLowerCase().includes(search.value.toLowerCase()) ||
       data.title.title.toLowerCase().includes(search.value.toLowerCase()) ||
-      data.status.text.toLowerCase().includes(search.value.toLowerCase()) 
+      data.status.text.toLowerCase().includes(search.value.toLowerCase())
   )
 );
 function getTableDimensions() {
@@ -140,6 +157,28 @@ function parseStatusOptions() {
       value: element.text,
     });
   });
+}
+
+async function updateTicketStatus(ticket_id: number, new_status: Status) {
+  // Update actual Ticket Status in backend
+  ElMessage({
+    message:
+      i18n.t("successfully") +
+      " " +
+      i18n.t("updated") +
+      " " +
+      i18n.t("ticket") +
+      " " +
+      ticket_id +
+      " " +
+      i18n.t("to") +
+      " " +
+      i18n.t("status") +
+      " " +
+      new_status.text,
+    type: "success",
+  });
+  return;
 }
 </script>
 

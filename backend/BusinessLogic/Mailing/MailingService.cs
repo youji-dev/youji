@@ -1,7 +1,8 @@
-﻿using Common.Helpers;
+﻿using Common.Extensions;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using PersistenceLayer.DataAccess.Entities;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
@@ -12,6 +13,77 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly string mailServerAddress = configuration.GetValueOrThrow("SmtpAddress", ["Mail"]);
         private readonly int mailServerPort = int.Parse(configuration.GetValueOrThrow("SmtpPort", ["Mail"]));
         private readonly bool useSsl = bool.Parse(configuration.GetValueOrThrow("UseSsl", ["Mail"]));
+
+        public BodyBuilder GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
+        {
+            MailBodyBuilder builder = new();
+            builder.AddHeading($"Ticket '{newTicket.Title}' wurde geändert");
+
+            if (newTicket.Title != oldTicket.Title)
+            {
+                builder.AddHeading("Titel geändert", 3);
+                builder.AddParagraph($"{oldTicket.Title} -> {newTicket.Title}");
+            }
+
+            if (newTicket.Description != oldTicket.Description)
+            {
+                builder.AddHeading("Beschreibung geändert", 3);
+                builder.AddParagraph(oldTicket.Description ?? "-");
+                builder.AddParagraph("->");
+                builder.AddParagraph(newTicket.Description ?? "-");
+            }
+
+            if (newTicket.Priority != oldTicket.Priority)
+            {
+                builder.AddHeading("Priorität geändert", 3);
+                builder.AddParagraph($"{oldTicket.Priority?.Name ?? "-"} -> {newTicket.Priority?.Name ?? "-"}");
+            }
+
+            if (newTicket.State != oldTicket.State)
+            {
+                builder.AddHeading("Status geändert", 3);
+                builder.AddParagraph($"{oldTicket.State.Name} -> {newTicket.State.Name}");
+            }
+
+            if (newTicket.Building != oldTicket.Building)
+            {
+                builder.AddHeading("Gebäude geändert", 3);
+                builder.AddParagraph($"{oldTicket.Building?.Name ?? "-"} -> {newTicket.Building?.Name ?? "-"}");
+            }
+
+            if (newTicket.Room != oldTicket.Room)
+            {
+                builder.AddHeading("Raum geändert", 3);
+                builder.AddParagraph($"{oldTicket.Room ?? "-"} -> {newTicket.Room ?? "-"}");
+            }
+
+            if (newTicket.Object != oldTicket.Object)
+            {
+                builder.AddHeading("Betroffenes Objekt geändert");
+                builder.AddParagraph($"{oldTicket.Object} -> {newTicket.Object}");
+            }
+
+            if (newTicket.Comments.Count > oldTicket.Comments.Count)
+            {
+                var newComments = newTicket.Comments.Skip(oldTicket.Comments.Count);
+
+                foreach (var comment in newComments)
+                {
+                    builder.AddHeading($"Neuer Kommentar von '{comment.Author}'", 3);
+                    builder.AddParagraph(comment.Content);
+                }
+            }
+
+            if (newTicket.Attachments.Count != oldTicket.Attachments.Count)
+            {
+                var newAttachments = newTicket.Attachments.Skip(oldTicket.Attachments.Count);
+                builder.AddHeading($"Neue Anhänge");
+
+                builder.AddUnorderedList(newAttachments.Select(attachment => $"{attachment.Name}"));
+            }
+
+            return builder.Complete();
+        }
 
         public async Task Send(MailboxAddress recipient, string subject, BodyBuilder body)
         {

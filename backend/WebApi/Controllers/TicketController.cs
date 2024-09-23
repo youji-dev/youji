@@ -1,9 +1,7 @@
 ﻿using Common.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
-using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Application.WebApi.Controllers
 {
@@ -36,30 +34,30 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
-        /// <param name="skip">The count of skipped elements as a <see langword="int"/>.</param>
-        /// <param name="take">The count of taken elements as a <see langword="int"/>.</param>
+        /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
+        /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
         public ActionResult Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string[] searchTerm,
-            [FromQuery] int skip,
-            [FromQuery] int take)
+            [FromQuery] int skip = 0,
+            [FromQuery] int take = 10)
         {
+            searchTerm = searchTerm.Select(term => term.ToLower()).ToArray();
+
             var tickets = ticketRepo.GetAllAsync(ticket =>
-                searchTerm.Any(term => EF.Functions.Collate(ticket.Description, "und-x-icu").Contains(term))
-                //|| ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.Contains(term)))
-                //|| ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.Contains(term)))
-                //|| ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.Contains(term)))
-                //|| ((ticket.State != null) && searchTerm.Any(term => ticket.State.Name.Contains(term)))
-                //|| searchTerm.Any(term => ticket.Title.Contains(term))
-                //|| searchTerm.Any(term => ticket.Author.Contains(term))
-                //|| searchTerm.Any(term => ticket.CreationDate.ToString().Contains(term))
-                )
+                ((ticket.Description != null) && searchTerm.Any(term => ticket.Description.ToLower().Contains(term)))
+                || ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.ToLower().Contains(term)))
+                || ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.ToLower().Contains(term)))
+                || ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.ToLower().Contains(term)))
+                || ((ticket.State != null) && searchTerm.Any(term => ticket.State.Name.ToLower().Contains(term)))
+                || searchTerm.Any(term => ticket.Title.ToLower().Contains(term))
+                || searchTerm.Any(term => ticket.Author.ToLower().Contains(term))
+                || searchTerm.Any(term => ticket.CreationDate.ToString().ToLower().Contains(term)))
                 .ToList()
                 .Skip(skip)
                 .Take(take);
-
 
             if (tickets is null)
             {

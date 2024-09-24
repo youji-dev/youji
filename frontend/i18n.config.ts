@@ -47,6 +47,7 @@ export default defineI18nConfig(() => ({
             tickets: "Tickets",
             searchVerb: "Search",
             title: "Title",
+            back: "Back",
         },
         de: {
             welcome: "Willkommen",
@@ -93,6 +94,7 @@ export default defineI18nConfig(() => ({
             tickets: "Tickets",
             searchVerb: "Suchen",
             title: "Titel",
+            back: "Zurück",
         }
     }
 }))

@@ -1,7 +1,5 @@
 <template>
   <component :is="Sidebar"></component>
-  <!-- Route: /login -->
-  <!-- Page for login mask -->
   <el-form
     :model="form"
     label-width="auto"

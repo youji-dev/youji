@@ -14,23 +14,23 @@ namespace Application.WebApi.Controllers
         /// Deletes the comment with the specific id.
         /// </summary>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/></param>
-        /// <param name="id">The specific id of the comment.</param>
+        /// <param name="commentId">The specific id of the comment.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete]
+        [HttpDelete("{commentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketCommentRepository commentRepo,
-            [FromBody] string id)
+            [FromRoute] string commentId)
         {
-            var comment = await commentRepo.GetAsync(new Guid(id));
+            var comment = await commentRepo.GetAsync(new Guid(commentId));
 
             if (comment is null)
-                return this.NotFound($"A comment with the id '{id}' doesn´t exist.");
+                return this.NotFound($"A comment with the id '{commentId}' doesn´t exist.");
 
             await commentRepo.DeleteAsync(comment);
 
-            return this.Ok($"The comment with the id '{id}' was deleted.");
+            return this.Ok($"The comment with the id '{commentId}' was deleted.");
         }
     }
 }

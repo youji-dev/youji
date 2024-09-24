@@ -61,23 +61,23 @@ namespace Application.WebApi.Controllers
         /// Deletes the priority with the specific id.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="value">The specific id of the priority that will deleted.</param>
+        /// <param name="priorityValue">The specific id of the priority that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete]
+        [HttpDelete("{priorityValue}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] int value)
+            [FromRoute] int priorityValue)
         {
-            var deletePriority = await priorityRepo.GetAsync(value);
+            var deletePriority = await priorityRepo.GetAsync(priorityValue);
 
             if (deletePriority is null)
-                return this.NotFound($"A priority with the value {value} doesn´t exist.");
+                return this.NotFound($"A priority with the value {priorityValue} doesn´t exist.");
 
             await priorityRepo.DeleteAsync(deletePriority);
 
-            return this.Ok($"The priority with the value {value} was deleted.");
+            return this.Ok($"The priority with the value {priorityValue} was deleted.");
         }
     }
 }

@@ -68,23 +68,23 @@ namespace Application.WebApi.Controllers
         /// Deletes the state with the specific id.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="id">The specific id of the state that will deleted.</param>
+        /// <param name="stateId">The specific id of the state that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete]
+        [HttpDelete("{stateId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] StateRepository stateRepo,
-            [FromBody] string id)
+            [FromRoute] string stateId)
         {
-            var deleteState = await stateRepo.GetAsync(new Guid(id));
+            var deleteState = await stateRepo.GetAsync(new Guid(stateId));
 
             if (deleteState is null)
-                return this.NotFound($"A state with the id '{id}' doesn´t exist.");
+                return this.NotFound($"A state with the id '{stateId}' doesn´t exist.");
 
             await stateRepo.DeleteAsync(deleteState);
 
-            return this.Ok($"The state with the id '{id}' was deleted.");
+            return this.Ok($"The state with the id '{stateId}' was deleted.");
         }
     }
 }

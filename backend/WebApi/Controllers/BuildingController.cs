@@ -69,12 +69,12 @@ namespace Application.WebApi.Controllers
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
         /// <param name="buildingId">The specific id of the building that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete]
+        [HttpDelete("{buildingId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] BuildingRepository buildingRepo,
-            [FromBody] string buildingId)
+            [FromRoute] string buildingId)
         {
             var deleteBuilding = await buildingRepo.GetAsync(new Guid(buildingId));
 

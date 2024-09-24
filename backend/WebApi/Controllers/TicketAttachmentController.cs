@@ -14,23 +14,23 @@ namespace Application.WebApi.Controllers
         /// Deletes the attachment with the specific id.
         /// </summary>
         /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/></param>
-        /// <param name="id">The specific id of the attachment.</param>
+        /// <param name="attachmentId">The specific id of the attachment.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete]
+        [HttpDelete("{attachmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketAttachmentRepository attachmentRepo,
-            [FromBody] string id)
+            [FromRoute] string attachmentId)
         {
-            var attachment = await attachmentRepo.GetAsync(new Guid(id));
+            var attachment = await attachmentRepo.GetAsync(new Guid(attachmentId));
 
             if (attachment is null)
-                return this.NotFound($"An attachment with the id '{id}' doesn´t exist.");
+                return this.NotFound($"An attachment with the id '{attachmentId}' doesn´t exist.");
 
             await attachmentRepo.DeleteAsync(attachment);
 
-            return this.Ok($"The attachment with the id '{id}' was deleted.");
+            return this.Ok($"The attachment with the id '{attachmentId}' was deleted.");
         }
     }
 }

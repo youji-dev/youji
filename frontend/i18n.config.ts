@@ -59,7 +59,12 @@ export default defineI18nConfig(() => ({
             open: "Open",
             new: "New",
             wip: "In progress",
-            done: "Done"
+            done: "Done",
+            id: "ID",
+            successful: "Successful",
+            updated: "Updated",
+            edit: "Edit",
+            detail: "Detail",
         },
         de: {
             welcome: "Willkommen",
@@ -118,7 +123,12 @@ export default defineI18nConfig(() => ({
             open: "Offen",
             new: "Neu",
             wip: "In Arbeit",
-            done: "Abgeschlossen"
+            done: "Abgeschlossen",
+            id: "ID",
+            successful: "Erfolgreich",
+            updated: "Aktualisiert",
+            edit: "Bearbeiten",
+            detail: "Detail",
         }
     }
 }))

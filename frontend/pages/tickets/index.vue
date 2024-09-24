@@ -1,5 +1,10 @@
 <template>
-  <div class="w-full h-[100vh] p-6 mt-8 md:mt-0" style="height: calc(100vh - 72px)">
+  <div
+    class="w-full h-[100vh] p-6 mt-8 lg:mt-0"
+    style="height: calc(100vh - 72px)"
+    :style="{ width: width }"
+    :onresize="determineViewWidth()"
+  >
     <div class="flex flex-row items-center justify-between w-full py-2">
       <h1
         class="text-lg font-light text-neutral-700 dark:text-neutral-300 text-start w-fit h-fit"
@@ -26,13 +31,13 @@
         v-if="!loading"
         :data="filterTableData"
         :height="tableDimensions['height']"
-        :width="tableDimensions['width']"
+        style="width: 100%; height: 100%"
         class="overflow-x-scroll"
         :default-sort="{ prop: 'create_date', order: 'descending' }"
       >
-        <el-table-column prop="id" :label="$t('id')" width="180" sortable />
-        <el-table-column prop="name" :label="$t('username')" width="180" sortable />
-        <el-table-column prop="title.title" :label="$t('title')" sortable />
+        <el-table-column prop="id" :label="$t('id')" width="100" sortable />
+        <el-table-column prop="name" :label="$t('username')" width="150" sortable />
+        <el-table-column prop="title.title" :label="$t('title')" width="250" sortable />
         <el-table-column
           prop="status.text"
           :label="$t('status')"
@@ -57,19 +62,40 @@
                   :value="option"
                 ></el-option>
               </el-select>
-              <el-tag class="w-1/3 mx-1" :type="scope.row.status.color" disable-transitions>
-                {{ $t(scope.row.status.text) }}
+              <el-tag
+                class="w-1/3 mx-1"
+                :type="scope.row.status.color"
+                disable-transitions
+              >
+                {{ scope.row.status.text }}
               </el-tag>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="building" :label="$t('building')" sortable />
-        <el-table-column prop="room" :label="$t('room')" sortable />
-        <el-table-column prop="priority" :label="$t('priority')" sortable />
-        <el-table-column prop="create_date" :label="$t('createDate')" sortable />
+        <el-table-column prop="building" :label="$t('building')" width="150" sortable />
+        <el-table-column prop="room" :label="$t('room')" width="100" sortable />
+        <el-table-column prop="priority" :label="$t('priority')" width="100" sortable />
+        <el-table-column
+          prop="create_date"
+          :label="$t('createDate')"
+          width="200"
+          sortable
+        />
+        <el-table-column fixed="right" label="Operations" min-width="120">
+          <template #default="scope">
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="router.push(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)"
+            >
+              {{ $t("detail") }}
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
+      <el-pagination v-if="!loading" layout="prev, pager, next" :total="1000" />
     </div>
-    <el-pagination layout="prev, pager, next" :total="1000" />
   </div>
 </template>
 
@@ -83,6 +109,8 @@ const { statusOptions } = storeToRefs(useTicketsStore());
 const parsedStatusOptions = ref([]) as Ref<Array<any>>;
 const { fetchStatusOptions } = useTicketsStore();
 const loading = ref(true);
+const localeRoute = useLocaleRoute();
+const router = useRouter();
 const i18n = useI18n();
 interface Ticket {
   id: number;
@@ -99,6 +127,28 @@ const tableDimensions = ref({
   width: 0,
   height: 0,
 });
+
+const width = ref("100vw");
+
+onNuxtReady(() => {
+  determineViewWidth();
+  window.addEventListener("resize", determineViewWidth);
+});
+
+function determineViewWidth() {
+  console.log("determining view width...");
+  if (typeof document === "undefined") return;
+  const navbar = document.getElementById("navbar");
+  if (typeof navbar === "undefined") return;
+  if (typeof navbar?.offsetWidth === "undefined") return;
+  console.log(window.innerWidth - navbar?.offsetWidth + "px");
+  width.value = window.innerWidth - navbar?.offsetWidth + "px";
+  const table = document.querySelector("el-table__inner-wrapper");
+  if (!!!table) return;
+
+  return;
+}
+
 let id = 0;
 const dataGenerator = () => ({
   id: ++id,
@@ -162,20 +212,7 @@ function parseStatusOptions() {
 async function updateTicketStatus(ticket_id: number, new_status: Status) {
   // Update actual Ticket Status in backend
   ElMessage({
-    message:
-      i18n.t("successfully") +
-      " " +
-      i18n.t("updated") +
-      " " +
-      i18n.t("ticket") +
-      " " +
-      ticket_id +
-      " " +
-      i18n.t("to") +
-      " " +
-      i18n.t("status") +
-      " " +
-      new_status.text,
+    message: i18n.t("updated"),
     type: "success",
   });
   return;

@@ -1,6 +1,7 @@
 <template>
   <div
-    class="max-h-[100vh] px-6 py-3 md:w-[40%] lg:w-[30%] xl:w-[20%] 2xl:w-[15%] w-fit base-bg-light dark:base-bg-dark hidden md:block lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
+    class="max-h-[100vh] px-6 py-3 md:min-w-[39%] lg:min-w-[25%] xl:min-w-[20%] 2xl:min-w-[15%] w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
+    id="navbar"
   >
     <Logo/>
     <el-menu

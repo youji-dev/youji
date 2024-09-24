@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute px-6 py-3 left-0 top-0 h-full w-full bg-transparent block md:hidden z-10"
+    class="absolute px-6 py-3 left-0 top-0 h-full w-full bg-transparent block lg:hidden z-10"
     :class="{ 'max-h-fit': !drawer }"
   >
     <div class="flex items-center justify-between w-full">

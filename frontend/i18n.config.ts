@@ -40,6 +40,12 @@ export default defineI18nConfig(() => ({
             serverError: "Internal server error",
             createTicket: "New Ticket",
             ticketOverview: "Ticket Overview",
+            navigation: "Navigation",
+            logout: "Logout",
+            settings: "Settings",
+            tickets: "Tickets",
+            searchVerb: "Search",
+            title: "Title",
         },
         de: {
             welcome: "Willkommen",
@@ -77,8 +83,14 @@ export default defineI18nConfig(() => ({
             light: "Hell",
             system: "System",
             serverError: "Serverfehler",
-            createTicket: "Ticket erstellen",
-            ticketOverview: "Ticket Übersicht",
+            createTicket: "Neues Ticket",
+            ticketOverview: "Ticketübersicht",
+            navigation: "Navigation",
+            logout: "Abmelden",
+            settings: "Einstellungen",
+            tickets: "Tickets",
+            searchVerb: "Suchen",
+            title: "Titel",
         }
     }
 }))

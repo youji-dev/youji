@@ -1,12 +1,11 @@
 <template>
-  <component :is="Sidebar"></component>
+  <!-- Route: /login -->
+  <!-- Page for login mask -->
   <el-form :model="form" label-width="auto" class="w-full h-lvh flex items-center justify-center">
     <div
       class="w-full md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark">
       <el-divider content-position="left" border-style="dashed">
-        <el-text class="" size="large" type="">{{
-          $t("ticketSystem")
-        }}</el-text>
+        <el-text size="large">{{ $t("ticketSystem") }}</el-text>
       </el-divider>
       <el-form-item class="w-full px-10 mt-3">
         <el-input v-model="form.username" :placeholder="$t('username')" :prefix-icon="User" Text />
@@ -25,14 +24,16 @@
 </template>
 
 <script lang="ts" setup>
+definePageMeta({
+  layout: "base"
+});
 import { Loading, Lock, User } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/stores/auth";
+import { ElNotification } from "element-plus";
 const { authenticateUser } = useAuthStore();
 const { authenticated, authErrors } = storeToRefs(useAuthStore());
 const i18n = useI18n();
-import { ElNotification } from "element-plus";
-import Sidebar from "~/components/sidebar.vue";
 const localePath = useLocaleRoute();
 const router = useRouter();
 

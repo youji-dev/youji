@@ -6,6 +6,10 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const token = useCookie(ACCESS_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
   const { checkIfTokenIsValid } = useAuthStore()
 
+  if (to.name === "login") {
+    return;
+  }
+
   if (token.value) {
     if (await checkIfTokenIsValid()) {
       authenticated.value = true;
@@ -16,12 +20,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
   }
 
-  if (token.value && to?.name === 'login') {
-    abortNavigation();
-    return navigateTo(localeRoute("/")?.fullPath);
-  }
-
-  if (!token.value && to?.name !== 'login') {
+  if (!token.value && !to?.name?.toString().startsWith("login")) {
     abortNavigation();
     return navigateTo(localeRoute("/login")?.fullPath);
   }

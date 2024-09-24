@@ -1,7 +1,9 @@
-﻿using MimeKit;
+﻿using Common.Helpers;
+using MimeKit;
 using MimeKit.Utils;
 using System.Reflection;
 using System.Text;
+using System.Web;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
@@ -13,7 +15,6 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly int maxLineWidth = 80;
 
         private readonly StringBuilder htmlBuilder = new();
-        private readonly StringBuilder plainTextBuilder = new();
         private readonly BodyBuilder bodyBuilder = new();
 
         /// <summary>
@@ -43,7 +44,9 @@ namespace DomainLayer.BusinessLogic.Mailing
                 .AppendLine("</div>");
 
             this.bodyBuilder.HtmlBody = this.htmlBuilder.ToString();
-            this.bodyBuilder.TextBody = this.plainTextBuilder.ToString();
+            this.bodyBuilder.TextBody = HtmlHelper.LimitLineLength(
+                HtmlHelper.HtmlToPlainText(this.bodyBuilder.HtmlBody),
+                this.maxLineWidth);
 
             return this.bodyBuilder;
         }
@@ -55,12 +58,10 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="level">The heading level</param>
         public void AddHeading(string content, int level = 1)
         {
-            this.htmlBuilder
-                .AppendLine($"<h{level}>{content}</h{level}>");
+            string cleanContent = this.Sanitize(content);
 
-            this.plainTextBuilder
-                .AppendLine(this.FormatForPlainText(content))
-                .AppendLine();
+            this.htmlBuilder
+                .AppendLine($"<h{level}>{cleanContent}</h{level}>");
         }
 
         /// <summary>
@@ -69,12 +70,10 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="content">The text content</param>
         public void AddParagraph(string content)
         {
-            this.htmlBuilder
-                .AppendLine($"<p>{content}</p>");
+            string cleanContent = this.Sanitize(content);
 
-            this.plainTextBuilder
-                .AppendLine(this.FormatForPlainText(content, true))
-                .AppendLine();
+            this.htmlBuilder
+                .AppendLine($"<p>{cleanContent}</p>");
         }
 
         /// <summary>
@@ -84,16 +83,14 @@ namespace DomainLayer.BusinessLogic.Mailing
         public void AddUnorderedList(IEnumerable<string> items)
         {
             this.htmlBuilder.AppendLine("<ul>");
-            this.plainTextBuilder.AppendLine();
 
             foreach (string item in items)
             {
-                this.htmlBuilder.AppendLine($"<li>{item}</li>");
-                this.plainTextBuilder.AppendLine($"\t- {item}");
+                string cleanItem = this.Sanitize(item);
+                this.htmlBuilder.AppendLine($"<li>{cleanItem}</li>");
             }
 
             this.htmlBuilder.AppendLine("</ul>");
-            this.plainTextBuilder.AppendLine();
         }
 
         /// <summary>
@@ -201,21 +198,14 @@ namespace DomainLayer.BusinessLogic.Mailing
                 .AppendLine("</header>");
         }
 
-        private string FormatForPlainText(string s, bool indent = false)
+        private string Sanitize(string input)
         {
-            StringBuilder limitedString = new();
+            //ReadOnlySpan<byte> inputSpan = Encoding.UTF8.GetBytes(input);
+            //Span<byte> output = [];
+            //HtmlEncoder.Default.EncodeUtf8(inputSpan, output, out _, out _);
 
-            do
-            {
-                int charactersInLine = Math.Min(s.Length, this.maxLineWidth);
-                string line = string.Join(string.Empty, s.Take(charactersInLine));
-
-                limitedString.AppendLine($"{(indent ? "\t" : string.Empty)}{line}");
-                s = s.Remove(0, charactersInLine);
-            }
-            while (s.Length > 0);
-
-            return limitedString.ToString();
+            //return Encoding.UTF8.GetString(output);
+            return HttpUtility.HtmlEncode(input);
         }
     }
 }

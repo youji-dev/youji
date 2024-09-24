@@ -19,13 +19,16 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <summary>
         /// Initializes new instance of <see cref="MailBodyBuilder"/>
         /// </summary>
-        public MailBodyBuilder()
+        /// <param name="mainHeading">The main heading of the mail</param>
+        public MailBodyBuilder(string mainHeading)
         {
+            this.htmlBuilder
+                .AppendLine("<div class\"container\">");
+
             this.AddStyling();
-            this.AddBranding();
+            this.AddHeader(mainHeading);
 
             this.htmlBuilder
-                .AppendLine("<div class\"container\">")
                 .AppendLine("<div class=\"content\">");
         }
 
@@ -70,7 +73,7 @@ namespace DomainLayer.BusinessLogic.Mailing
                 .AppendLine($"<p>{content}</p>");
 
             this.plainTextBuilder
-                .AppendLine("\t" + this.FormatForPlainText(content))
+                .AppendLine(this.FormatForPlainText(content, true))
                 .AppendLine();
         }
 
@@ -93,38 +96,89 @@ namespace DomainLayer.BusinessLogic.Mailing
             this.plainTextBuilder.AppendLine();
         }
 
+        /// <summary>
+        /// Adds a card-style element
+        /// </summary>
+        /// <param name="content">The text content</param>
+        public void AddCard(string content) => this.AddCard([content]);
+
+        /// <summary>
+        /// Adds a card-style element
+        /// </summary>
+        /// <param name="paragraphs">The paragraphs in the card</param>
+        public void AddCard(string[] paragraphs)
+        {
+            this.htmlBuilder
+                .AppendLine("<div class=\"card\"");
+
+            foreach (string paragraph in paragraphs)
+            {
+                this.AddParagraph(paragraph);
+            }
+
+            this.htmlBuilder
+                .AppendLine("</div>");
+        }
+
         private void AddStyling()
         {
             this.htmlBuilder.AppendLine(
                     $@"
 <style>
+    html, body {{
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+    }}
+
     .container {{
-        position: relative;
         width: 100%;
         height: 100%;
+
+        display: grid;
+        grid-template-rows: min-content, auto;
+    }}
+
+    header {{
+        grid-row: 1;
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem; 
+
+        background-color: #409EFF;
+    }}
+
+    header > h1 {{
+        padding-inline: 5ch;
+    }}
+
+    header > .logo {{
+        padding-inline: 5ch;
     }}
 
     .logo {{
-        position: absolute;
-        top: 10;
-        right: 10;
         width: 100px;
         height: 100px;
     }}
 
     .content {{
+        grid-row: 2;
+        margin-inline: 10ch;
         max-width: {this.maxLineWidth}ch;
-        font-family: sans-serif;
     }}
 
-    h1, h2, h3, h4, h5, h6, p, li {{
-        font-family: inherit;
+    .card {{
+        padding: 20px;
+        background-color: #e2e2e2;
     }}
 </style>
                 ");
         }
 
-        private void AddBranding()
+        private void AddHeader(string heading)
         {
             Assembly? assembly = Assembly.GetEntryAssembly();
             if (assembly is null)
@@ -141,7 +195,10 @@ namespace DomainLayer.BusinessLogic.Mailing
             logo.ContentId = MimeUtils.GenerateMessageId();
 
             this.htmlBuilder
-                .AppendLine($@"<img class='logo' src='cid:{logo.ContentId}'/>");
+                .AppendLine("<header>")
+                .AppendLine($"<h1>{heading}</h1>")
+                .AppendLine($@"<img class='logo' src='cid:{logo.ContentId}'/>")
+                .AppendLine("</header>");
         }
 
         private string FormatForPlainText(string s, bool indent = false)

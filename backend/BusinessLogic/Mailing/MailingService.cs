@@ -25,8 +25,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <returns>The generated mail body</returns>
         public BodyBuilder GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
         {
-            MailBodyBuilder builder = new();
-            builder.AddHeading($"Ticket '{newTicket.Title}' wurde geändert");
+            MailBodyBuilder builder = new($"Ticket '{newTicket.Title}' wurde geändert");
 
             if (newTicket.Title != oldTicket.Title)
             {
@@ -37,9 +36,7 @@ namespace DomainLayer.BusinessLogic.Mailing
             if (newTicket.Description != oldTicket.Description)
             {
                 builder.AddHeading("Beschreibung geändert", 3);
-                builder.AddParagraph(oldTicket.Description ?? "-");
-                builder.AddParagraph("->");
-                builder.AddParagraph(newTicket.Description ?? "-");
+                builder.AddCard([oldTicket.Description ?? "-", "->", newTicket.Description ?? "-"]);
             }
 
             if (newTicket.Priority != oldTicket.Priority)
@@ -79,14 +76,14 @@ namespace DomainLayer.BusinessLogic.Mailing
                 foreach (var comment in newComments)
                 {
                     builder.AddHeading($"Neuer Kommentar von '{comment.Author}'", 3);
-                    builder.AddParagraph(comment.Content);
+                    builder.AddCard(comment.Content);
                 }
             }
 
             if (newTicket.Attachments.Count != oldTicket.Attachments.Count)
             {
                 var newAttachments = newTicket.Attachments.Skip(oldTicket.Attachments.Count);
-                builder.AddHeading($"Neue Anhänge");
+                builder.AddHeading($"Neue Anhänge", 3);
 
                 builder.AddUnorderedList(newAttachments.Select(attachment => $"{attachment.Name}"));
             }

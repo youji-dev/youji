@@ -21,21 +21,27 @@ namespace Application.WebApi.Controllers
         public ActionResult<Building[]> Get(
             [FromServices] BuildingRepository buildingRepo)
         {
-            return this.Ok(buildingRepo.GetAllAsync(building => building != null));
+            return this.Ok(buildingRepo.GetAll().ToArray());
         }
 
         /// <summary>
         /// Adds a new building entity.
         /// </summary>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
-        /// <param name="building">Instance of <see cref="Building"/></param>
+        /// <param name="buildingName">A <see langword="string"/> with the new name of building</param>
         /// <returns>An <see cref="ObjectResult"/> with the added building entity.</returns>
         [HttpPost]
-        public async Task<ActionResult<Building[]>> Post(
+        public async Task<ActionResult<Building>> Post(
             [FromServices] BuildingRepository buildingRepo,
-            [FromBody] Building building)
+            [FromBody] string buildingName)
         {
+            var building = new Building()
+            {
+                Name = buildingName,
+            };
+
             await buildingRepo.AddAsync(building);
+
             return this.Ok(building);
         }
 
@@ -46,7 +52,7 @@ namespace Application.WebApi.Controllers
         /// <param name="building">Instance of <see cref="Building"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated building.</returns>
         [HttpPut]
-        public async Task<ActionResult<Building[]>> Put(
+        public async Task<ActionResult<Building>> Put(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] Building building)
         {
@@ -58,23 +64,21 @@ namespace Application.WebApi.Controllers
         /// Deletes the building with the specific id.
         /// </summary>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
-        /// <param name="id">The specific id of the building that will deleted.</param>
+        /// <param name="buildingId">The specific id of the building that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
-        public async Task<ActionResult<Building[]>> Delete(
+        public async Task<ActionResult<string>> Delete(
             [FromServices] BuildingRepository buildingRepo,
-            [FromBody] string id)
+            [FromBody] string buildingId)
         {
-            var deleteBuilding = await buildingRepo.GetAsync(new Guid(id));
+            var deleteBuilding = await buildingRepo.GetAsync(new Guid(buildingId));
 
             if (deleteBuilding is null)
-            {
-                return this.BadRequest($"Eine Priorität mit der ID '{id}' existiert nicht.");
-            }
+                return this.NotFound($"Eine Priorität mit der ID '{buildingId}' existiert nicht.");
 
             await buildingRepo.DeleteAsync(deleteBuilding);
 
-            return this.Ok($"Die Priorität mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"Die Priorität mit der ID '{buildingId}' wurde gelöscht.");
         }
     }
 }

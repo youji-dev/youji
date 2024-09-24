@@ -17,16 +17,14 @@ namespace Application.WebApi.Controllers
         /// <param name="id">The specific id of the comment.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
-        public async Task<ActionResult> Delete(
+        public async Task<ActionResult<string>> Delete(
             [FromServices] TicketCommentRepository commentRepo,
             [FromBody] string id)
         {
             var comment = await commentRepo.GetAsync(new Guid(id));
 
-            if (comment == null)
-            {
-                return this.NotFound();
-            }
+            if (comment is null)
+                return this.NotFound($"Ein Kommentar mit der ID '{id}' existiert nicht.");
 
             await commentRepo.DeleteAsync(comment);
 

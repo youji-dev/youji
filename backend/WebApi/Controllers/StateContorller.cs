@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Common.Contracts;
+using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 
@@ -21,21 +22,28 @@ namespace Application.WebApi.Controllers
         public ActionResult<State[]> Get(
             [FromServices] StateRepository stateRepo)
         {
-            return this.Ok(stateRepo.GetAllAsync(state => state != null));
+            return this.Ok(stateRepo.GetAll().ToArray());
         }
 
         /// <summary>
         /// Adds a new state entity.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="state">Instance of <see cref="State"/></param>
+        /// <param name="stateData">Instance of <see cref="StateDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
-        public async Task<ActionResult<State[]>> Post(
+        public async Task<ActionResult<State>> Post(
             [FromServices] StateRepository stateRepo,
-            [FromBody] State state)
+            [FromBody] StateDTO stateData)
         {
+            var state = new State()
+            {
+                Name = stateData.Name,
+                Color = stateData.Color,
+            };
+
             await stateRepo.AddAsync(state);
+
             return this.Ok(state);
         }
 
@@ -46,7 +54,7 @@ namespace Application.WebApi.Controllers
         /// <param name="state">Instance of <see cref="State"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
-        public async Task<ActionResult<State[]>> Put(
+        public async Task<ActionResult<State>> Put(
             [FromServices] StateRepository stateRepo,
             [FromBody] State state)
         {
@@ -61,16 +69,14 @@ namespace Application.WebApi.Controllers
         /// <param name="id">The specific id of the state that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
-        public async Task<ActionResult<State[]>> Delete(
+        public async Task<ActionResult<string>> Delete(
             [FromServices] StateRepository stateRepo,
             [FromBody] string id)
         {
             var deleteState = await stateRepo.GetAsync(new Guid(id));
 
             if (deleteState is null)
-            {
-                return this.BadRequest($"Ein State mit der ID '{id}' existiert nicht.");
-            }
+                return this.NotFound($"Ein State mit der ID '{id}' existiert nicht.");
 
             await stateRepo.DeleteAsync(deleteState);
 

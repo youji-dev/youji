@@ -17,16 +17,14 @@ namespace Application.WebApi.Controllers
         /// <param name="id">The specific id of the attachment.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
-        public async Task<ActionResult> Delete(
+        public async Task<ActionResult<string>> Delete(
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromBody] string id)
         {
             var attachment = await attachmentRepo.GetAsync(new Guid(id));
 
-            if (attachment == null)
-            {
-                return this.NotFound();
-            }
+            if (attachment is null)
+                return this.NotFound($"Ein Anhang mit der ID '{id}' existiert nicht.");
 
             await attachmentRepo.DeleteAsync(attachment);
 

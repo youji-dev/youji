@@ -40,29 +40,29 @@ namespace Application.WebApi.Controllers
         [HttpGet("search")]
         public ActionResult Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromQuery] string[] searchTerm,
+            [FromQuery] string searchTerm,
             [FromQuery] int skip = 0,
-            [FromQuery] int take = 10)
+            [FromQuery] int? take = null)
         {
-            searchTerm = searchTerm.Select(term => term.ToLower()).ToArray();
+            searchTerm = searchTerm.ToLower();
 
-            var tickets = ticketRepo.GetAllAsync(ticket =>
-                ((ticket.Description != null) && searchTerm.Any(term => ticket.Description.ToLower().Contains(term)))
-                || ((ticket.Building != null) && searchTerm.Any(term => ticket.Building.Name.ToLower().Contains(term)))
-                || ((ticket.Room != null) && searchTerm.Any(term => ticket.Room.ToLower().Contains(term)))
-                || ((ticket.Priority != null) && searchTerm.Any(term => ticket.Priority.Name.ToLower().Contains(term)))
-                || ((ticket.State != null) && searchTerm.Any(term => ticket.State.Name.ToLower().Contains(term)))
-                || searchTerm.Any(term => ticket.Title.ToLower().Contains(term))
-                || searchTerm.Any(term => ticket.Author.ToLower().Contains(term))
-                || searchTerm.Any(term => ticket.CreationDate.ToString().ToLower().Contains(term)))
-                .ToList()
-                .Skip(skip)
-                .Take(take);
+            var ticketQuery = ticketRepo.GetAll().Where(ticket =>
+                ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
+                || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
+                || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
+                || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
+                || ((ticket.State != null) && ticket.State.Name.ToLower().Contains(searchTerm))
+                || ticket.Title.ToLower().Contains(searchTerm)
+                || ticket.Author.ToLower().Contains(searchTerm)
+                || ticket.CreationDate.ToString().ToLower().Contains(searchTerm))
+                .Skip(skip);
 
-            if (tickets is null)
+            if (take is not null)
             {
-                return this.NotFound();
+                ticketQuery = ticketQuery.Take((int)take);
             }
+
+            Ticket[] tickets = [.. ticketQuery];
 
             return this.Ok(tickets);
         }
@@ -120,7 +120,8 @@ namespace Application.WebApi.Controllers
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var state = await stateRepo.GetAsync(ticketData.StateId)
+                ?? throw new BadHttpRequestException("Das zu erstellende Ticket muss einen gültigen Zustand (state) haben!");
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
@@ -160,9 +161,7 @@ namespace Application.WebApi.Controllers
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (ticket is null)
-            {
                 return this.NotFound();
-            };
 
             TicketComment comment = new ()
             {
@@ -173,10 +172,6 @@ namespace Application.WebApi.Controllers
             };
 
             await commentRepo.AddAsync(comment);
-
-            //ticket.Comments?.Add(comment);
-
-            //await ticketRepo.UpdateAsync(ticket);
 
             return this.Ok(comment);
         }
@@ -199,9 +194,7 @@ namespace Application.WebApi.Controllers
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (ticket is null)
-            {
                 return this.NotFound();
-            }
 
             using MemoryStream stream = new ();
             await attachmentFile.CopyToAsync(stream);
@@ -215,10 +208,6 @@ namespace Application.WebApi.Controllers
             };
 
             await attachmentRepo.AddAsync(attachment);
-
-            //ticket.Attachments?.Add(attachment);
-
-            //await ticketRepo.UpdateAsync(ticket);
 
             return this.Ok(attachment);
         }
@@ -240,7 +229,8 @@ namespace Application.WebApi.Controllers
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var state = await stateRepo.GetAsync(ticketData.StateId)
+                ?? throw new BadHttpRequestException("Das zu erstellende Ticket muss einen gültigen Zustand (state) haben!");
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
@@ -276,9 +266,7 @@ namespace Application.WebApi.Controllers
             var deleteTicket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (deleteTicket is null)
-            {
                 return this.NotFound();
-            }
 
             await ticketRepo.DeleteAsync(deleteTicket);
 

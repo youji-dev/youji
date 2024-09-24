@@ -36,7 +36,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Buildings");
+                    b.ToTable("Buildings", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Priority", b =>
@@ -53,7 +53,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Value");
 
-                    b.ToTable("Priorities");
+                    b.ToTable("Priorities", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.RoleAssignment", b =>
@@ -66,7 +66,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("RoleAssignments");
+                    b.ToTable("RoleAssignments", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.State", b =>
@@ -86,7 +86,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("States");
+                    b.ToTable("States", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>
@@ -133,7 +133,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketAttachment", b =>
@@ -162,7 +162,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketComment", b =>
@@ -190,7 +190,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>
@@ -229,13 +229,11 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketComment", b =>
                 {
-                    b.HasOne("PersistenceLayer.DataAccess.Entities.Ticket", "Ticket")
+                    b.HasOne("PersistenceLayer.DataAccess.Entities.Ticket", null)
                         .WithMany("Comments")
                         .HasForeignKey("TicketId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Ticket");
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>

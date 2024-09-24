@@ -18,6 +18,7 @@ namespace Application.WebApi.Controllers
         /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all role assignments.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<RoleAssignment[]> Get(
             [FromServices] RoleAssignmentRepository roleAssignmentRepo)
         {
@@ -31,6 +32,7 @@ namespace Application.WebApi.Controllers
         /// <param name="roleAssignment">Instance of <see cref="RoleAssignment"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added role assignment entity.</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<RoleAssignment>> Post(
             [FromServices] RoleAssignmentRepository roleAssignmentRepo,
             [FromBody] RoleAssignment roleAssignment)
@@ -46,6 +48,8 @@ namespace Application.WebApi.Controllers
         /// <param name="id">Instance of <see cref="RoleAssignment"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated role assignment.</returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] RoleAssignmentRepository roleAssignmentRepo,
             string id)
@@ -53,11 +57,11 @@ namespace Application.WebApi.Controllers
             var deleteRoleAssignment = await roleAssignmentRepo.GetAsync(new Guid(id));
 
             if (deleteRoleAssignment is null)
-                return this.NotFound($"Eine Rollenzuweisung mit der ID '{id}' existiert nicht.");
+                return this.NotFound($"A role assignment with de id '{id}' doesn´t exist.");
 
             await roleAssignmentRepo.DeleteAsync(deleteRoleAssignment);
 
-            return this.Ok($"Die Rollenzuweisung mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"The role assignment with the id '{id}' was deleted.");
         }
     }
 }

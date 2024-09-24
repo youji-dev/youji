@@ -17,6 +17,8 @@ namespace Application.WebApi.Controllers
         /// <param name="id">The specific id of the attachment.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromBody] string id)
@@ -24,11 +26,11 @@ namespace Application.WebApi.Controllers
             var attachment = await attachmentRepo.GetAsync(new Guid(id));
 
             if (attachment is null)
-                return this.NotFound($"Ein Anhang mit der ID '{id}' existiert nicht.");
+                return this.NotFound($"An attachment with the id '{id}' doesn´t exist.");
 
             await attachmentRepo.DeleteAsync(attachment);
 
-            return this.Ok($"Der Anhang mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"The attachment with the id '{id}' was deleted.");
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Application.WebApi.Controllers
         /// <param name="id">The specific id of the comment.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketCommentRepository commentRepo,
             [FromBody] string id)
@@ -24,11 +26,11 @@ namespace Application.WebApi.Controllers
             var comment = await commentRepo.GetAsync(new Guid(id));
 
             if (comment is null)
-                return this.NotFound($"Ein Kommentar mit der ID '{id}' existiert nicht.");
+                return this.NotFound($"A comment with the id '{id}' doesn´t exist.");
 
             await commentRepo.DeleteAsync(comment);
 
-            return this.Ok($"Der Kommentar mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"The comment with the id '{id}' was deleted.");
         }
     }
 }

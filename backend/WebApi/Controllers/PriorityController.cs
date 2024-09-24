@@ -18,6 +18,7 @@ namespace Application.WebApi.Controllers
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all priorities.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<Priority[]> Get(
             [FromServices] PriorityRepository priorityRepo)
         {
@@ -31,6 +32,7 @@ namespace Application.WebApi.Controllers
         /// <param name="priority">Instance of <see cref="Priority"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added priority entity.</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Priority>> Post(
             [FromServices] PriorityRepository priorityRepo,
             [FromBody] Priority priority)
@@ -46,6 +48,7 @@ namespace Application.WebApi.Controllers
         /// <param name="priority">Instance of <see cref="Priority"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated priority.</returns>
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
             [FromBody] Priority priority)
@@ -61,6 +64,8 @@ namespace Application.WebApi.Controllers
         /// <param name="value">The specific id of the priority that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] PriorityRepository priorityRepo,
             [FromBody] int value)
@@ -68,11 +73,11 @@ namespace Application.WebApi.Controllers
             var deletePriority = await priorityRepo.GetAsync(value);
 
             if (deletePriority is null)
-                return this.NotFound($"Eine Priorität mit dem Wert {value} existiert nicht.");
+                return this.NotFound($"A priority with the value {value} doesn´t exist.");
 
             await priorityRepo.DeleteAsync(deletePriority);
 
-            return this.Ok($"Die Priorität mit dem Wert {value} wurde gelöscht.");
+            return this.Ok($"The priority with the value {value} was deleted.");
         }
     }
 }

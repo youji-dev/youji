@@ -18,6 +18,7 @@ namespace Application.WebApi.Controllers
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all buildings.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<Building[]> Get(
             [FromServices] BuildingRepository buildingRepo)
         {
@@ -31,6 +32,7 @@ namespace Application.WebApi.Controllers
         /// <param name="buildingName">A <see langword="string"/> with the new name of building</param>
         /// <returns>An <see cref="ObjectResult"/> with the added building entity.</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Building>> Post(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] string buildingName)
@@ -52,6 +54,7 @@ namespace Application.WebApi.Controllers
         /// <param name="building">Instance of <see cref="Building"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated building.</returns>
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Building>> Put(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] Building building)
@@ -67,6 +70,8 @@ namespace Application.WebApi.Controllers
         /// <param name="buildingId">The specific id of the building that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] string buildingId)
@@ -74,11 +79,11 @@ namespace Application.WebApi.Controllers
             var deleteBuilding = await buildingRepo.GetAsync(new Guid(buildingId));
 
             if (deleteBuilding is null)
-                return this.NotFound($"Eine Priorität mit der ID '{buildingId}' existiert nicht.");
+                return this.NotFound($"A building with the id '{buildingId}' doesn´t exist.");
 
             await buildingRepo.DeleteAsync(deleteBuilding);
 
-            return this.Ok($"Die Priorität mit der ID '{buildingId}' wurde gelöscht.");
+            return this.Ok($"The building with the id '{buildingId}' was deleted.");
         }
     }
 }

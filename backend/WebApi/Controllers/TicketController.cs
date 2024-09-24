@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
+using System.Collections.ObjectModel;
 
 namespace Application.WebApi.Controllers
 {
@@ -22,7 +23,8 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific ticket id.</param>
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}")]
-        public async Task<ActionResult> Get(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] string ticketId)
         {
@@ -38,7 +40,8 @@ namespace Application.WebApi.Controllers
         /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
-        public ActionResult Get(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public ActionResult<Ticket[]> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string searchTerm,
             [FromQuery] int skip = 0,
@@ -74,13 +77,14 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific ticket id</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketComment"/> from the specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}/comments")]
-        public async Task<ActionResult> GetComments(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Collection<TicketComment>>> GetComments(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] string ticketId)
         {
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
-            ICollection<TicketComment>? ticketComments = ticket?.Comments;
+            Collection<TicketComment>? ticketComments = ticket?.Comments;
 
             return this.Ok(ticketComments);
         }
@@ -92,13 +96,14 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific ticket id</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketAttachment"/> from the specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}/attachments")]
-        public async Task<ActionResult> GetAttachments(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Collection<TicketAttachment>>> GetAttachments(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] string ticketId)
         {
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
-            ICollection<TicketAttachment>? ticketAttachments = ticket?.Attachments;
+            Collection<TicketAttachment>? ticketAttachments = ticket?.Attachments;
 
             return this.Ok(ticketAttachments);
         }
@@ -113,15 +118,20 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketData">Instance of <see cref="TicketDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added ticket entity.</returns>
         [HttpPost]
-        public async Task<ActionResult> Post(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Ticket>> Post(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId)
-                ?? throw new BadHttpRequestException("Das zu erstellende Ticket muss einen gültigen Zustand (state) haben!");
+            var state = await stateRepo.GetAsync(ticketData.StateId);
+
+            if (state is null)
+                return this.BadRequest("The ticket to be created must have a valid state.");
+
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
@@ -152,7 +162,9 @@ namespace Application.WebApi.Controllers
         /// <param name="commentData">Instance of <see cref="CommentDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
-        public async Task<ActionResult> PostComment(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<TicketComment>> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] string ticketId,
@@ -161,7 +173,7 @@ namespace Application.WebApi.Controllers
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (ticket is null)
-                return this.NotFound();
+                return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
             TicketComment comment = new ()
             {
@@ -185,7 +197,9 @@ namespace Application.WebApi.Controllers
         /// <param name="attachmentFile">Instance of <see cref="IFormFile"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
         [HttpPost("{ticketId}/attachment")]
-        public async Task<ActionResult> PostAttachment(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<TicketAttachment>> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromRoute] string ticketId,
@@ -194,7 +208,7 @@ namespace Application.WebApi.Controllers
             Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (ticket is null)
-                return this.NotFound();
+                return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
             using MemoryStream stream = new ();
             await attachmentFile.CopyToAsync(stream);
@@ -222,15 +236,20 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketData">Instance of <see cref="TicketDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
-        public async Task<ActionResult> Put(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Ticket>> Put(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId)
-                ?? throw new BadHttpRequestException("Das zu erstellende Ticket muss einen gültigen Zustand (state) haben!");
+            var state = await stateRepo.GetAsync(ticketData.StateId);
+
+            if (state is null)
+                return this.BadRequest("The ticket to be created must have a valid state.");
+
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
@@ -259,18 +278,20 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific id of the ticket that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{ticketId}")]
-        public async Task<ActionResult> Delete(
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<string>> Delete(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] string ticketId)
         {
             var deleteTicket = await ticketRepo.GetAsync(new Guid(ticketId));
 
             if (deleteTicket is null)
-                return this.NotFound();
+                return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
             await ticketRepo.DeleteAsync(deleteTicket);
 
-            return this.Ok($"Das Ticket mit der ID '{ticketId}' wurde gelöscht.");
+            return this.Ok($"The ticket with the id '{ticketId}' was deleted.");
         }
     }
 }

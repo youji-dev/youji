@@ -32,6 +32,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateData">Instance of <see cref="StateDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<State>> Post(
             [FromServices] StateRepository stateRepo,
             [FromBody] StateDTO stateData)
@@ -54,6 +55,7 @@ namespace Application.WebApi.Controllers
         /// <param name="state">Instance of <see cref="State"/>.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<State>> Put(
             [FromServices] StateRepository stateRepo,
             [FromBody] State state)
@@ -69,6 +71,8 @@ namespace Application.WebApi.Controllers
         /// <param name="id">The specific id of the state that will deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] StateRepository stateRepo,
             [FromBody] string id)
@@ -76,11 +80,11 @@ namespace Application.WebApi.Controllers
             var deleteState = await stateRepo.GetAsync(new Guid(id));
 
             if (deleteState is null)
-                return this.NotFound($"Ein State mit der ID '{id}' existiert nicht.");
+                return this.NotFound($"A state with the id '{id}' doesn´t exist.");
 
             await stateRepo.DeleteAsync(deleteState);
 
-            return this.Ok($"Der State mit der ID '{id}' wurde gelöscht.");
+            return this.Ok($"The state with the id '{id}' was deleted.");
         }
     }
 }

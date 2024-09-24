@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <None Remove="Resources.I18N.xml" />
-    <None Remove="Resources\Logo.svg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,12 +42,6 @@
     <ProjectReference Include="..\BusinessLogic\DomainLayer.BusinessLogic.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\DataAccessLayer\PersistenceLayer.DataAccess.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Logo.svg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

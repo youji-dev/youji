@@ -28,20 +28,10 @@ namespace PersistenceLayer.DataAccess.Repositories
         /// <summary>
         /// Gets all entities.
         /// </summary>
-        /// <returns>All entities.</returns>
-        public virtual TEntity[]? GetAllAsync()
+        /// <returns>All entities of <see cref="TEntity">.</returns>
+        public virtual IQueryable<TEntity> GetAll()
         {
-            return [.. this.Context.Set<TEntity>()];
-        }
-
-        /// <summary>
-        /// Get all entities that matches the expression.
-        /// </summary>
-        /// <param name="expression">Instance of <see cref="Expression"/></param>
-        /// <returns>All entities matches the expression.</returns>
-        public virtual List<TEntity> GetAllAsync(Expression<Func<TEntity, bool>> expression)
-        {
-            return this.Context.Set<TEntity>().Where(expression).ToList();
+            return this.Context.Set<TEntity>();
         }
 
         /// <summary>

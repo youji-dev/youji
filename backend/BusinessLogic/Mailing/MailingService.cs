@@ -1,8 +1,14 @@
-﻿using Common.Extensions;
+﻿using System.Reflection;
+using Common.Extensions;
+using Common.Helpers;
+using DomainLayer.BusinessLogic.Mailing.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
+using MimeKit.Utils;
 using PersistenceLayer.DataAccess.Entities;
+using RazorEngine;
+using RazorEngine.Templating;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
@@ -23,72 +29,31 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="newTicket">New version of the ticket</param>
         /// <param name="oldTicket">Old version of the ticket</param>
         /// <returns>The generated mail body</returns>
-        public BodyBuilder GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
+        public MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
         {
-            MailBodyBuilder builder = new($"Ticket '{newTicket.Title}' wurde geändert");
+            BodyBuilder bodyBuilder = new();
 
-            if (newTicket.Title != oldTicket.Title)
-            {
-                builder.AddHeading("Titel geändert", 3);
-                builder.AddParagraph($"{oldTicket.Title} -> {newTicket.Title}");
-            }
+            Assembly assembly = Assembly.GetExecutingAssembly()
+                ?? throw new InvalidOperationException("Could not get assembly while loading logo file");
 
-            if (newTicket.Description != oldTicket.Description)
-            {
-                builder.AddHeading("Beschreibung geändert", 3);
-                builder.AddCard([oldTicket.Description ?? "-", "->", newTicket.Description ?? "-"]);
-            }
+            var logo = bodyBuilder.LinkedResources.Add(
+                "Logo.svg",
+                assembly.GetResource("Logo.svg"));
 
-            if (newTicket.Priority != oldTicket.Priority)
-            {
-                builder.AddHeading("Priorität geändert", 3);
-                builder.AddParagraph($"{oldTicket.Priority?.Name ?? "-"} -> {newTicket.Priority?.Name ?? "-"}");
-            }
+            logo.ContentId = MimeUtils.GenerateMessageId();
 
-            if (newTicket.State != oldTicket.State)
-            {
-                builder.AddHeading("Status geändert", 3);
-                builder.AddParagraph($"{oldTicket.State.Name} -> {newTicket.State.Name}");
-            }
+            TicketChangedModel mailModel = TicketChangedModel.FromTickets(newTicket, oldTicket);
+            mailModel.LogoSrc = $"cid:{logo.ContentId}";
 
-            if (newTicket.Building != oldTicket.Building)
-            {
-                builder.AddHeading("Gebäude geändert", 3);
-                builder.AddParagraph($"{oldTicket.Building?.Name ?? "-"} -> {newTicket.Building?.Name ?? "-"}");
-            }
+            string template = TemplateHelper.GetTemplate("TicketChanged")
+                ?? throw new InvalidOperationException("Could not find template");
 
-            if (newTicket.Room != oldTicket.Room)
-            {
-                builder.AddHeading("Raum geändert", 3);
-                builder.AddParagraph($"{oldTicket.Room ?? "-"} -> {newTicket.Room ?? "-"}");
-            }
+            var html = Engine.Razor.RunCompile(template, "TicketChanged", typeof(TicketChangedModel), mailModel);
 
-            if (newTicket.Object != oldTicket.Object)
-            {
-                builder.AddHeading("Betroffenes Objekt geändert");
-                builder.AddParagraph($"{oldTicket.Object} -> {newTicket.Object}");
-            }
+            bodyBuilder.HtmlBody = html;
+            bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);
 
-            if (newTicket.Comments.Count > oldTicket.Comments.Count)
-            {
-                var newComments = newTicket.Comments.Skip(oldTicket.Comments.Count);
-
-                foreach (var comment in newComments)
-                {
-                    builder.AddHeading($"Neuer Kommentar von '{comment.Author}'", 3);
-                    builder.AddCard(comment.Content);
-                }
-            }
-
-            if (newTicket.Attachments.Count != oldTicket.Attachments.Count)
-            {
-                var newAttachments = newTicket.Attachments.Skip(oldTicket.Attachments.Count);
-                builder.AddHeading($"Neue Anhänge", 3);
-
-                builder.AddUnorderedList(newAttachments.Select(attachment => $"{attachment.Name}"));
-            }
-
-            return builder.Complete();
+            return bodyBuilder.ToMessageBody();
         }
 
         /// <summary>
@@ -98,14 +63,14 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="subject">The mail subject</param>
         /// <param name="body">The mail body</param>
         /// <returns>A task representing the asynchronous operation</returns>
-        public async Task Send(MailboxAddress recipient, string subject, BodyBuilder body)
+        public async Task Send(MailboxAddress recipient, string subject, MimeEntity body)
         {
             MimeMessage message = new();
             message.From.Add(new MailboxAddress(this.mailSenderName, this.mailSenderAddress));
             message.To.Add(recipient);
             message.Subject = subject;
 
-            message.Body = body.ToMessageBody();
+            message.Body = body;
 
             using SmtpClient client = new();
 

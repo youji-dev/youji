@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Resources\Logo.svg" />
+    <None Remove="Resources\Mailing\Templates\TicketChanged.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,6 +18,7 @@
     <PackageReference Include="JWT" Version="11.0.0-beta2" />
     <PackageReference Include="LdapForNet" Version="2.7.15" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.2" />
+    <PackageReference Include="RazorEngine.NetCore" Version="3.1.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -32,6 +34,9 @@
 
 	<ItemGroup>
 	  <EmbeddedResource Include="Resources\Logo.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Mailing\Templates\TicketChanged.cshtml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>

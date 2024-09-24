@@ -24,16 +24,10 @@ const useFetchAuthenticated = (url: string | (() => string), options?: UseFetchO
         retryDelay: 500,
 
         onRequest({ options }) {
-            if (accessToken) {
-                const headers = options.headers ||= {}
-                if (Array.isArray(headers)) {
-                    headers.push(['Authorization', `Bearer ${accessToken.value}`])
-                } else if (headers instanceof Headers) {
-                    headers.set('Authorization', `Bearer ${accessToken.value}`)
-                } else {
-                    headers.Authorization = `Bearer ${accessToken.value}`
-                }
-            }
+            options.headers = {
+                ...options.headers,
+                Authorization: `Bearer ${accessToken.value}`,
+            };
         },
         async onResponseError({ response }) {
             if (response?.status === 401) {
@@ -50,8 +44,7 @@ const useFetchAuthenticated = (url: string | (() => string), options?: UseFetchO
                     );
                     accessToken.value = data.value.accessToken;
                     refreshToken.value = data.value.refreshToken;
-                }
-                catch (error) {
+                } catch (error) {
                     authStore.logUserOut();
                     navigateTo(localePath("/login")?.fullPath);
                 }

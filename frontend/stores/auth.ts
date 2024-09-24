@@ -8,6 +8,7 @@ interface UserPayloadInterface {
   name: string;
   password: string;
 }
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
@@ -40,17 +41,15 @@ export const useAuthStore = defineStore("auth", {
 
         this.loading = pending;
 
-        if (error.value) {
-          console.error(error.value);
+        if (error?.value?.statusCode === 401) {
+          this.authErrors.push("wrong credentials");
+        } else if (error?.value) {
+          console.error(error);
           this.authErrors.push(error.value);
-          return;
         }
 
-        if (!data.value) {
-          console.error("missing data");
-          this.authErrors.push("missing data");
+        if (!data.value)
           return;
-        }
 
         useCookie(ACCESS_TOKEN_NAME, { secure: true, sameSite: "strict" }).value = data.value.accessToken;
         useCookie(REFRESH_TOKEN_NAME, { secure: true, sameSite: "strict" }).value = data.value.refreshToken;

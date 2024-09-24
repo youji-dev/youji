@@ -35,21 +35,13 @@
         </el-input>
       </el-form-item>
       <div class="flex items-center justify-between w-full">
-        <el-checkbox
-          v-model="form.remember"
-          :label="$t('rememberMe')"
-          class="mr-auto ml-10"
-          size="large"
-          style="font-weight: 400;"
-        />
-
         <el-button
           :loading="loading"
           :loading-icon="Loading"
           type="primary"
           plain
           round
-          @click="login()"
+          @click="loginUser()"
           class="ml-auto mr-10"
           >{{ $t("login") }}</el-button
         >
@@ -73,49 +65,55 @@ const router = useRouter();
 let form = ref({
   username: "",
   password: "",
-  remember: false,
 });
 const loading = ref(false);
 
-async function login() {
+
+async function loginUser() {
   loading.value = true;
   try {
-    const user = ref({
-      name: form.value.username,
-      password: form.value.password,
-    });
-    await authenticateUser(user.value);
+    const { username, password } = form.value;
+    const user = { name: username, password };
+    await authenticateUser(user);
     if (authenticated.value) {
-      ElNotification({
-        title: i18n.t("success"),
-        message: i18n.t("authSuccess"),
-        type: "success",
-        duration: 3000,
-      });
-      loading.value = false;
+      notifySuccess(i18n.t("authSuccess"));
       router.push(localePath("/")?.fullPath as string);
     } else {
-      loading.value = false;
-      if (authErrors.value.length > 0) {
-        ElNotification({
-        title: i18n.t("error"),
-        message: i18n.t("serverError"),
-        type: "error",
-        duration: 5000,
-      });
+      const errors = authErrors.value;
+      if (errors.length === 0) {
+        notifyError(i18n.t("serverError"));
       } else {
-        ElNotification({
-        title: i18n.t("error"),
-        message: i18n.t("authError"),
-        type: "error",
-        duration: 5000,
-      });
+        const firstError = errors[0];
+        if (firstError === "wrong credentials") {
+          notifyError(i18n.t("wrongCredentials"));
+        } else {
+          notifyError(firstError);
+        }
       }
-
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    loading.value = false;
   }
+}
+
+function notifySuccess(message: string) {
+  ElNotification({
+    title: i18n.t("success"),
+    message,
+    type: "success",
+    duration: 3000,
+  });
+}
+
+function notifyError(message: string) {
+  ElNotification({
+    title: i18n.t("error"),
+    message,
+    type: "error",
+    duration: 5000,
+  });
 }
 </script>
 

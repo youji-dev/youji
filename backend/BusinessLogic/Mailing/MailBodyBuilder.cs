@@ -23,7 +23,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         public MailBodyBuilder(string mainHeading)
         {
             this.htmlBuilder
-                .AppendLine("<div class\"container\">");
+                .AppendLine("<div class=\"container\">");
 
             this.AddStyling();
             this.AddHeader(mainHeading);
@@ -109,7 +109,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         public void AddCard(string[] paragraphs)
         {
             this.htmlBuilder
-                .AppendLine("<div class=\"card\"");
+                .AppendLine("<div class=\"card\">");
 
             foreach (string paragraph in paragraphs)
             {

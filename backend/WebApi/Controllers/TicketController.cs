@@ -43,22 +43,25 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<Ticket[]> Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromQuery] string searchTerm,
+            [FromQuery] string? searchTerm = null,
             [FromQuery] int skip = 0,
             [FromQuery] int? take = null)
         {
-            searchTerm = searchTerm.ToLower();
+            var ticketQuery = ticketRepo.GetAll().Skip(skip);
 
-            var ticketQuery = ticketRepo.GetAll().Where(ticket =>
-                ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
-                || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
-                || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
-                || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
-                || ((ticket.State != null) && ticket.State.Name.ToLower().Contains(searchTerm))
-                || ticket.Title.ToLower().Contains(searchTerm)
-                || ticket.Author.ToLower().Contains(searchTerm)
-                || ticket.CreationDate.ToString().ToLower().Contains(searchTerm))
-                .Skip(skip);
+            if (searchTerm is not null)
+            {
+                searchTerm = searchTerm.ToLower();
+                ticketQuery = ticketRepo.GetAll().Where(ticket =>
+                    ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
+                    || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
+                    || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
+                    || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
+                    || ((ticket.State != null) && ticket.State.Name.ToLower().Contains(searchTerm))
+                    || ticket.Title.ToLower().Contains(searchTerm)
+                    || ticket.Author.ToLower().Contains(searchTerm)
+                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+            }
 
             if (take is not null)
             {

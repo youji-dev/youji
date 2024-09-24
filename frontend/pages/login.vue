@@ -90,5 +90,3 @@ function notifyError(message: string) {
   });
 }
 </script>
-
-<style></style>

@@ -54,7 +54,7 @@ namespace Application.WebApi.Controllers
             [FromServices] RoleAssignmentRepository roleAssignmentRepo,
             [FromRoute] string roleAssignmentId)
         {
-            var deleteRoleAssignment = await roleAssignmentRepo.GetAsync(new Guid(roleAssignmentId));
+            var deleteRoleAssignment = await roleAssignmentRepo.GetAsync(roleAssignmentId);
 
             if (deleteRoleAssignment is null)
                 return this.NotFound($"A role assignment with de id '{roleAssignmentId}' doesn´t exist.");

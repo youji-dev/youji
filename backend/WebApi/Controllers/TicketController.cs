@@ -138,7 +138,7 @@ namespace Application.WebApi.Controllers
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
-            Ticket ticket = new ()
+            Ticket ticket = new()
             {
                 Title = ticketData.Title,
                 Author = ticketData.Author,
@@ -178,7 +178,7 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
-            TicketComment comment = new ()
+            TicketComment comment = new()
             {
                 Author = commentData.Author,
                 Content = commentData.Content,
@@ -213,10 +213,10 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
-            using MemoryStream stream = new ();
+            using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
-            TicketAttachment attachment = new ()
+            TicketAttachment attachment = new()
             {
                 Name = attachmentFile.FileName,
                 Binary = stream.ToArray(),
@@ -256,7 +256,7 @@ namespace Application.WebApi.Controllers
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
-            Ticket ticket = new ()
+            Ticket ticket = new()
             {
                 Title = ticketData.Title,
                 Author = ticketData.Author,

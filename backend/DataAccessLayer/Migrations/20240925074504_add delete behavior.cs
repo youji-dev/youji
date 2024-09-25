@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace PersistenceLayer.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class updatecascade : Migration
+    public partial class adddeletebehavior : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,16 +21,39 @@ namespace PersistenceLayer.DataAccess.Migrations
                 table: "Comments");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Tickets_Buildings_BuildingId",
-                table: "Tickets");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Tickets_Priorities_PriorityValue",
+                name: "FK_Tickets_Priorities_PriorityName",
                 table: "Tickets");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Tickets_States_StateId",
                 table: "Tickets");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Tickets_PriorityName",
+                table: "Tickets");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_Priorities",
+                table: "Priorities");
+
+            migrationBuilder.DropColumn(
+                name: "PriorityName",
+                table: "Tickets");
+
+            migrationBuilder.AddColumn<int>(
+                name: "PriorityValue",
+                table: "Tickets",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Value",
+                table: "Priorities",
+                type: "integer",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "integer")
+                .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "TicketId",
@@ -49,6 +74,16 @@ namespace PersistenceLayer.DataAccess.Migrations
                 oldClrType: typeof(Guid),
                 oldType: "uuid",
                 oldNullable: true);
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_Priorities",
+                table: "Priorities",
+                column: "Value");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_PriorityValue",
+                table: "Tickets",
+                column: "PriorityValue");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Attachments_Tickets_TicketId",
@@ -67,20 +102,11 @@ namespace PersistenceLayer.DataAccess.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Tickets_Buildings_BuildingId",
-                table: "Tickets",
-                column: "BuildingId",
-                principalTable: "Buildings",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.SetNull);
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_Tickets_Priorities_PriorityValue",
                 table: "Tickets",
                 column: "PriorityValue",
                 principalTable: "Priorities",
-                principalColumn: "Value",
-                onDelete: ReferentialAction.SetNull);
+                principalColumn: "Value");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Tickets_States_StateId",
@@ -103,16 +129,39 @@ namespace PersistenceLayer.DataAccess.Migrations
                 table: "Comments");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Tickets_Buildings_BuildingId",
-                table: "Tickets");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_Tickets_Priorities_PriorityValue",
                 table: "Tickets");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_Tickets_States_StateId",
                 table: "Tickets");
+
+            migrationBuilder.DropIndex(
+                name: "IX_Tickets_PriorityValue",
+                table: "Tickets");
+
+            migrationBuilder.DropPrimaryKey(
+                name: "PK_Priorities",
+                table: "Priorities");
+
+            migrationBuilder.DropColumn(
+                name: "PriorityValue",
+                table: "Tickets");
+
+            migrationBuilder.AddColumn<string>(
+                name: "PriorityName",
+                table: "Tickets",
+                type: "text",
+                nullable: true);
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Value",
+                table: "Priorities",
+                type: "integer",
+                nullable: false,
+                oldClrType: typeof(int),
+                oldType: "integer")
+                .OldAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             migrationBuilder.AlterColumn<Guid>(
                 name: "TicketId",
@@ -129,6 +178,16 @@ namespace PersistenceLayer.DataAccess.Migrations
                 nullable: true,
                 oldClrType: typeof(Guid),
                 oldType: "uuid");
+
+            migrationBuilder.AddPrimaryKey(
+                name: "PK_Priorities",
+                table: "Priorities",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_PriorityName",
+                table: "Tickets",
+                column: "PriorityName");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Attachments_Tickets_TicketId",
@@ -145,18 +204,11 @@ namespace PersistenceLayer.DataAccess.Migrations
                 principalColumn: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Tickets_Buildings_BuildingId",
+                name: "FK_Tickets_Priorities_PriorityName",
                 table: "Tickets",
-                column: "BuildingId",
-                principalTable: "Buildings",
-                principalColumn: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Tickets_Priorities_PriorityValue",
-                table: "Tickets",
-                column: "PriorityValue",
+                column: "PriorityName",
                 principalTable: "Priorities",
-                principalColumn: "Value");
+                principalColumn: "Name");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Tickets_States_StateId",

@@ -13,7 +13,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
     [Migration("20240925074504_add delete behavior")]
-    partial class adddeletebehavior
+    partial class Adddeletebehavior
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

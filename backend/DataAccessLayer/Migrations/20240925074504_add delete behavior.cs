@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class adddeletebehavior : Migration
+    public partial class Adddeletebehavior : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

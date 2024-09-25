@@ -1,5 +1,6 @@
 using DomainLayer.BusinessLogic.PDF;
 using System.Text;
+using Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -55,6 +56,30 @@ namespace Application.WebApi
         {
             services.AddScoped<ExportService>();
             services.AddScoped<AuthenticationService>();
+        }
+
+        /// <summary>
+        /// Adds Cross Origin Resource Sharing Configuration
+        /// </summary>
+        /// <param name="services">Instance of <see cref="ISession"/></param>
+        /// <param name="configurationManager">Instance of <see cref="ConfigurationManager"/></param>
+        public static void AddCorsConfiguration(
+            this IServiceCollection services,
+            ConfigurationManager configurationManager)
+        {
+            var corsConfig = configurationManager.GetSection("CORS").Get<CorsConfigDto>()
+                ?? throw new InvalidOperationException("CORS Settings must be set");
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("Settings", builder =>
+                {
+                    builder
+                        .WithOrigins(corsConfig.AllowedOrigins)
+                        .WithHeaders(corsConfig.AllowedHeaders)
+                        .WithMethods(corsConfig.AllowedMethods);
+                });
+            });
         }
 
         /// <summary>

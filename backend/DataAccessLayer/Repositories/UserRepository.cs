@@ -6,7 +6,7 @@ namespace PersistenceLayer.DataAccess.Repositories
     /// Represents the repository of the role assignment entity.
     /// </summary>
     /// <param name="context">Instance of <see cref="DataContext"/></param>
-    public class RoleAssignmentRepository(DataContext context) : Repository<RoleAssignment, string>(context)
+    public class UserRepository(DataContext context) : Repository<User, string>(context)
     {
     }
 }

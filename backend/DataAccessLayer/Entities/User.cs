@@ -1,11 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Common.Enums;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
     /// Represents the assignment of the roles.
     /// </summary>
-    public class RoleAssignment
+    public class User
     {
         /// <summary>
         /// The id of the user.
@@ -16,6 +17,11 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The type of the user.
         /// </summary>
-        public required int Type { get; set; }
+        public required Roles Type { get; set; }
+
+        /// <summary>
+        /// E-Mail address of the user.
+        /// </summary>
+        public string? Email { get; set; }
     }
 }

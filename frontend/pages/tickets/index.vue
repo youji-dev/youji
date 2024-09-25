@@ -2,9 +2,7 @@
   <div class="w-full h-[100vh] p-6 mt-8 lg:mt-0" style="height: calc(100vh - 72px)" :style="{ width: width }"
     :onresize="determineViewWidth()">
     <div class="flex flex-row items-center justify-between w-full py-2">
-      <h1 class="text-lg font-light text-neutral-700 dark:text-neutral-300 text-start w-fit h-fit">
-        {{ $t("ticketOverview") }}
-      </h1>
+      <PageHeader :text="$t('ticketOverview')"/>
       <div class="w-1/2 md:lg-1/6">
         <el-input v-model="search" style="width: 100%" :placeholder="$t('searchVerb')" :prefix-icon="Search" />
       </div>

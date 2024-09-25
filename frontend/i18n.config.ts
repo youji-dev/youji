@@ -48,6 +48,8 @@ export default defineI18nConfig(() => ({
             searchVerb: "Search",
             title: "Title",
             back: "Back",
+            edit: "Edit",
+            delete: "Delete",
         },
         de: {
             welcome: "Willkommen",
@@ -95,6 +97,8 @@ export default defineI18nConfig(() => ({
             searchVerb: "Suchen",
             title: "Titel",
             back: "Zurück",
+            edit: "Bearbeiten",
+            delete: "Löschen",
         }
     }
 }))

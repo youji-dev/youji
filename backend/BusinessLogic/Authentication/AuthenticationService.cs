@@ -28,16 +28,16 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// <returns>A short living JWT AccessToken</returns>
         public string CreateAccessToken(User roleAssignment)
         {
-            var jwtKey = configuration["JWTKey"] ?? throw new InvalidOperationException("JWT Key cant be empty");
+            var jwtKey = configuration.GetValueOrThrow("JWTKey");
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                claims: new[]
-                {
+                claims:
+                [
                     new Claim("username", roleAssignment.UserId),
                     new Claim("role", roleAssignment.Type.ToString()),
-                },
+                ],
                 expires: DateTime.UtcNow.AddMinutes(15),
                 issuer: "youji",
                 signingCredentials: credentials);

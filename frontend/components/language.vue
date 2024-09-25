@@ -10,7 +10,7 @@
       </div>
     </div>
     <template #reference>
-      <el-button circle>
+      <el-button type="primary" circle>
         <Icon name="material-symbols:language"
           :style="{ 'backgroundColor': colorMode.value === 'light' ? TEXT_LIGHT : TEXT_DARK }" />
       </el-button>
@@ -19,10 +19,8 @@
 </template>
 
 <script lang="ts" setup>
-const { locale, locales } = useI18n();
+const { locales } = useI18n();
 const router = useRouter();
-const i18n = useI18n();
-const localePath = useLocalePath();
 const switchLocalePath = useSwitchLocalePath();
 const colorMode = useColorMode();
 const { public: { TEXT_LIGHT, TEXT_DARK } } = useRuntimeConfig();
@@ -33,10 +31,6 @@ const availableLocales = computed(() => {
 const switchLocale = (localeKey: string) => {
   console.log(localeKey)
   router.push(switchLocalePath(localeKey));
-  ElMessage({
-    type:"success",
-    message: i18n.t("localeSwitched")
-  })
 };
 </script>
 

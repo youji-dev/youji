@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersistenceLayer.DataAccess;
@@ -11,9 +12,11 @@ using PersistenceLayer.DataAccess;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240919075313_AddRefreshTokenEntity")]
+    partial class AddRefreshTokenEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +28,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Building", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
@@ -41,17 +44,13 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Priority", b =>
                 {
-                    b.Property<int>("Value")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Value"));
-
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.HasKey("Value");
+                    b.Property<int>("Value")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Name");
 
                     b.ToTable("Priorities");
                 });
@@ -94,7 +93,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.State", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
@@ -114,7 +113,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
@@ -135,8 +134,8 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<string>("Object")
                         .HasColumnType("text");
 
-                    b.Property<int?>("PriorityValue")
-                        .HasColumnType("integer");
+                    b.Property<string>("PriorityName")
+                        .HasColumnType("text");
 
                     b.Property<string>("Room")
                         .HasColumnType("text");
@@ -152,7 +151,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("BuildingId");
 
-                    b.HasIndex("PriorityValue");
+                    b.HasIndex("PriorityName");
 
                     b.HasIndex("StateId");
 
@@ -161,7 +160,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketAttachment", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
@@ -178,7 +177,7 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("TicketId")
+                    b.Property<Guid?>("TicketId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -190,7 +189,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketComment", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
@@ -206,7 +205,7 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("TicketId")
+                    b.Property<Guid?>("TicketId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -224,12 +223,12 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasOne("PersistenceLayer.DataAccess.Entities.Priority", "Priority")
                         .WithMany()
-                        .HasForeignKey("PriorityValue");
+                        .HasForeignKey("PriorityName");
 
                     b.HasOne("PersistenceLayer.DataAccess.Entities.State", "State")
                         .WithMany()
                         .HasForeignKey("StateId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Building");
@@ -241,24 +240,16 @@ namespace PersistenceLayer.DataAccess.Migrations
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketAttachment", b =>
                 {
-                    b.HasOne("PersistenceLayer.DataAccess.Entities.Ticket", "Ticket")
+                    b.HasOne("PersistenceLayer.DataAccess.Entities.Ticket", null)
                         .WithMany("Attachments")
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ticket");
+                        .HasForeignKey("TicketId");
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketComment", b =>
                 {
-                    b.HasOne("PersistenceLayer.DataAccess.Entities.Ticket", "Ticket")
+                    b.HasOne("PersistenceLayer.DataAccess.Entities.Ticket", null)
                         .WithMany("Comments")
-                        .HasForeignKey("TicketId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ticket");
+                        .HasForeignKey("TicketId");
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>

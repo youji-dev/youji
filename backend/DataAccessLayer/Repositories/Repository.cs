@@ -35,6 +35,16 @@ namespace PersistenceLayer.DataAccess.Repositories
         }
 
         /// <summary>
+        /// Find entity that matches the expression.
+        /// </summary>
+        /// <param name="expression">Instance of <see cref="Expression"/></param>
+        /// <returns>The entitis matches the expression.</returns>
+        public virtual IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
+        {
+            return this.Context.Set<TEntity>().Where(expression);
+        }
+
+        /// <summary>
         /// Adds an entity.
         /// </summary>
         /// <param name="entity">Instance of <see cref="TEntity"/></param>

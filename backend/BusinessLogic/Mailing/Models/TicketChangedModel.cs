@@ -5,30 +5,64 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// <summary>
     /// Model for ticket change e-mail
     /// </summary>
-    public record TicketChangedModel
+    internal record TicketChangedModel : MailModel
     {
+        /// <summary>
+        /// The current title of the ticket
+        /// </summary>
         public required string TicketTitle { get; set; }
 
+        /// <summary>
+        /// Change of the ticket title
+        /// </summary>
         public SimpleChange? TitleChange { get; set; }
 
+        /// <summary>
+        /// Change of the description
+        /// </summary>
         public SimpleChange? DescriptionChange { get; set; }
 
+        /// <summary>
+        /// Change of the state
+        /// </summary>
         public SimpleChange? StateChange { get; set; }
 
+        /// <summary>
+        /// Change of the priority
+        /// </summary>
         public SimpleChange? PriorityChange { get; set; }
 
+        /// <summary>
+        /// Change of the building
+        /// </summary>
         public SimpleChange? BuildingChange { get; set; }
 
+        /// <summary>
+        /// Change of the room
+        /// </summary>
         public SimpleChange? RoomChange { get; set; }
 
+        /// <summary>
+        /// Change of the affected object
+        /// </summary>
         public SimpleChange? ObjectChange { get; set; }
 
+        /// <summary>
+        /// New attachments
+        /// </summary>
         public IEnumerable<string> NewAttachments { get; set; } = [];
 
+        /// <summary>
+        /// New comments
+        /// </summary>
         public IEnumerable<CommentModel> NewComments { get; set; } = [];
 
-        public string LogoSrc { get; set; } = string.Empty;
-
+        /// <summary>
+        /// Creates a new instance of <see cref="TicketChangedModel"/> from the differences of two versions of a ticket
+        /// </summary>
+        /// <param name="newTicket">New version of the ticket</param>
+        /// <param name="oldTicket">Old version of the ticket</param>
+        /// <returns>The generated model</returns>
         public static TicketChangedModel FromTickets(Ticket newTicket, Ticket oldTicket)
         {
             TicketChangedModel result = new() { TicketTitle = newTicket.Title };
@@ -116,17 +150,35 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         }
     }
 
-    public struct SimpleChange
+    /// <summary>
+    /// Struct for simple string property change
+    /// </summary>
+    internal struct SimpleChange
     {
+        /// <summary>
+        /// New value of the property
+        /// </summary>
         public string OldValue { get; set; }
 
+        /// <summary>
+        /// Old value of the property
+        /// </summary>
         public string NewValue { get; set; }
     }
 
-    public struct CommentModel
+    /// <summary>
+    /// Comment DTO for the <see cref="TicketChangedModel"/>
+    /// </summary>
+    internal struct CommentModel
     {
+        /// <summary>
+        /// The comment author
+        /// </summary>
         public string Author { get; set; }
 
+        /// <summary>
+        /// The comments content
+        /// </summary>
         public string Content { get; set; }
     }
 }

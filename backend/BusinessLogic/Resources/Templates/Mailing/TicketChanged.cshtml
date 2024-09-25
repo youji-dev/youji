@@ -1,0 +1,162 @@
+﻿@page
+@using DomainLayer.BusinessLogic.Mailing.Models
+@model TicketChangedModel
+
+<div class="container">
+    <header>
+        <h1>Ticket '@Model.TicketTitle' wurde geändert</h1>
+        <img class='logo' src="@Model.LogoSrc" />
+    </header>
+
+    <div class="content">
+        @if (Model.TitleChange is not null)
+        {
+            <h2>Titel geändert</h2>
+            <p>@Model.TitleChange?.NewValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/> @Model.TitleChange?.OldValue</p>
+        }
+
+        @if (Model.DescriptionChange is not null)
+        {
+            <h2>Beschreibung geändert</h2>
+            <div class="card">
+                <p>@Model.DescriptionChange?.NewValue</p>
+                <img src="@Model.ArrowDownIconSrc" alt="v" class="icon card-seperator" />
+                <p>@Model.DescriptionChange?.OldValue</p>
+            </div>
+        }
+
+        @if (Model.PriorityChange is not null)
+        {
+            <h2>Priorität geändert</h2>
+            <p>@Model.PriorityChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/>  @Model.PriorityChange?.NewValue</p>
+        }
+
+        @if (Model.StateChange is not null)
+        {
+            <h2>Status geändert</h2>
+            <p>@Model.StateChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/>  @Model.StateChange?.NewValue</p>
+        }
+
+        @if (Model.BuildingChange is not null)
+        {
+            <h2>Gebäude geändert</h2>
+            <p>@Model.BuildingChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/>  @Model.BuildingChange?.NewValue</p>
+        }
+
+        @if (Model.RoomChange is not null)
+        {
+            <h2>Raum geändert</h2>
+            <p>@Model.RoomChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/>  @Model.RoomChange?.NewValue</p>
+        }
+
+        @if (Model.ObjectChange is not null)
+        {
+            <h2>Betroffenes Object geändert</h2>
+            <p>@Model.ObjectChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/>  @Model.ObjectChange?.NewValue</p>
+        }
+
+        @if (Model.NewComments.Count() > 0)
+        {
+            <h2>Neue Kommentare</h2>
+            <div class="card-list">
+            @foreach (var comment in Model.NewComments)
+            {
+                <div class="card">
+                    <h3 class="card-header">von @comment.Author</h3>
+                    <p>@comment.Content</p>
+                </div>
+            }
+            </div>
+        }
+
+        @if (Model.NewAttachments.Count() > 0)
+        {
+            <h2>Neue Anhänge</h2>
+            <ul>
+                @foreach (var attachment in Model.NewAttachments)
+                {
+                    <li>@attachment</li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+<style>
+    html, body {
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+
+        display: grid;
+        grid-template-rows: min-content, auto;
+    }
+
+    header {
+        grid-row: 1;
+        display: flex;
+
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+
+        background-color: #409EFF;
+    }
+
+    header > h1 {
+        padding-inline: 5ch;
+    }
+
+    header > .logo {
+        padding-inline: 5ch;
+    }
+
+    .logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .content {
+        grid-row: 2;
+        margin-inline: 10ch;
+        max-width: 80ch;
+    }
+
+    .card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .card {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+
+        background-color: #e2e2e2;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card > * {
+        padding-inline: 20px;
+    }
+
+    .card > .card-header {
+        border-bottom: 1px solid black;
+    }
+
+    .card > .card-seperator {
+        align-self: center;
+    }
+
+    .icon {
+        width: 2ch;
+    }
+</style>

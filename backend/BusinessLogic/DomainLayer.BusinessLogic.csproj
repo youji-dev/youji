@@ -8,7 +8,9 @@
 
   <ItemGroup>
     <None Remove="Resources\Logo.svg" />
-    <None Remove="Resources\Mailing\Templates\TicketChanged.cshtml" />
+    <None Remove="Resources\Templates\arrow_down.svg" />
+    <None Remove="Resources\Templates\arrow_right.svg" />
+    <None Remove="Resources\Templates\TicketChanged.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,7 +38,13 @@
 	  <EmbeddedResource Include="Resources\Logo.svg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </EmbeddedResource>
-	  <EmbeddedResource Include="Resources\Mailing\Templates\TicketChanged.cshtml">
+	  <EmbeddedResource Include="Resources\Templates\arrow_down.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Templates\arrow_right.svg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Templates\Mailing\TicketChanged.cshtml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	</ItemGroup>

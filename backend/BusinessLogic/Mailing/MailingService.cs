@@ -33,17 +33,8 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             BodyBuilder bodyBuilder = new();
 
-            Assembly assembly = Assembly.GetExecutingAssembly()
-                ?? throw new InvalidOperationException("Could not get assembly while loading logo file");
-
-            var logo = bodyBuilder.LinkedResources.Add(
-                "Logo.svg",
-                assembly.GetResource("Logo.svg"));
-
-            logo.ContentId = MimeUtils.GenerateMessageId();
-
             TicketChangedModel mailModel = TicketChangedModel.FromTickets(newTicket, oldTicket);
-            mailModel.LogoSrc = $"cid:{logo.ContentId}";
+            this.AddResourcesToModel(bodyBuilder, mailModel);
 
             string template = TemplateHelper.GetTemplate("TicketChanged")
                 ?? throw new InvalidOperationException("Could not find template");
@@ -78,6 +69,31 @@ namespace DomainLayer.BusinessLogic.Mailing
 
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
+        }
+
+        private void AddResourcesToModel(BodyBuilder bodyBuilder, MailModel mailModel)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly()
+                ?? throw new InvalidOperationException("Could not get assembly while loading logo file");
+
+            var logo = bodyBuilder.LinkedResources.Add(
+                "Logo.svg",
+                assembly.GetResource("Logo.svg"));
+            logo.ContentId = MimeUtils.GenerateMessageId();
+
+            var arrowRight = bodyBuilder.LinkedResources.Add(
+                "arrow_right.svg",
+                assembly.GetResource("arrow_right.svg"));
+            arrowRight.ContentId = MimeUtils.GenerateMessageId();
+
+            var arrowDown = bodyBuilder.LinkedResources.Add(
+                "arrow_down.svg",
+                assembly.GetResource("arrow_down.svg"));
+            arrowDown.ContentId = MimeUtils.GenerateMessageId();
+
+            mailModel.LogoSrc = $"cid:{logo.ContentId}";
+            mailModel.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
+            mailModel.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
         }
     }
 }

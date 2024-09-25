@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-
+import type { Response } from "~/types/response";
 // In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
 // All of these actions and variables can be used and called in our vue files.
 
@@ -7,6 +7,12 @@ interface UserPayloadInterface {
   name: string;
   password: string;
 }
+
+type CheckAuthData = {
+  authenticated: boolean,
+  userId: number
+}
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
@@ -55,7 +61,7 @@ export const useAuthStore = defineStore("auth", {
       } = useRuntimeConfig();
       const token = useCookie(AUTH_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
       this.authenticated = false;
-      const { data, error }: any = await useFetch(BACKEND_URL + "/api/logout", {
+      const { data, error }: any = await useFetch<Response<CheckAuthData>>(BACKEND_URL + "/api/logout", {
         method: "get",
         headers: {
           Authorization: "Bearer " + token.value,

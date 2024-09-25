@@ -16,7 +16,7 @@
       v-model="drawer"
       :title="$t('navigation')"
       :direction="'ltr'"
-      style="min-width: 60%; max-height: 100vh"
+      style="min-width: fit-content; max-height: 100vh"
     >
       <template #header="{}" style="margin-bottom: 0"> </template>
       <template #body style="overflow-y: hidden"></template>

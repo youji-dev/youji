@@ -21,9 +21,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketCommentRepository commentRepo,
-            [FromRoute] string commentId)
+            [FromRoute] Guid commentId)
         {
-            var comment = await commentRepo.GetAsync(new Guid(commentId));
+            var comment = await commentRepo.GetAsync(commentId);
 
             if (comment is null)
                 return this.NotFound($"A comment with the id '{commentId}' doesn´t exist.");

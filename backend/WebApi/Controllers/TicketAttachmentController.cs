@@ -21,9 +21,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketAttachmentRepository attachmentRepo,
-            [FromRoute] string attachmentId)
+            [FromRoute] Guid attachmentId)
         {
-            var attachment = await attachmentRepo.GetAsync(new Guid(attachmentId));
+            var attachment = await attachmentRepo.GetAsync(attachmentId);
 
             if (attachment is null)
                 return this.NotFound($"An attachment with the id '{attachmentId}' doesn´t exist.");

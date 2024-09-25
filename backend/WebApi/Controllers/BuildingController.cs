@@ -74,9 +74,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] BuildingRepository buildingRepo,
-            [FromRoute] string buildingId)
+            [FromRoute] Guid buildingId)
         {
-            var deleteBuilding = await buildingRepo.GetAsync(new Guid(buildingId));
+            var deleteBuilding = await buildingRepo.GetAsync(buildingId);
 
             if (deleteBuilding is null)
                 return this.NotFound($"A building with the id '{buildingId}' doesn´t exist.");

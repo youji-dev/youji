@@ -75,9 +75,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] StateRepository stateRepo,
-            [FromRoute] string stateId)
+            [FromRoute] Guid stateId)
         {
-            var deleteState = await stateRepo.GetAsync(new Guid(stateId));
+            var deleteState = await stateRepo.GetAsync(stateId);
 
             if (deleteState is null)
                 return this.NotFound($"A state with the id '{stateId}' doesn´t exist.");

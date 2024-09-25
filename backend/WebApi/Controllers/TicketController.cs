@@ -12,8 +12,8 @@ namespace Application.WebApi.Controllers
     /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/></param>
     /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/></param>
     /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/></param>
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class TicketController : Controller
     {
         /// <summary>
@@ -26,9 +26,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
-            [FromRoute] string ticketId)
+            [FromRoute] Guid ticketId)
         {
-            return this.Ok(await ticketRepo.GetAsync(new Guid(ticketId)));
+            return this.Ok(await ticketRepo.GetAsync(ticketId));
         }
 
         /// <summary>
@@ -83,9 +83,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Collection<TicketComment>>> GetComments(
             [FromServices] TicketRepository ticketRepo,
-            [FromRoute] string ticketId)
+            [FromRoute] Guid ticketId)
         {
-            Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
+            Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
             Collection<TicketComment>? ticketComments = ticket?.Comments;
 
@@ -102,9 +102,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Collection<TicketAttachment>>> GetAttachments(
             [FromServices] TicketRepository ticketRepo,
-            [FromRoute] string ticketId)
+            [FromRoute] Guid ticketId)
         {
-            Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
+            Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
             Collection<TicketAttachment>? ticketAttachments = ticket?.Attachments;
 
@@ -170,10 +170,10 @@ namespace Application.WebApi.Controllers
         public async Task<ActionResult<TicketComment>> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
-            [FromRoute] string ticketId,
+            [FromRoute] Guid ticketId,
             [FromBody] CommentDTO commentData)
         {
-            Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
+            Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
@@ -183,7 +183,7 @@ namespace Application.WebApi.Controllers
                 Author = commentData.Author,
                 Content = commentData.Content,
                 CreationDate = commentData.CreationDate,
-                TicketId = new Guid(ticketId),
+                TicketId = ticketId,
             };
 
             await commentRepo.AddAsync(comment);
@@ -205,10 +205,10 @@ namespace Application.WebApi.Controllers
         public async Task<ActionResult<TicketAttachment>> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
-            [FromRoute] string ticketId,
+            [FromRoute] Guid ticketId,
             IFormFile attachmentFile)
         {
-            Ticket? ticket = await ticketRepo.GetAsync(new Guid(ticketId));
+            Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
@@ -221,7 +221,7 @@ namespace Application.WebApi.Controllers
                 Name = attachmentFile.FileName,
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
-                TicketId = new Guid(ticketId),
+                TicketId = ticketId,
             };
 
             await attachmentRepo.AddAsync(attachment);
@@ -285,9 +285,9 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketRepository ticketRepo,
-            [FromRoute] string ticketId)
+            [FromRoute] Guid ticketId)
         {
-            var deleteTicket = await ticketRepo.GetAsync(new Guid(ticketId));
+            var deleteTicket = await ticketRepo.GetAsync(ticketId);
 
             if (deleteTicket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");

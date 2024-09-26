@@ -5,6 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Mailing;
+using Quartz;
+using Application.WebApi.Jobs.Mailing;
+using Quartz.Core;
 
 namespace Application.WebApi
 {
@@ -82,6 +85,26 @@ namespace Application.WebApi
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSignKey)),
                     };
                 });
+        }
+
+        public static async Task AddJobs(this WebApplication app)
+        {
+            IScheduler scheduler = await app.Services.GetRequiredService<ISchedulerFactory>().GetScheduler();
+
+            IJobDetail ticketChangedMailingJob = JobBuilder.Create<TicketChangedJob>()
+                .WithIdentity("ticketChanged", "mailing")
+                .DisallowConcurrentExecution()
+                .Build();
+
+            var ticketChangedMailingTrigger = TriggerBuilder.Create()
+                .WithIdentity("ticketChanged", "mailing")
+                .StartNow()
+                .WithSimpleSchedule(s => s
+                    .WithIntervalInSeconds(2)
+                    .RepeatForever())
+                .Build();
+
+            await scheduler.ScheduleJob(ticketChangedMailingJob, ticketChangedMailingTrigger);
         }
     }
 }

@@ -1,5 +1,6 @@
 using Application.WebApi;
 using PersistenceLayer.DataAccess;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,6 @@ builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerConfiguration();
 
 builder.Services.AddInfrastructure(
@@ -20,7 +20,12 @@ builder.Services.AddLogicServices(builder.Configuration);
 
 builder.Services.AddAuthenticationConfiguration(builder.Configuration);
 
+builder.Services.AddQuartz();
+builder.Services.AddQuartzHostedService();
+
 var app = builder.Build();
+
+await app.AddJobs();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -16,6 +16,15 @@ namespace PersistenceLayer.DataAccess.Repositories
         protected DataContext Context { get => context; }
 
         /// <summary>
+        /// Returns the query over the entire table
+        /// </summary>
+        /// <returns>A Queryable containing all entities of the table</returns>
+        public virtual IQueryable<TEntity> GetAll()
+        {
+            return this.Context.Set<TEntity>();
+        }
+
+        /// <summary>
         /// Gets the entity with the specific id.
         /// </summary>
         /// <param name="id">Instance of <see cref="TId"/></param>

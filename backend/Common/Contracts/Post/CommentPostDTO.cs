@@ -1,9 +1,9 @@
-﻿namespace Common.Contracts
+﻿namespace Common.Contracts.Post
 {
     /// <summary>
-    /// Represents a comment data transfer object.
+    /// Represents a comment data transfer object for post operation.
     /// </summary>
-    public class CommentDTO
+    public class CommentPostDTO
     {
         /// <summary>
         /// The author of the comment.

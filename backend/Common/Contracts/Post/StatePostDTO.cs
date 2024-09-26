@@ -1,9 +1,9 @@
-﻿namespace Common.Contracts
+﻿namespace Common.Contracts.Post
 {
     /// <summary>
-    /// Represents a state data transfer object.
+    /// Represents a state data transfer object for post operation.
     /// </summary>
-    public class StateDTO
+    public class StatePostDTO
     {
         /// <summary>
         /// The name of the state.

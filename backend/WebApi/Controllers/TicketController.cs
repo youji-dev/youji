@@ -1,4 +1,5 @@
-﻿using Common.Contracts;
+﻿using Common.Contracts.Post;
+using Common.Contracts.Put;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
@@ -118,7 +119,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
-        /// <param name="ticketData">Instance of <see cref="TicketDTO"/></param>
+        /// <param name="ticketData">Instance of <see cref="TicketPostDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added ticket entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -128,21 +129,27 @@ namespace Application.WebApi.Controllers
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
             [FromServices] BuildingRepository buildingRepo,
-            [FromBody] TicketDTO ticketData)
+            [FromBody] TicketPostDTO ticketData)
         {
             var state = await stateRepo.GetAsync(ticketData.StateId);
 
             if (state is null)
                 return this.BadRequest("The ticket to be created must have a valid state.");
 
-            var building = await buildingRepo.GetAsync(ticketData.BuildingId);
+            Building? building = null;
+
+            if (ticketData.BuildingId is not null)
+            {
+                building = await buildingRepo.GetAsync((Guid)ticketData.BuildingId);
+            }
+
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
             Ticket ticket = new()
             {
                 Title = ticketData.Title,
                 Author = ticketData.Author,
-                CreationDate = ticketData.CreationDate,
+                CreationDate = DateTime.Now,
                 State = state,
                 Description = ticketData.Description,
                 Priority = priority,
@@ -162,7 +169,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="commentData">Instance of <see cref="CommentDTO"/></param>
+        /// <param name="commentData">Instance of <see cref="CommentPostDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -171,7 +178,7 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] Guid ticketId,
-            [FromBody] CommentDTO commentData)
+            [FromBody] CommentPostDTO commentData)
         {
             Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
@@ -182,7 +189,7 @@ namespace Application.WebApi.Controllers
             {
                 Author = commentData.Author,
                 Content = commentData.Content,
-                CreationDate = commentData.CreationDate,
+                CreationDate = DateTime.Now,
                 TicketId = ticketId,
             };
 
@@ -236,7 +243,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
-        /// <param name="ticketData">Instance of <see cref="TicketDTO"/></param>
+        /// <param name="ticketData">Instance of <see cref="TicketPutDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -246,28 +253,24 @@ namespace Application.WebApi.Controllers
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
             [FromServices] BuildingRepository buildingRepo,
-            [FromBody] TicketDTO ticketData)
+            [FromBody] TicketPutDTO ticketData)
         {
+            var ticket = await ticketRepo.GetAsync(ticketData.Id);
+
+            if (ticket is null)
+                return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
+
             var state = await stateRepo.GetAsync(ticketData.StateId);
-
-            if (state is null)
-                return this.BadRequest("The ticket to be created must have a valid state.");
-
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
-            Ticket ticket = new()
-            {
-                Title = ticketData.Title,
-                Author = ticketData.Author,
-                CreationDate = ticketData.CreationDate,
-                State = state,
-                Description = ticketData.Description,
-                Priority = priority,
-                Building = building,
-                Object = ticketData.Object,
-                Room = ticketData.Room,
-            };
+            ticket.Title = ticketData.Title ?? ticket.Title;
+            ticket.Description = ticketData.Description ?? ticket.Description;
+            ticket.State = state ?? ticket.State;
+            ticket.Building = building ?? ticket.Building;
+            ticket.Priority = priority ?? ticket.Priority;
+            ticket.Object = ticketData.Object ?? ticket.Object;
+            ticket.Room = ticketData.Room ?? ticket.Room;
 
             await ticketRepo.UpdateAsync(ticket);
 

@@ -1,4 +1,4 @@
-﻿using Common.Contracts;
+﻿using Common.Contracts.Post;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
@@ -29,13 +29,13 @@ namespace Application.WebApi.Controllers
         /// Adds a new state entity.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="stateData">Instance of <see cref="StateDTO"/></param>
+        /// <param name="stateData">Instance of <see cref="StatePostDTO"/></param>
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<State>> Post(
             [FromServices] StateRepository stateRepo,
-            [FromBody] StateDTO stateData)
+            [FromBody] StatePostDTO stateData)
         {
             var state = new State()
             {

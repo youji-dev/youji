@@ -3,7 +3,7 @@
 namespace PersistenceLayer.DataAccess.Entities
 {
     /// <summary>
-    /// Represens the ticket priority.
+    /// Represents the ticket priority.
     /// </summary>
     public class Priority
     {

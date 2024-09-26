@@ -57,7 +57,7 @@ namespace PersistenceLayer.DataAccess
 
             modelBuilder.Entity<TicketAttachment>()
                 .HasOne(attachment => attachment.Ticket)
-                .WithMany(tikcet => tikcet.Attachments)
+                .WithMany(ticket => ticket.Attachments)
                 .HasForeignKey(attachment => attachment.TicketId)
                 .OnDelete(DeleteBehavior.Cascade);
 

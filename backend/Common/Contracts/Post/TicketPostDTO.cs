@@ -1,9 +1,9 @@
-﻿namespace Common.Contracts
+﻿namespace Common.Contracts.Post
 {
     /// <summary>
-    /// Represents a ticket data transfer object.
+    /// Represents a ticket data transfer object for post operation.
     /// </summary>
-    public class TicketDTO
+    public class TicketPostDTO
     {
         /// <summary>
         /// The title of the ticket.
@@ -38,7 +38,7 @@
         /// <summary>
         /// The building where the issue of the ticket was located.
         /// </summary>
-        public Guid BuildingId { get; set; }
+        public Guid? BuildingId { get; set; }
 
         /// <summary>
         /// The room where the issue of the ticket was located.

@@ -35,7 +35,7 @@ namespace PersistenceLayer.DataAccess.Entities
         public required Guid TicketId { get; set; }
 
         /// <summary>
-        /// The refernce type of the relatet tickets.
+        /// The reference type of the related tickets.
         /// </summary>
         [JsonIgnore]
         public Ticket? Ticket { get; set; }

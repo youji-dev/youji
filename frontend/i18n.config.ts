@@ -50,6 +50,10 @@ export default defineI18nConfig(() => ({
             back: "Back",
             edit: "Edit",
             delete: "Delete",
+            state: "State",
+            priority: "Priority",
+            room: "Room",
+            building: "Building",
         },
         de: {
             welcome: "Willkommen",
@@ -99,6 +103,10 @@ export default defineI18nConfig(() => ({
             back: "Zurück",
             edit: "Bearbeiten",
             delete: "Löschen",
+            state: "Status",
+            priority: "Priorität",
+            room: "Raum",
+            building: "Gebäude"
         }
     }
 }))

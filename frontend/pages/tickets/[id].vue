@@ -3,7 +3,7 @@
   <!-- Page for detail view of a ticket -->
   <!-- header -->
   <div class=" h-[100vh] p-6 mt-8 lg:mt-0" style="height: calc(100vh - 72px)" :style="{ width: width }">
-    <div class="flex m-2">
+    <div class="flex my-2">
       <!-- backbutton -->
       <el-button class="text-sm flex-none" link @click="router.back()" :icon="ArrowLeft">{{ $t("back")
         }}</el-button>
@@ -14,10 +14,10 @@
       <!-- Edit Button -->
       <el-button class="text-sm flex-none justify-self-end" type="primary" :icon="EditPen" @click="toggleEditMode">{{
         $t("edit")
-        }}</el-button>
+      }}</el-button>
     </div>
     <!-- Dropdown Group -->
-    <div class="grid-cols-2 grid-rows-2">
+    <div class="grid gap-3 grid-cols-2 grid-rows-2">
       <!-- State dropdown -->
       <div>
         <el-text>{{ $t("state") }}</el-text>

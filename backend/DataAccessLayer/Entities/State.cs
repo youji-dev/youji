@@ -11,7 +11,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the state.
         /// </summary>
         [Key]
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
 
         /// <summary>
         /// The name of the state.

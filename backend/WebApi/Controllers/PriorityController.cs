@@ -7,7 +7,6 @@ namespace Application.WebApi.Controllers
     /// <summary>
     /// Controller that provides endpoints to manage priority requests.
     /// </summary>
-    /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
     [Route("api/[controller]")]
     [ApiController]
     public class PriorityController : ControllerBase
@@ -29,7 +28,7 @@ namespace Application.WebApi.Controllers
         /// Adds a new priority entity.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="priority">Instance of <see cref="Priority"/></param>
+        /// <param name="priority">The <see cref="Priority"/> that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added priority entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -45,7 +44,7 @@ namespace Application.WebApi.Controllers
         /// Updates the specific priority.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="priority">Instance of <see cref="Priority"/>.</param>
+        /// <param name="priority">The <see cref="Priority"/> that will be updated.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated priority.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -61,7 +60,7 @@ namespace Application.WebApi.Controllers
         /// Deletes the priority with the specific id.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="priorityValue">The specific id of the priority that will deleted.</param>
+        /// <param name="priorityValue">The specific id of the priority that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{priorityValue}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

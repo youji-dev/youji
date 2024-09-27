@@ -7,7 +7,6 @@ namespace Application.WebApi.Controllers
     /// <summary>
     /// Controller that provides endpoints to manage role assignment requests.
     /// </summary>
-    /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
     [Route("api/[controller]")]
     [ApiController]
     public class RoleAssignmentController : ControllerBase
@@ -29,7 +28,7 @@ namespace Application.WebApi.Controllers
         /// Adds a new role assignment entity.
         /// </summary>
         /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
-        /// <param name="roleAssignment">Instance of <see cref="RoleAssignment"/></param>
+        /// <param name="roleAssignment">The <see cref="RoleAssignment"/> that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added role assignment entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]

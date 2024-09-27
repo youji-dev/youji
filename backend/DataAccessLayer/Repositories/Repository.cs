@@ -28,7 +28,7 @@ namespace PersistenceLayer.DataAccess.Repositories
         /// <summary>
         /// Gets all entities.
         /// </summary>
-        /// <returns>All entities of <see cref="TEntity">.</returns>
+        /// <returns>All entities of <see cref="TEntity"/>.</returns>
         public virtual IQueryable<TEntity> GetAll()
         {
             return this.Context.Set<TEntity>();

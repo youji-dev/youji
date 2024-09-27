@@ -7,7 +7,6 @@ namespace Application.WebApi.Controllers
     /// <summary>
     /// Controller that provides endpoints to manage building requests.
     /// </summary>
-    /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
     [Route("api/[controller]")]
     [ApiController]
     public class BuildingController : ControllerBase
@@ -51,7 +50,7 @@ namespace Application.WebApi.Controllers
         /// Updates the specific building.
         /// </summary>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
-        /// <param name="building">Instance of <see cref="Building"/>.</param>
+        /// <param name="building">The <see cref="Building"/> that will updated.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated building.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -67,7 +66,7 @@ namespace Application.WebApi.Controllers
         /// Deletes the building with the specific id.
         /// </summary>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
-        /// <param name="buildingId">The specific id of the building that will deleted.</param>
+        /// <param name="buildingId">The specific id of the building that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{buildingId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

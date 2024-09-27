@@ -8,10 +8,9 @@ namespace Application.WebApi.Controllers
     /// <summary>
     /// Controller that provides endpoints to manage state requests.
     /// </summary>
-    /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
     [Route("api/[controller]")]
     [ApiController]
-    public class StateContorller : ControllerBase
+    public class StateController : ControllerBase
     {
         /// <summary>
         /// Gets all states.
@@ -29,7 +28,7 @@ namespace Application.WebApi.Controllers
         /// Adds a new state entity.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="stateData">Instance of <see cref="StatePostDTO"/></param>
+        /// <param name="stateData">The state data that will be Sadded.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -39,6 +38,7 @@ namespace Application.WebApi.Controllers
         {
             var state = new State()
             {
+                Id = default,
                 Name = stateData.Name,
                 Color = stateData.Color,
             };
@@ -52,14 +52,21 @@ namespace Application.WebApi.Controllers
         /// Updates the specific state.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="state">Instance of <see cref="State"/>.</param>
+        /// <param name="state">The <see cref="State"/> that will be updated.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<State>> Put(
             [FromServices] StateRepository stateRepo,
             [FromBody] State state)
         {
+            if (state.Id == default)
+                return this.BadRequest("The state id is missing");
+
+            if (await stateRepo.GetAsync(state.Id) is null)
+                return this.NotFound($"A state with the id '{state.Id}' doesn´t exist.");
+
             await stateRepo.UpdateAsync(state);
             return this.Ok(state);
         }
@@ -68,7 +75,7 @@ namespace Application.WebApi.Controllers
         /// Deletes the state with the specific id.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="stateId">The specific id of the state that will deleted.</param>
+        /// <param name="stateId">The specific id of the state that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{stateId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

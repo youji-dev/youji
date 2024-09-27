@@ -26,11 +26,6 @@
         public required string Author { get; set; }
 
         /// <summary>
-        /// The date when the ticket was created
-        /// </summary>
-        public required DateTime CreationDate { get; set; }
-
-        /// <summary>
         /// The state of the ticket.
         /// </summary>
         public required Guid StateId { get; set; }

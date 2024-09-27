@@ -119,7 +119,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
-        /// <param name="ticketData">Instance of <see cref="TicketPostDTO"/></param>
+        /// <param name="ticketData">The ticket data that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added ticket entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -169,7 +169,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="commentData">Instance of <see cref="CommentPostDTO"/></param>
+        /// <param name="commentData">The comment data that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -204,7 +204,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="attachmentFile">Instance of <see cref="IFormFile"/></param>
+        /// <param name="attachmentFile">The file that will be uploaded.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
         [HttpPost("{ticketId}/attachment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -243,7 +243,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
-        /// <param name="ticketData">Instance of <see cref="TicketPutDTO"/></param>
+        /// <param name="ticketData">The ticket data that will update the ticket.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -281,7 +281,7 @@ namespace Application.WebApi.Controllers
         /// Deletes the ticket with the specific id.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="ticketId">The specific id of the ticket that will deleted.</param>
+        /// <param name="ticketId">The specific id of the ticket that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{ticketId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]

@@ -25,12 +25,15 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] Guid commentId)
         {
+            var userClaim = this.User.FindFirst("username")?.Value;
+
             var comment = await commentRepo.GetAsync(commentId);
 
             if (comment is null)
                 return this.NotFound($"A comment with the id '{commentId}' doesn´t exist.");
 
-            // TODO: verify it the user is allowed to delete this attachment by checking if he is the owner of the ticker or admin or Facility Manager
+            if (!comment.Author.Equals(userClaim))
+                return this.Forbid();
 
             await commentRepo.DeleteAsync(comment);
 

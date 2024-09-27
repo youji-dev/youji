@@ -1,6 +1,7 @@
 ﻿using Application.WebApi.Decorators;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi.Controllers
@@ -26,12 +27,19 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromRoute] Guid attachmentId)
         {
-            var attachment = await attachmentRepo.GetAsync(attachmentId);
+            var userClaim = this.User.FindFirst("username")?.Value;
+
+            var attachment = await attachmentRepo
+                .Find(x => x.Id == attachmentId)
+                .Include(x => x.Ticket)
+                .FirstOrDefaultAsync();
 
             if (attachment is null)
                 return this.NotFound($"An attachment with the id '{attachmentId}' doesn´t exist.");
 
-            // TODO: verify it the user is allowed to delete this attachment by checking if he is the owner of the ticker or admin or Facility Manager
+            if (attachment.Ticket == null || !attachment.Ticket.Author.Equals(userClaim))
+                return this.Forbid();
+
             await attachmentRepo.DeleteAsync(attachment);
 
             return this.Ok($"The attachment with the id '{attachmentId}' was deleted.");

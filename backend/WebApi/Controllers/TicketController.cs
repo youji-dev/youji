@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Application.WebApi.Controllers
 {
@@ -15,8 +16,11 @@ namespace Application.WebApi.Controllers
     /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/></param>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TicketController : Controller
     {
+        // TODO: everything regarding authentication
+
         /// <summary>
         /// Gets a ticket by a specific ticket id.
         /// </summary>

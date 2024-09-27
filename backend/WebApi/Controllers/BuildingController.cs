@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.WebApi.Decorators;
+using Common.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 
@@ -19,6 +22,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with all buildings.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public ActionResult<Building[]> Get(
             [FromServices] BuildingRepository buildingRepo)
         {
@@ -33,6 +37,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the added building entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Building>> Post(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] string buildingName)
@@ -55,6 +60,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated building.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Building>> Put(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] Building building)
@@ -72,6 +78,7 @@ namespace Application.WebApi.Controllers
         [HttpDelete("{buildingId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] BuildingRepository buildingRepo,
             [FromRoute] Guid buildingId)

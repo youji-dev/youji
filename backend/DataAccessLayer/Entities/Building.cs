@@ -11,7 +11,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// Id of the building.
         /// </summary>
         [Key]
-        public Guid? Id { get; set; }
+        public required Guid Id { get; set; }
 
         /// <summary>
         /// Name of the building.

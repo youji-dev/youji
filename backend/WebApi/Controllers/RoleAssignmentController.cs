@@ -48,23 +48,23 @@ namespace Application.WebApi.Controllers
         /// Updates the specific role assignment.
         /// </summary>
         /// <param name="roleAssignmentRepo">Instance of <see cref="RoleAssignmentRepository"/></param>
-        /// <param name="roleAssignmentId">Instance of <see cref="RoleAssignment"/>.</param>
+        /// <param name="userId">The user id of the role assignment.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated role assignment.</returns>
         [HttpDelete("{roleAssignmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] RoleAssignmentRepository roleAssignmentRepo,
-            [FromRoute] string roleAssignmentId)
+            [FromRoute] string userId)
         {
-            var deleteRoleAssignment = await roleAssignmentRepo.GetAsync(roleAssignmentId);
+            var deleteRoleAssignment = await roleAssignmentRepo.GetAsync(userId);
 
             if (deleteRoleAssignment is null)
-                return this.NotFound($"A role assignment with de id '{roleAssignmentId}' doesn´t exist.");
+                return this.NotFound($"A role assignment with de id '{userId}' doesn´t exist.");
 
             await roleAssignmentRepo.DeleteAsync(deleteRoleAssignment);
 
-            return this.Ok($"The role assignment with the id '{roleAssignmentId}' was deleted.");
+            return this.Ok($"The role assignment with the id '{userId}' was deleted.");
         }
     }
 }

@@ -1,19 +1,17 @@
 ﻿using Common.Contracts.Post;
 using Common.Contracts.Put;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
-using Microsoft.AspNetCore.Authorization;
+using System.Globalization;
 
 namespace Application.WebApi.Controllers
 {
     /// <summary>
     /// Controller that provides endpoints to manage ticket requests.
     /// </summary>
-    /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/></param>
-    /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/></param>
-    /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/></param>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
@@ -58,14 +56,14 @@ namespace Application.WebApi.Controllers
             {
                 searchTerm = searchTerm.ToLower();
                 ticketQuery = ticketRepo.GetAll().Where(ticket =>
-                    ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
-                    || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
-                    || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
-                    || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
-                    || ((ticket.State != null) && ticket.State.Name.ToLower().Contains(searchTerm))
-                    || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm)
-                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                    ((ticket.Description != null) && ticket.Description.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm))
+                    || ((ticket.Building != null) && ticket.Building.Name.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm))
+                    || ((ticket.Room != null) && ticket.Room.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm))
+                    || ((ticket.Priority != null) && ticket.Priority.Name.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm))
+                    || ticket.State.Name.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm)
+                    || ticket.Title.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm)
+                    || ticket.Author.ToLower(CultureInfo.InvariantCulture).Contains(searchTerm)
+                    || ticket.CreationDate.ToString().ToLower(CultureInfo.InvariantCulture).Contains(searchTerm));
             }
 
             if (take is not null)
@@ -151,6 +149,7 @@ namespace Application.WebApi.Controllers
 
             Ticket ticket = new()
             {
+                Id = default,
                 Title = ticketData.Title,
                 Author = ticketData.Author,
                 CreationDate = DateTime.Now,
@@ -191,6 +190,7 @@ namespace Application.WebApi.Controllers
 
             TicketComment comment = new()
             {
+                Id = default,
                 Author = commentData.Author,
                 Content = commentData.Content,
                 CreationDate = DateTime.Now,
@@ -229,6 +229,7 @@ namespace Application.WebApi.Controllers
 
             TicketAttachment attachment = new()
             {
+                Id = default,
                 Name = attachmentFile.FileName,
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
@@ -251,7 +252,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<Ticket>> Put(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] StateRepository stateRepo,

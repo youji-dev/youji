@@ -43,6 +43,7 @@ namespace Application.WebApi.Controllers
         {
             var building = new Building()
             {
+                Id = default,
                 Name = buildingName,
             };
 
@@ -59,11 +60,15 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated building.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Building>> Put(
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] Building building)
         {
+            if (await buildingRepo.GetAsync(building.Id) is null)
+                return this.NotFound($"A building with the id '{building.Id}' doesn´t exist.");
+
             await buildingRepo.UpdateAsync(building);
             return this.Ok(building);
         }

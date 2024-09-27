@@ -12,7 +12,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the attachment.
         /// </summary>
         [Key]
-        public Guid? Id { get; set; }
+        public required Guid Id { get; set; }
 
         /// <summary>
         /// The binaries of the attachment.

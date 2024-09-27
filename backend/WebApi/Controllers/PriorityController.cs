@@ -53,11 +53,15 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated priority.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
             [FromBody] Priority priority)
         {
+            if (await priorityRepo.GetAsync(priority.Value) is null)
+                return this.NotFound($"A priority with the value {priority.Value} doesn´t exist.");
+
             await priorityRepo.UpdateAsync(priority);
             return this.Ok(priority);
         }

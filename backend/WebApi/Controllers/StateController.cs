@@ -21,6 +21,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all states.</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
         public ActionResult<State[]> Get(
             [FromServices] StateRepository stateRepo)
@@ -61,15 +62,12 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Put(
             [FromServices] StateRepository stateRepo,
             [FromBody] State state)
         {
-            if (state.Id == default)
-                return this.BadRequest("The state id is missing");
-
             if (await stateRepo.GetAsync(state.Id) is null)
                 return this.NotFound($"A state with the id '{state.Id}' doesn´t exist.");
 

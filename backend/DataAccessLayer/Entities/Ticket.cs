@@ -13,7 +13,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the ticket.
         /// </summary>
         [Key]
-        public Guid? Id { get; set; }
+        public required Guid Id { get; set; }
 
         /// <summary>
         /// The title of the ticket:

@@ -1,4 +1,7 @@
-﻿using Common.Contracts.Post;
+﻿using Application.WebApi.Decorators;
+using Common.Contracts.Post;
+using Common.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
@@ -18,6 +21,7 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all states.</returns>
         [HttpGet]
+        [Authorize]
         public ActionResult<State[]> Get(
             [FromServices] StateRepository stateRepo)
         {
@@ -32,6 +36,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Post(
             [FromServices] StateRepository stateRepo,
             [FromBody] StatePostDTO stateData)
@@ -57,6 +62,7 @@ namespace Application.WebApi.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Put(
             [FromServices] StateRepository stateRepo,
             [FromBody] State state)
@@ -80,6 +86,7 @@ namespace Application.WebApi.Controllers
         [HttpDelete("{stateId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] StateRepository stateRepo,
             [FromRoute] Guid stateId)

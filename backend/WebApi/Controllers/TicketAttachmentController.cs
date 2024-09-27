@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.WebApi.Decorators;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi.Controllers
@@ -8,6 +10,7 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TicketAttachmentController : ControllerBase
     {
         /// <summary>
@@ -28,6 +31,7 @@ namespace Application.WebApi.Controllers
             if (attachment is null)
                 return this.NotFound($"An attachment with the id '{attachmentId}' doesn´t exist.");
 
+            // TODO: verify it the user is allowed to delete this attachment by checking if he is the owner of the ticker or admin or Facility Manager
             await attachmentRepo.DeleteAsync(attachment);
 
             return this.Ok($"The attachment with the id '{attachmentId}' was deleted.");

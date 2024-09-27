@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DomainLayer.BusinessLogic.PDF;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -78,6 +79,7 @@ namespace Application.WebApi
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = "youji",
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSignKey)),
+                        RoleClaimType = ClaimTypes.Role,
                     };
                 });
         }

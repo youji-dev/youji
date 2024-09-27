@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi.Controllers
@@ -8,6 +9,7 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TicketCommentController : ControllerBase
     {
         /// <summary>
@@ -27,6 +29,8 @@ namespace Application.WebApi.Controllers
 
             if (comment is null)
                 return this.NotFound($"A comment with the id '{commentId}' doesn´t exist.");
+
+            // TODO: verify it the user is allowed to delete this attachment by checking if he is the owner of the ticker or admin or Facility Manager
 
             await commentRepo.DeleteAsync(comment);
 

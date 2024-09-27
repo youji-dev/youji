@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.WebApi.Decorators;
+using Common.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 
@@ -18,6 +21,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with all priorities.</returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public ActionResult<Priority[]> Get(
             [FromServices] PriorityRepository priorityRepo)
         {
@@ -32,6 +36,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the added priority entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Post(
             [FromServices] PriorityRepository priorityRepo,
             [FromBody] Priority priority)
@@ -48,6 +53,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated priority.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
             [FromBody] Priority priority)
@@ -65,6 +71,7 @@ namespace Application.WebApi.Controllers
         [HttpDelete("{priorityValue}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] PriorityRepository priorityRepo,
             [FromRoute] int priorityValue)

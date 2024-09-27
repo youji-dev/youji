@@ -1,4 +1,6 @@
-﻿namespace DomainLayer.BusinessLogic.Mailing.Models
+﻿using PersistenceLayer.DataAccess.Entities;
+
+namespace DomainLayer.BusinessLogic.Mailing.Models
 {
     /// <summary>
     /// Model for new comment email
@@ -14,5 +16,16 @@
         /// The comments content
         /// </summary>
         public required string Content { get; set; }
+
+        public static NewTicketCommentModel FromComment(TicketComment comment)
+        {
+            return new NewTicketCommentModel()
+            {
+#warning TODO: Platzhalter mit Ticket Titel ersetzten
+                Title = $"Neuer Kommentar an {"N/A"}",
+                Author = comment.Author,
+                Content = comment.Content,
+            };
+        }
     }
 }

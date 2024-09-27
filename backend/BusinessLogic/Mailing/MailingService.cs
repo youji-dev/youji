@@ -33,13 +33,17 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             BodyBuilder bodyBuilder = new();
 
-            TicketChangedModel mailModel = TicketChangedModel.FromTickets(newTicket, oldTicket);
+            TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket);
             this.AddResourcesToModel(bodyBuilder, mailModel);
 
-            string template = TemplateHelper.GetTemplate("TicketChanged")
+            string layout = TemplateHelper.GetTemplate("MailBase")
+                ?? throw new InvalidOperationException("Could not find mail layout");
+
+            string template = TemplateHelper.GetTemplate("TicketDataChanged")
                 ?? throw new InvalidOperationException("Could not find template");
 
-            var html = Engine.Razor.RunCompile(template, "TicketChanged", typeof(TicketChangedModel), mailModel);
+            Engine.Razor.AddTemplate("mailLayout", layout);
+            var html = Engine.Razor.RunCompile(template, "template", typeof(TicketDataChangedModel), mailModel);
 
             bodyBuilder.HtmlBody = html;
             bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);

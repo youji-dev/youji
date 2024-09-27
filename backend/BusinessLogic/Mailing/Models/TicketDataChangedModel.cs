@@ -3,15 +3,10 @@
 namespace DomainLayer.BusinessLogic.Mailing.Models
 {
     /// <summary>
-    /// Model for ticket change e-mail
+    /// Model for ticket master-/meta-data changes e-mail
     /// </summary>
-    internal record TicketChangedModel : MailModel
+    public record TicketDataChangedModel : MailModel
     {
-        /// <summary>
-        /// The current title of the ticket
-        /// </summary>
-        public required string TicketTitle { get; set; }
-
         /// <summary>
         /// Change of the ticket title
         /// </summary>
@@ -48,24 +43,14 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         public SimpleChange? ObjectChange { get; set; }
 
         /// <summary>
-        /// New attachments
-        /// </summary>
-        public IEnumerable<string> NewAttachments { get; set; } = [];
-
-        /// <summary>
-        /// New comments
-        /// </summary>
-        public IEnumerable<CommentModel> NewComments { get; set; } = [];
-
-        /// <summary>
-        /// Creates a new instance of <see cref="TicketChangedModel"/> from the differences of two versions of a ticket
+        /// Creates a new instance of <see cref="TicketDataChangedModel"/> from the differences of two versions of a ticket
         /// </summary>
         /// <param name="newTicket">New version of the ticket</param>
         /// <param name="oldTicket">Old version of the ticket</param>
         /// <returns>The generated model</returns>
-        public static TicketChangedModel FromTickets(Ticket newTicket, Ticket oldTicket)
+        public static TicketDataChangedModel FromTickets(Ticket newTicket, Ticket oldTicket)
         {
-            TicketChangedModel result = new() { TicketTitle = newTicket.Title };
+            TicketDataChangedModel result = new() { Title = $"Ticket '{newTicket.Title}' wurde geändert" };
 
             if (newTicket.Title != oldTicket.Title)
             {
@@ -130,22 +115,6 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                 };
             }
 
-            if (newTicket.Comments.Count > oldTicket.Comments.Count)
-            {
-                var newComments = newTicket.Comments.Skip(oldTicket.Comments.Count);
-                result.NewComments = newComments.Select(c => new CommentModel
-                {
-                    Author = c.Author,
-                    Content = c.Content,
-                });
-            }
-
-            if (newTicket.Attachments.Count != oldTicket.Attachments.Count)
-            {
-                var newAttachments = newTicket.Attachments.Skip(oldTicket.Attachments.Count);
-                result.NewAttachments = newAttachments.Select(a => a.Name);
-            }
-
             return result;
         }
     }
@@ -153,7 +122,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// <summary>
     /// Struct for simple string property change
     /// </summary>
-    internal struct SimpleChange
+    public struct SimpleChange
     {
         /// <summary>
         /// New value of the property
@@ -164,21 +133,5 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         /// Old value of the property
         /// </summary>
         public string NewValue { get; set; }
-    }
-
-    /// <summary>
-    /// Comment DTO for the <see cref="TicketChangedModel"/>
-    /// </summary>
-    internal struct CommentModel
-    {
-        /// <summary>
-        /// The comment author
-        /// </summary>
-        public string Author { get; set; }
-
-        /// <summary>
-        /// The comments content
-        /// </summary>
-        public string Content { get; set; }
     }
 }

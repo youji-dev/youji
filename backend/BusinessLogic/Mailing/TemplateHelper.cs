@@ -38,7 +38,7 @@ namespace DomainLayer.BusinessLogic.Mailing
     /// </summary>
     internal static partial class TemplateHelper
     {
-        [GeneratedRegex(@"^[^<]*")]
+        [GeneratedRegex(@"^.*<!-- Begin document -->\s*", RegexOptions.Singleline)]
         private static partial Regex RazorDeclaresRegex();
     }
 }

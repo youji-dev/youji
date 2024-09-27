@@ -1,10 +1,15 @@
 ﻿namespace DomainLayer.BusinessLogic.Mailing.Models
 {
     /// <summary>
-    /// Base mail model for resources
+    /// Base mail model
     /// </summary>
-    internal record MailModel
+    public record MailModel
     {
+        /// <summary>
+        /// The main mail title
+        /// </summary>
+        public required string Title { get; set; }
+
         /// <summary>
         /// The youji logo src
         /// </summary>

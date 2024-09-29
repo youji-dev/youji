@@ -6,6 +6,9 @@ using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Security.Claims;
+using Application.WebApi.Decorators;
+using Common.Enums;
 
 namespace Application.WebApi.Controllers
 {
@@ -14,11 +17,8 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class TicketController : Controller
     {
-        // TODO: everything regarding authentication
-
         /// <summary>
         /// Gets a ticket by a specific ticket id.
         /// </summary>
@@ -27,6 +27,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
@@ -44,6 +45,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public ActionResult<Ticket[]> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
@@ -84,6 +86,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketComment"/> from the specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}/comments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public async Task<ActionResult<Collection<TicketComment>>> GetComments(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
@@ -103,6 +106,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of <see cref="TicketAttachment"/> from the specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}/attachments")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
         public async Task<ActionResult<Collection<TicketAttachment>>> GetAttachments(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
@@ -126,6 +130,7 @@ namespace Application.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<Ticket>> Post(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] StateRepository stateRepo,
@@ -152,7 +157,7 @@ namespace Application.WebApi.Controllers
                 Id = default,
                 Title = ticketData.Title,
                 Author = ticketData.Author,
-                CreationDate = DateTime.Now,
+                CreationDate = DateTime.UtcNow,
                 State = state,
                 Description = ticketData.Description,
                 Priority = priority,
@@ -177,6 +182,7 @@ namespace Application.WebApi.Controllers
         [HttpPost("{ticketId}/comment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<TicketComment>> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
@@ -193,7 +199,7 @@ namespace Application.WebApi.Controllers
                 Id = default,
                 Author = commentData.Author,
                 Content = commentData.Content,
-                CreationDate = DateTime.Now,
+                CreationDate = DateTime.UtcNow,
                 TicketId = ticketId,
             };
 
@@ -213,6 +219,7 @@ namespace Application.WebApi.Controllers
         [HttpPost("{ticketId}/attachment")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<TicketAttachment>> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
@@ -242,7 +249,7 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Updates the specific ticket.
+        /// Updates a specific ticket.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
@@ -253,6 +260,7 @@ namespace Application.WebApi.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<Ticket>> Put(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] StateRepository stateRepo,
@@ -264,6 +272,19 @@ namespace Application.WebApi.Controllers
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
+
+            var userClaim = this.User.FindFirst("username")?.Value;
+            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (userClaim is null || rolesClaim is null)
+                return this.Unauthorized();
+
+            if (!Enum.TryParse(rolesClaim, out Roles role))
+                return this.Unauthorized();
+
+            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
+            {
+                return this.Forbid();
+            }
 
             var state = await stateRepo.GetAsync(ticketData.StateId);
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
@@ -295,12 +316,25 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
         {
-            var deleteTicket = await ticketRepo.GetAsync(ticketId);
+            var ticket = await ticketRepo.GetAsync(ticketId);
 
-            if (deleteTicket is null)
+            if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
-            await ticketRepo.DeleteAsync(deleteTicket);
+            var userClaim = this.User.FindFirst("username")?.Value;
+            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (userClaim is null || rolesClaim is null)
+                return this.Unauthorized();
+
+            if (!Enum.TryParse(rolesClaim, out Roles role))
+                return this.Unauthorized();
+
+            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
+            {
+                return this.Forbid();
+            }
+
+            await ticketRepo.DeleteAsync(ticket);
 
             return this.Ok($"The ticket with the id '{ticketId}' was deleted.");
         }

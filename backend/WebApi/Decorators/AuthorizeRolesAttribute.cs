@@ -25,7 +25,7 @@ namespace Application.WebApi.Decorators
                 return;
             }
 
-            if ((roles & userRoles) != roles)
+            if ((userRoles & roles) == 0)
             {
                 context.Result = new ForbidResult();
             }

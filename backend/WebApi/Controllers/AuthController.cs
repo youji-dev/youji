@@ -42,7 +42,7 @@ namespace Application.WebApi.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                 return this.Unauthorized();
+                return this.Unauthorized();
             }
         }
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersistenceLayer.DataAccess;
@@ -11,9 +12,11 @@ using PersistenceLayer.DataAccess;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240925074504_add delete behavior")]
+    partial class Adddeletebehavior
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,29 +57,6 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.HasKey("Value");
 
                     b.ToTable("Priorities");
-                });
-
-            modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.RefreshToken", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("uuid_generate_v4()");
-
-                    b.Property<DateTime>("CreationDateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.RoleAssignment", b =>

@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
 using Common.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.WebApi.Controllers
 {
@@ -40,6 +41,8 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
+        /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
+        /// <param name="orderDirection">The direction teh results should be ordered in ("ASC" or "DESC") <see langword="string"/>.</param>
         /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
         /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
@@ -49,15 +52,17 @@ namespace Application.WebApi.Controllers
         public ActionResult<Ticket[]> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
+            [FromQuery] string orderByColumn = "CreationDate",
+            [FromQuery] string orderDirection = "ASC",
             [FromQuery] int skip = 0,
             [FromQuery] int? take = null)
         {
-            var ticketQuery = ticketRepo.GetAll().Skip(skip);
+            var ticketQuery = ticketRepo.GetAll();
 
             if (searchTerm is not null)
             {
                 searchTerm = searchTerm.ToLower();
-                ticketQuery = ticketRepo.GetAll().Where(ticket =>
+                ticketQuery = ticketQuery.Where(ticket =>
                     ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
                     || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
                     || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
@@ -66,11 +71,22 @@ namespace Application.WebApi.Controllers
                     || ticket.Title.ToLower().Contains(searchTerm)
                     || ticket.Author.ToLower().Contains(searchTerm)
                     || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                ticketQuery =
+                orderDirection.Equals("DESC")
+                ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn))
+                : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn));
+            }
+            else
+            {
+                ticketQuery =
+                orderDirection.Equals("DESC")
+                ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
             }
 
             if (take is not null)
             {
-                ticketQuery = ticketQuery.Take((int)take);
+                ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
             }
 
             Ticket[] tickets = [.. ticketQuery];

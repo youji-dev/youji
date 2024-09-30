@@ -6,7 +6,7 @@ namespace PersistenceLayer.DataAccess.Repositories
     /// Represents the repository of the priority entity.
     /// </summary>
     /// <param name="context">Instance of <see cref="DataContext"/></param>
-    public class PriorityRepository(DataContext context) : Repository<Priority, Guid>(context)
+    public class PriorityRepository(DataContext context) : Repository<Priority, int>(context)
     {
     }
 }

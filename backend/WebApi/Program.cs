@@ -1,5 +1,6 @@
 using Application.WebApi;
 using PersistenceLayer.DataAccess;
+using Microsoft.AspNetCore.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,17 +9,15 @@ builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerConfiguration();
 
 builder.Services.AddInfrastructure(
     builder.Configuration.GetConnectionString("DefaultConnection"));
 
 builder.Services.AddRepositories();
-
 builder.Services.AddLogicServices(builder.Configuration);
-
 builder.Services.AddAuthenticationConfiguration(builder.Configuration);
+builder.Services.AddCorsConfiguration(builder.Configuration);
 
 var app = builder.Build();
 
@@ -26,14 +25,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-
     app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
+app.UseCors("Settings");
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

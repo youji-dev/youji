@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -27,5 +28,16 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The file type of the attachment.
         /// </summary>
         public required string FileType { get; set; }
+
+        /// <summary>
+        /// The id of the related ticket.
+        /// </summary>
+        public required Guid TicketId { get; set; }
+
+        /// <summary>
+        /// The refernce type of the relatet tickets.
+        /// </summary>
+        [JsonIgnore]
+        public Ticket? Ticket { get; set; }
     }
 }

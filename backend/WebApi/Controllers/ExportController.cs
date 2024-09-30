@@ -5,12 +5,14 @@ using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Globalization;
 using System.Reflection;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Application.WebApi.Controllers
 {
     /// <summary>
     /// Contains endpoints relating to export functionality
     /// </summary>
+    [Authorize]
     public class ExportController : ControllerBase
     {
         /// <summary>

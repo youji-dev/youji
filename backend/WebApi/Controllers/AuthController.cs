@@ -2,7 +2,6 @@ using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Authentication.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using PersistenceLayer.DataAccess.Entities;
 
 namespace Application.WebApi.Controllers

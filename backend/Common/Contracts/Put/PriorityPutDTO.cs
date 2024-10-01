@@ -1,26 +1,23 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PersistenceLayer.DataAccess.Entities
+﻿namespace Common.Contracts.Put
 {
     /// <summary>
-    /// Represents the ticket priority.
+    /// Represents a priority data transfer object for put operation.
     /// </summary>
-    public class Priority
+    public class PriorityPutDTO
     {
         /// <summary>
         /// The id of the priority.
         /// </summary>
-        [Key]
         public required Guid Id { get; set; }
 
         /// <summary>
         /// The value of the priority.
         /// </summary>
-        public required int Value { get; set; }
+        public int? Value { get; set; }
 
         /// <summary>
         /// The name of the priority.
         /// </summary>
-        public required string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

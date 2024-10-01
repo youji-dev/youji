@@ -56,6 +56,11 @@ export default defineI18nConfig(() => ({
 			building: "Building",
 			createdBy: "Created by",
 			createdOn: "Created on",
+			files: "Files",
+			enter: "Enter",
+			select: "Select",
+			newComment: "Add a new comment",
+			sendComment: "Send comment",
 		},
 		de: {
 			welcome: "Willkommen",
@@ -111,6 +116,11 @@ export default defineI18nConfig(() => ({
 			building: "Gebäude",
 			createdBy: "Erstellt von",
 			createdOn: "Erstellt am",
+			files: "Dateien",
+			enter: "Eingeben",
+			select: "Auswählen",
+			newComment: "Einen neuen Kommentar hinzufügen",
+			sendComment: "Kommentar senden",
 		},
 	},
 }));

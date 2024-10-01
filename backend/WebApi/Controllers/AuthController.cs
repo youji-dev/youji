@@ -2,6 +2,7 @@ using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Authentication.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using PersistenceLayer.DataAccess.Entities;
 
 namespace Application.WebApi.Controllers
@@ -27,9 +28,18 @@ namespace Application.WebApi.Controllers
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine(Environment.GetCommandLineArgs());
+                bool dev = false;
+                if (Environment.GetCommandLineArgs().Length > 1)
+                {
+                    dev = Environment.GetCommandLineArgs()[1].Equals("--dev-auth");
+                }
+
+                System.Diagnostics.Debug.WriteLine(dev);
                 RoleAssignment roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,
-                    loginRequestDto.Password);
+                    loginRequestDto.Password,
+                    dev);
 
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);

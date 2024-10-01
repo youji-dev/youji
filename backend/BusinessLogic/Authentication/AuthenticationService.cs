@@ -89,10 +89,16 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// </summary>
         /// <param name="username">LDAP-DN pointing to a single Entity</param>
         /// <param name="password">Password for the entity</param>
+        /// <param name="dev">If true, auth will always succeed (for development)</param>
         /// <returns>A <see cref="RoleAssignment"/> that is either queries from the database or
         /// create if the user logs in for the first time</returns>
-        public async Task<RoleAssignment> LdapLogin(string username, string password)
+        public async Task<RoleAssignment> LdapLogin(string username, string password, bool dev = false)
         {
+            if (dev)
+            {
+                return await this.GetOrCreateRoleAssignment(username.ToLowerInvariant());
+            }
+
             var host = configuration["LDAPHost"] ?? throw new InvalidOperationException("LDAPHost");
             var port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException("LDAPPort"));
             var baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException("LDAPBaseDN");

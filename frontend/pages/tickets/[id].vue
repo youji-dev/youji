@@ -83,7 +83,7 @@
       <el-upload v-model:file-list="form.files" list-type="picture-card">
         <template #file="{ file }">
           <div>
-            <img class="object-cover aspect-square" :src="file.url" />
+            <img class="object-cover aspect-square w-full" :src="file.url" />
             <span class="el-upload-list__item-actions">
               <span class="el-upload-list__item-preview" @click="">
                 <el-icon><zoom-in /></el-icon>

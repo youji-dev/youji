@@ -71,18 +71,12 @@ namespace Application.WebApi.Controllers
                     || ticket.Title.ToLower().Contains(searchTerm)
                     || ticket.Author.ToLower().Contains(searchTerm)
                     || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
-                ticketQuery =
-                orderDirection.Equals("DESC")
-                ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn))
-                : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn));
             }
-            else
-            {
-                ticketQuery =
-                orderDirection.Equals("DESC")
-                ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-                : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
-            }
+
+            ticketQuery =
+            orderDirection.Equals("DESC")
+            ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+            : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
             if (take is not null)
             {

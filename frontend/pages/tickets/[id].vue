@@ -20,19 +20,25 @@
       <!-- State dropdown -->
       <div>
         <el-text>{{ $t("state") }}</el-text>
-        <el-select v-model="form.state" value-key="id" class="drop-shadow-xl">
+        <el-select v-model="form.state" value-key="id" class="drop-shadow-xl" :placeholder='$t("select")'>
           <el-option v-for="state in stateOptions" :key="state.id" :label="state.name" :value="state">
-            <div class="flex items-center">
-              <el-tag :color="state.color" size="small" class="mr-2 aspect-square" />
-              <span :style="{ color: state.color }">{{ state.name }}</span>
-            </div>
+            <el-tag :color="state.color">
+              <el-text :style='{ color: contrastColor({ bgColor: state.color }) }'> {{ state.name
+                }}</el-text>
+            </el-tag>
           </el-option>
+          <template #label>
+            <div class="flex items-center">
+              <el-tag :color="form.state.color" size="small" class="mr-2 aspect-square" />
+              <span class="truncate">{{ form.state.name }}</span>
+            </div>
+          </template>
         </el-select>
       </div>
       <!-- Priority dropdown -->
       <div>
         <el-text>{{ $t("priority") }}</el-text>
-        <el-select v-model="form.priority" value-key="value" class="drop-shadow-xl">
+        <el-select v-model="form.priority" value-key="value" class="drop-shadow-xl" :placeholder='$t("select")'>
           <el-option v-for="priority in priorityOptions" :key="priority.value" :label="priority.name"
             :value="priority" />
         </el-select>
@@ -40,21 +46,28 @@
       <!-- Room textfield -->
       <div>
         <el-text>{{ $t("room") }}</el-text>
-        <el-input v-model="form.room" class="drop-shadow-xl" />
+        <el-input v-model="form.room" class="drop-shadow-xl" :placeholder='$t("enter")' />
       </div>
       <!-- Building dropdown -->
       <div>
         <el-text>{{ $t("building") }}</el-text>
-        <el-select v-model="form.building" class="drop-shadow-xl" value-key="id">
+        <el-select v-model="form.building" class="drop-shadow-xl" value-key="id" :clearable="true"
+          :placeholder='$t("select")'>
           <el-option v-for=" building in buildingOptions" :key="building.id" :label="building.name" :value="building" />
         </el-select>
+      </div>
+      <!-- Object -->
+      <div>
+        <el-text>{{ $t("object") }}</el-text>
+        <el-input v-model="form.object" class="drop-shadow-xl" :placeholder='$t("enter")' />
       </div>
     </div>
 
     <!-- Description -->
     <div class="mt-6">
       <el-text>{{ $t("description") }}</el-text>
-      <el-input v-model="form.description" type="textarea" class="drop-shadow-xl" resize="vertical" :rows="10" />
+      <el-input v-model="form.description" type="textarea" class="drop-shadow-xl" resize="vertical" :rows="10"
+        :placeholder='$t("enter")' />
     </div>
 
     <!-- meta data -->
@@ -103,50 +116,45 @@
       <el-divider class="mt-10 mb-3" />
 
       <el-timeline>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
-          <el-card>
-            <h4>Update GitHub template</h4>
-            <p>Tom committed 2018/4/12 20:46</p>
+        <el-timeline-item class="drop-shadow-xl" timestamp="2018/4/12" placement="top">
+          <el-card class="block">
+            <el-text size="large" tag="b" type="primary">dmeyer</el-text>
+            <br />
+            <el-text size="default">Lorem ipsum dolor sit amet, **consetetur** sadipscing elitr, sed diam nonumy eirmod
+              tempor
+              invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+              dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+              Lorem
+              ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et
+              dolore
+              magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
+              clita
+              kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</el-text>
           </el-card>
         </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
-          <el-card>
-            <h4>Update GitHub template</h4>
-            <p>Tom committed 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
-          <el-card>
-            <h4>Update GitHub template</h4>
-            <p>Tom committed 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
-          <el-card>
-            <h4>Update GitHub template</h4>
-            <p>Tom committed 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
-          <el-card>
-            <h4>Update GitHub template</h4>
-            <p>Tom committed 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-        <el-timeline-item timestamp="2018/4/12" placement="top">
-          <el-card>
-            <h4>Update GitHub template</h4>
-            <p>Tom committed 2018/4/12 20:46</p>
-          </el-card>
-        </el-timeline-item>
-
       </el-timeline>
+    </div>
+
+    <!-- buttons -->
+    <div class="flex justify-between base-bg-light dark:base-bg-dark">
+      <el-button class="text-sm drop-shadow-xl" type="default" :icon="Printer">{{
+        $t("pdfExport") }}</el-button>
+
+      <div class="flex">
+        <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary">{{
+          $t("save") }}</el-button>
+
+        <el-button class="text-sm justify-self-end drop-shadow-xl" type="default">{{
+          $t("close") }}</el-button>
+
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ArrowLeft, EditPen, Upload, ZoomIn, Download, Delete, Plus } from "@element-plus/icons-vue";
+import { ArrowLeft, EditPen, Upload, ZoomIn, Download, Delete, Printer } from "@element-plus/icons-vue";
+import { contrastColor } from 'contrast-color';
 import type state from "~/types/state";
 import type priority from "~/types/priority";
 import type building from "~/types/building";
@@ -159,12 +167,13 @@ let newComment = ref("");
 let form = ref({
   title: "TicketName" as string,
   state: stateOptions[0] as state,
-  priority: priorityOptions[0] as priority,
-  room: "" as string,
-  building: buildingOptions[0] as building,
-  createdAt: "21.05.2024" as string,
-  author: "dmeyer" as string,
-  description: "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet." as string,
+  priority: priorityOptions[0] as priority | undefined,
+  room: undefined as string | undefined,
+  building: undefined as building | undefined,
+  object: undefined as string | undefined,
+  createdAt: undefined as string | undefined,
+  author: undefined as string | undefined,
+  description: undefined as string | undefined,
   files: userFiles as UploadUserFile[]
 });
 </script>

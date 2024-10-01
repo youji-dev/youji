@@ -102,9 +102,7 @@ namespace DomainLayer.BusinessLogic.Authentication
             var host = configuration["LDAPHost"] ?? throw new InvalidOperationException("LDAPHost");
             var port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException("LDAPPort"));
             var baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException("LDAPBaseDN");
-
             var connection = new LdapConnection();
-
             try
             {
                 connection.Connect(host, port);
@@ -112,7 +110,6 @@ namespace DomainLayer.BusinessLogic.Authentication
                     Native.LdapAuthMechanism.SIMPLE,
                     $"CN={username},{baseDn}",
                     password);
-
                 return await this.GetOrCreateRoleAssignment(username.ToLowerInvariant());
             }
             catch (LdapException ex)

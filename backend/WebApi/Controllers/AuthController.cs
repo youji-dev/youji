@@ -39,10 +39,8 @@ namespace Application.WebApi.Controllers
                     loginRequestDto.Username,
                     loginRequestDto.Password,
                     dev);
-
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
-
                 return this.Ok(new LoginResponseDto()
                 {
                     AccessToken = accessToken,

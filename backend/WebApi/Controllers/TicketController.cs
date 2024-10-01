@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
 using Common.Enums;
@@ -69,8 +68,7 @@ namespace Application.WebApi.Controllers
                     || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm)
-                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                    || ticket.Author.ToLower().Contains(searchTerm);
             }
 
             ticketQuery =

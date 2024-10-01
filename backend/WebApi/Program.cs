@@ -1,6 +1,5 @@
 using Application.WebApi;
 using PersistenceLayer.DataAccess;
-using Microsoft.AspNetCore.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
 

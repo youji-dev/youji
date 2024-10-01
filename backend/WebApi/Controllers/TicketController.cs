@@ -42,7 +42,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
         /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
-        /// <param name="orderDirection">The direction teh results should be ordered in ("ASC" or "DESC") <see langword="string"/>.</param>
+        /// <param name="orderDesc">The direction teh results should be ordered in ("ASC" or "DESC") <see langword="string"/>.</param>
         /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
         /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
@@ -53,7 +53,7 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string orderByColumn = "CreationDate",
-            [FromQuery] string orderDirection = "ASC",
+            [FromQuery] bool orderDesc = false,
             [FromQuery] int skip = 0,
             [FromQuery] int? take = null)
         {
@@ -74,7 +74,7 @@ namespace Application.WebApi.Controllers
             }
 
             ticketQuery =
-            orderDirection.Equals("DESC")
+            orderDesc
             ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
             : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 

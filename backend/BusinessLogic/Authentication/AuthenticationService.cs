@@ -35,7 +35,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                 claims: new[]
                 {
                     new Claim("username", roleAssignment.UserId),
-                    new Claim("role", roleAssignment.Type.ToString()),
+                    new Claim(ClaimTypes.Role, roleAssignment.Type.ToString()),
                 },
                 expires: DateTime.UtcNow.AddMinutes(15),
                 issuer: "youji",

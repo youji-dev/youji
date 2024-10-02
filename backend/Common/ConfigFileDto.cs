@@ -1,4 +1,4 @@
-﻿namespace PersistenceLayer.DataAccess.Entities
+﻿namespace Common
 {
     /// <summary>
     /// Represents the configuration file
@@ -34,5 +34,10 @@
         /// The BaseDN for the user entities that will be able to authenticate
         /// </summary>
         public required string LDAPBaseDN { get; set; }
+
+        /// <summary>
+        /// The CORS Settings for the web application
+        /// </summary>
+        public required CorsConfigDto CORS { get; set; }
     }
 }

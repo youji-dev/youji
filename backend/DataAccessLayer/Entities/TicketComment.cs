@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -27,5 +28,16 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The date and time when the comment was created.
         /// </summary>
         public required DateTime CreationDate { get; set; }
+
+        /// <summary>
+        /// The id of the related ticket.
+        /// </summary>
+        public required Guid TicketId { get; set; }
+
+        /// <summary>
+        /// The reference type of the related tickets.
+        /// </summary>
+        [JsonIgnore]
+        public Ticket? Ticket { get; set; }
     }
 }

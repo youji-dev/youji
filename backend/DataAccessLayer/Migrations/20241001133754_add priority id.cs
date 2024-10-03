@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class addpriorityid : Migration
+    public partial class Addpriorityid : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

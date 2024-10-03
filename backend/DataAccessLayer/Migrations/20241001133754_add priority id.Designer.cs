@@ -13,7 +13,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
     [Migration("20241001133754_add priority id")]
-    partial class addpriorityid
+    partial class Addpriorityid
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

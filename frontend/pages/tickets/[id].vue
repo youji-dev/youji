@@ -1,8 +1,7 @@
 <template>
   <!-- Route: /tickets/[ticketId] -->
   <!-- Page for detail view of a ticket -->
-  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10"
-    :style="{ width: width }">
+  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }">
     <!-- header -->
     <div class="flex justify-between lg:col-span-full lg:row-start-1 lg:row-end-2">
       <div>
@@ -15,13 +14,11 @@
       </div>
       <div>
         <!-- Edit Button -->
-        <el-button class="text-sm drop-shadow-xl" type="primary" :icon="EditPen" @click="toggleEditMode">{{ $t("edit")
-          }}</el-button>
+        <el-button class="text-sm drop-shadow-xl" type="primary" :icon="EditPen" @click="toggleEditMode">{{ $t("edit") }}</el-button>
       </div>
     </div>
     <!-- Dropdown Group -->
-    <div
-      class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center | lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-3">
+    <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center | lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-3">
       <!-- State dropdown -->
       <div>
         <el-text>{{ $t("state") }}</el-text>
@@ -43,15 +40,13 @@
       <div>
         <el-text>{{ $t("priority") }}</el-text>
         <el-select v-model="form.priority" value-key="value" class="drop-shadow-xl" :placeholder="$t('select')">
-          <el-option v-for="priority in priorityOptions" :key="priority.value" :label="priority.name"
-            :value="priority" />
+          <el-option v-for="priority in priorityOptions" :key="priority.value" :label="priority.name" :value="priority" />
         </el-select>
       </div>
       <!-- Building dropdown -->
       <div class="lg:col-span-full">
         <el-text>{{ $t("building") }}</el-text>
-        <el-select v-model="form.building" class="drop-shadow-xl" value-key="id" :clearable="true"
-          :placeholder="$t('select')">
+        <el-select v-model="form.building" class="drop-shadow-xl" value-key="id" :clearable="true" :placeholder="$t('select')">
           <el-option v-for="building in buildingOptions" :key="building.id" :label="building.name" :value="building" />
         </el-select>
       </div>
@@ -70,21 +65,18 @@
     <!-- Description -->
     <div class="lg:col-start-1 lg:col-end-7 lg:row-start-2 lg:row-end-3">
       <el-text>{{ $t("description") }}</el-text>
-      <el-input v-model="form.description" type="textarea" class="drop-shadow-xl max-h-full" rows="15" resize="vertical"
-        :placeholder="$t('enter')" />
+      <el-input v-model="form.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
     </div>
 
     <!-- meta data -->
-    <div
-      class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
+    <div class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
       <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ form.author }}</el-text>
       <br />
       <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ form.createdAt }}</el-text>
     </div>
 
     <!-- files -->
-    <el-card
-      class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-3 lg:row-end-4">
+    <el-card class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-3 lg:row-end-4">
       <el-text class="text-xl">{{ $t("files") }}</el-text>
       <el-upload v-model:file-list="form.files" list-type="picture-card">
         <template #file="{ file }">
@@ -115,8 +107,7 @@
     </el-card>
 
     <!-- comments -->
-    <el-card
-      class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-5">
+    <el-card class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-5">
       <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
       <el-button class="mt-2 float-end" type="primary" size="small">{{ $t("sendComment") }}</el-button>
 
@@ -127,15 +118,12 @@
           <el-card class="block">
             <el-text size="large" tag="b" type="primary">dmeyer</el-text>
             <br />
-            <el-text size="default">Lorem ipsum dolor sit amet, **consetetur** sadipscing elitr, sed diam nonumy eirmod
-              tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
-              justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-              sit
-              amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
-              eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam
-              et
-              justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
-              sanctus est Lorem ipsum dolor sit amet.</el-text>
+            <el-text size="default"
+              >Lorem ipsum dolor sit amet, **consetetur** sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et
+              justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+              eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata
+              sanctus est Lorem ipsum dolor sit amet.</el-text
+            >
           </el-card>
         </el-timeline-item>
       </el-timeline>

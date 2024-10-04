@@ -14,7 +14,7 @@
       </div>
       <div>
         <!-- Edit Button -->
-        <el-button class="text-sm drop-shadow-xl" type="primary" :icon="EditPen" @click="toggleEditMode">{{ $t("edit") }}</el-button>
+        <el-button class="text-sm drop-shadow-xl" type="primary" :icon="EditPen">{{ $t("edit") }}</el-button>
       </div>
     </div>
     <!-- Dropdown Group -->
@@ -145,19 +145,22 @@
 <script lang="ts" setup>
 import { ArrowLeft, EditPen, Upload, ZoomIn, Download, Delete, Printer } from "@element-plus/icons-vue";
 import { contrastColor } from "contrast-color";
-import type state from "~/types/state";
-import type priority from "~/types/priority";
-import type building from "~/types/building";
 import type { UploadProps, UploadUserFile } from "element-plus";
+const { $api } = useNuxtApp();
 
 const router = useRouter();
+const route = useRoute();
 
+const width = ref("100vw");
 let newComment = ref("");
+let newTicket = ref((route.params.id as string).toLocaleLowerCase() == "new");
+
+let stateOptions = $api.state.getAll();
 
 let form = ref({
   title: "TicketName" as string,
-  state: stateOptions[0] as state,
-  priority: priorityOptions[0] as priority | undefined,
+  state:  as state,
+  priority:undefined as priority | undefined,
   room: undefined as string | undefined,
   building: undefined as building | undefined,
   object: undefined as string | undefined,
@@ -169,15 +172,12 @@ let form = ref({
 </script>
 
 <script lang="ts">
-const editMode = ref(false);
-const width = ref("100vw");
+
 onNuxtReady(() => {
   determineViewWidth();
   window.addEventListener("resize", determineViewWidth);
 });
-function toggleEditMode() {
-  editMode.value = !editMode.value;
-}
+
 function determineViewWidth() {
   if (typeof document === "undefined") return;
   const navbar = document.getElementById("navbar");
@@ -190,60 +190,5 @@ function determineViewWidth() {
   return;
 }
 
-const stateOptions: state[] = [
-  ...Array.from({ length: 100 }).map((_, i) => ({
-    id: (i + 1).toString(),
-    name: `option ${i + 1}`,
-    color: `hsl(${(i * 12) % 360}, 100%, 50%)`,
-  })),
-];
-
-const priorityOptions: priority[] = [
-  {
-    value: 1,
-    name: "low",
-  },
-  {
-    value: 2,
-    name: "medium",
-  },
-  {
-    value: 3,
-    name: "high",
-  },
-];
-
-const buildingOptions: building[] = [
-  {
-    id: "1",
-    name: "Hauptgebäude",
-  },
-  {
-    id: "2",
-    name: "Nebengebäude",
-  },
-  {
-    id: "3",
-    name: "Werkhalle",
-  },
-  {
-    id: "4",
-    name: "Turnhalle",
-  },
-];
-
-const userFiles: UploadUserFile[] = [
-  {
-    name: "angry link",
-    url: "https://i.pinimg.com/474x/03/8a/bf/038abf64c89b9cb7f522e59843f5eb92.jpg",
-  },
-  {
-    name: "Bored Link",
-    url: "https://static1.cbrimages.com/wordpress/wp-content/uploads/2023/11/img_0183.jpeg",
-  },
-  {
-    name: `pissed link`,
-    url: "https://pm1.aminoapps.com/6913/821d0c4190c8e3e9599b056f4e6d1649598bb5bbr1-1600-1200v2_hq.jpg",
-  },
-];
+function
 </script>

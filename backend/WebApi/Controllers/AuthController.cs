@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Authentication.DTO;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(IConfiguration configuration) : ControllerBase
     {
         /// <summary>
         /// Route used to exchange login credentials for an access and refresh token pair
@@ -27,18 +28,20 @@ namespace Application.WebApi.Controllers
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine(Environment.GetCommandLineArgs());
-                bool dev = false;
-                if (Environment.GetCommandLineArgs().Length > 1)
+                bool devAuth;
+                try
                 {
-                    dev = Environment.GetCommandLineArgs()[1].Equals("--dev-auth");
+                    devAuth = bool.Parse(configuration["DevAuth"] ?? throw new InvalidOperationException("Dev auth was empty"));
+                }
+                catch
+                {
+                    devAuth = false;
                 }
 
-                System.Diagnostics.Debug.WriteLine(dev);
                 RoleAssignment roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,
                     loginRequestDto.Password,
-                    dev);
+                    devAuth);
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
                 return this.Ok(new LoginResponseDto()

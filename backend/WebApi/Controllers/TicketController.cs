@@ -297,7 +297,8 @@ namespace Application.WebApi.Controllers
             }
 
             var state = await stateRepo.GetAsync(ticketData.StateId);
-            var building = await buildingRepo.GetAsync(ticketData.BuildingId);
+            var building = await buildingRepo.GetAsync(ticketData.BuildingId ??
+                                                       throw new ArgumentNullException(nameof(ticketData.BuildingId)));
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
             ticket.Title = ticketData.Title ?? ticket.Title;

@@ -21,7 +21,7 @@ export default interface ticket {
   /**
    * The description of the ticket
    */
-  description: string | null;
+  description: string | undefined;
 
   /**
    * The author of the ticket
@@ -46,25 +46,25 @@ export default interface ticket {
   /**
    * The building where the issue of this ticket was located
    */
-  building: building | null;
+  building: building | undefined;
 
   /**
    * The room where the issue of this ticket was located
    */
-  room: string | null;
+  room: string | undefined;
 
   /**
    * The object that the report is about
    */
-  object: string | null;
+  object: string | undefined;
 
   /**
    * The comments of the ticket
    */
-  Comments: ticketComment[];
+  comments: ticketComment[];
 
   /**
    * The attachments of the ticket
    */
-  Attachments: ticketAttachment[];
+  attachments: ticketAttachment[];
 }

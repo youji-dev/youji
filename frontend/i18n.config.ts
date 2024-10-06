@@ -66,6 +66,7 @@ export default defineI18nConfig(() => ({
       save: "Save",
       close: "Close",
       loadingData: "Loading data...",
+      ticketNotFound: "Ticket not found",
     },
     de: {
       welcome: "Willkommen",
@@ -131,6 +132,7 @@ export default defineI18nConfig(() => ({
       save: "Speichern",
       close: "Schließen",
       loadingData: "Daten werden geladen...",
+      ticketNotFound: "Ticket nicht gefunden",
     },
   },
 }));

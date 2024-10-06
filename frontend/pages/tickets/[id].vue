@@ -157,14 +157,24 @@ let availableBuildings: Ref<building[]> = ref([] as building[]);
 let ticket: Ref<ticket> = ref({} as ticket);
 
 onNuxtReady(async () => {
-  const [states, priorities, buildings, ticketData] = await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrCreateTicket(route.params.id as string)]);
+  try {
+    const [states, priorities, buildings, ticketData] = await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrCreateTicket(route.params.id as string)]);
 
-  availableStates.value = states.data.value ?? [];
-  availablePriorities.value = priorities.data.value ?? [];
-  availableBuildings.value = buildings.data.value ?? [];
-  ticket.value = ticketData;
+    availableStates.value = states.data.value ?? [];
+    availablePriorities.value = priorities.data.value ?? [];
+    availableBuildings.value = buildings.data.value ?? [];
+    ticket.value = ticketData;
 
-  loading.value = false;
+    loading.value = false;
+  } catch (error) {
+    loading.value = false;
+    ElNotification({
+      title: i18n.t("error"),
+      message: (error as Error).message,
+      type: "error",
+      duration: 5000,
+    });
+  }
 });
 
 async function fetchOrCreateTicket(id: string): Promise<ticket> {
@@ -181,16 +191,21 @@ async function fetchOrCreateTicket(id: string): Promise<ticket> {
   const ticketResult = await $api.ticket.get(id);
 
   if (ticketResult.error.value) {
-    ElNotification({
-      title: i18n.t("error"),
-      message: ticketResult.error.value?.message ?? JSON.stringify(ticketResult.error.value),
-      type: "error",
-      duration: 5000,
-    });
-
-    throw new Error(ticketResult.error.value?.message);
+    if (ticketResult.error.value.status === 404) {
+      throw new Error(i18n.t("ticketNotFound"));
+    }
+    if (ticketResult.error.value.status === 500) {
+      throw new Error("serverError");
+    }
+    if (ticketResult.error.value.message) {
+      throw new Error(ticketResult.error.value.message);
+    }
+    if (ticketResult.error.value.data) {
+      throw new Error(ticketResult.error.value.data);
+    } else {
+      throw new Error(i18n.t("error"));
+    }
   }
-
   const ticketData = ticketResult.data.value;
 
   if (ticketData === null) {

@@ -1,7 +1,7 @@
 <template>
   <!-- Route: /tickets/[ticketId] -->
   <!-- Page for detail view of a ticket -->
-  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }">
+  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
     <!-- header -->
     <div class="flex justify-between lg:col-span-full lg:row-start-1 lg:row-end-2">
       <div>
@@ -139,6 +139,7 @@
 
 <script lang="ts" setup async>
 import type { UploadProps, UploadUserFile } from "element-plus";
+import { ElLoading } from "element-plus";
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 
@@ -149,21 +150,21 @@ const width = ref("100vw");
 let newComment = ref("");
 let newTicket = ref((route.params.id as string).toLocaleLowerCase() == "new");
 let loading = ref(true);
-
+let loadingText = ref(i18n.t("loadingData"));
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);
 let ticket: Ref<ticket> = ref({} as ticket);
 
 onNuxtReady(async () => {
-  const states = (await $api.state.getAll()).data.value ?? [];
-  const priorities = (await $api.priority.getAll()).data.value ?? [];
-  const buildings = (await $api.building.getAll()).data.value ?? [];
+  const [states, priorities, buildings, ticketData] = await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrCreateTicket(route.params.id as string)]);
 
-  availableStates.value = states;
-  availablePriorities.value = priorities;
-  availableBuildings.value = buildings;
-  ticket.value = await fetchOrCreateTicket(route.params.id as string);
+  availableStates.value = states.data.value ?? [];
+  availablePriorities.value = priorities.data.value ?? [];
+  availableBuildings.value = buildings.data.value ?? [];
+  ticket.value = ticketData;
+
+  loading.value = false;
 });
 
 async function fetchOrCreateTicket(id: string): Promise<ticket> {

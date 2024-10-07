@@ -3,22 +3,23 @@
   <!-- Page for detail view of a ticket -->
   <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
     <!-- header -->
-    <div class="flex justify-between lg:col-span-full lg:row-start-1 lg:row-end-2">
-      <div>
-        <!-- backbutton -->
-        <el-button class="text-sm" link @click="router.back()" :icon="ArrowLeft">{{ $t("back") }}</el-button>
-        <!-- separator -->
-        <el-divider class="self-center" direction="vertical" />
-        <!-- Title -->
-        <el-text class="font-semibold truncate" size="large">{{ ticket.title }}</el-text>
-      </div>
-      <div>
-        <!-- Edit Button -->
-        <el-button class="text-sm drop-shadow-xl" type="primary" :icon="EditPen">{{ $t("edit") }}</el-button>
-      </div>
+    <div class="flex lg:col-span-full lg:row-start-1 lg:row-end-2">
+      <!-- backbutton -->
+      <el-button class="text-sm" link @click="router.back()" :icon="ArrowLeft">{{ $t("back") }}</el-button>
+      <!-- separator -->
+      <el-divider class="self-center" direction="vertical" />
+      <!-- Title -->
+      <el-text class="font-semibold truncate" size="large">{{ ticket.title }}</el-text>
     </div>
+
+    <!-- Title -->
+    <div class="lg:col-start-1 lg:col-end-7 lg:row-start-2 lg:row-end-3">
+      <el-text>{{ $t("title") }}</el-text>
+      <el-input v-model="ticket.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
+    </div>
+
     <!-- Dropdown Group -->
-    <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center | lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-3">
+    <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center | lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-4">
       <!-- State dropdown -->
       <div>
         <el-text>{{ $t("state") }}</el-text>
@@ -63,20 +64,20 @@
     </div>
 
     <!-- Description -->
-    <div class="lg:col-start-1 lg:col-end-7 lg:row-start-2 lg:row-end-3">
+    <div class="lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-4">
       <el-text>{{ $t("description") }}</el-text>
       <el-input v-model="ticket.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
     </div>
 
     <!-- meta data -->
-    <div class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
+    <div class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-5 lg:row-end-6">
       <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticket.author }}</el-text>
       <br />
       <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticket.creationDate).toLocaleString() }}</el-text>
     </div>
 
     <!-- files -->
-    <el-card class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-3 lg:row-end-4">
+    <el-card class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
       <el-text class="text-xl">{{ $t("files") }}</el-text>
       <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
         <template #file="{ file }">
@@ -107,7 +108,7 @@
     </el-card>
 
     <!-- comments -->
-    <el-card class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-5">
+    <el-card class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6">
       <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
       <el-button class="mt-2 float-end" type="primary" size="small">{{ $t("sendComment") }}</el-button>
 
@@ -125,7 +126,7 @@
     </el-card>
 
     <!-- buttons -->
-    <div class="flex justify-between lg:col-span-full lg:row-start-5 lg:row-end-6">
+    <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
       <el-button class="text-sm drop-shadow-xl" type="default" :icon="Printer">{{ $t("pdfExport") }}</el-button>
 
       <div class="flex">

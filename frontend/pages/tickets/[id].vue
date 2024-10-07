@@ -110,7 +110,7 @@
     <!-- comments -->
     <el-card class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6">
       <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
-      <el-button class="mt-2 float-end" type="primary" size="small">{{ $t("sendComment") }}</el-button>
+      <el-button class="mt-2 float-end" type="primary" size="small" @click="sendComment()">{{ $t("sendComment") }}</el-button>
 
       <el-divider class="mt-10 mb-3" />
 
@@ -213,7 +213,54 @@ async function fetchOrCreateTicket(id: string): Promise<ticket> {
     return await fetchOrCreateTicket("new");
   }
 
+  ticketData.comments = ticketData.comments.sort(sortCommentsByDate);
   return ticketData;
+}
+
+async function sendComment() {
+  if (newComment.value === "") {
+    ElNotification({
+      title: i18n.t("error"),
+      message: i18n.t("commentEmpty"),
+      type: "error",
+      duration: 5000,
+    });
+    return;
+  }
+
+  if (newTicket.value) {
+    // TODO: Queue Commentpost when Ticket is created
+    return;
+  }
+
+  loading.value = true;
+  let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value, author: "someone" });
+
+  if (commentPostResult.error.value) {
+    loading.value = false;
+    if (commentPostResult.error.value.status === 404) {
+      throw new Error(i18n.t("ticketNotFound"));
+    }
+    if (commentPostResult.error.value.status === 500) {
+      throw new Error("serverError");
+    }
+    if (commentPostResult.error.value.message) {
+      throw new Error(commentPostResult.error.value.message);
+    }
+    if (commentPostResult.error.value.data) {
+      throw new Error(commentPostResult.error.value.data);
+    } else {
+      throw new Error(i18n.t("error"));
+    }
+  }
+
+  ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
+  newComment.value = "";
+  loading.value = false;
+}
+
+function sortCommentsByDate(a: ticketComment, b: ticketComment) {
+  return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
 }
 </script>
 
@@ -224,6 +271,7 @@ import type priority from "~/types/api/response/priorityResponse";
 import type building from "~/types/api/response/buildingResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
+import type ticketComment from "~/types/api/response/ticketCommentResponse";
 
 const width = ref("100vw");
 onNuxtReady(() => {

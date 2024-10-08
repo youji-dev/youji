@@ -117,8 +117,10 @@
       <el-timeline>
         <el-timeline-item v-for="comment in ticket.comments" class="drop-shadow-xl" :timestamp="new Date(comment.creationDate).toLocaleString()" :key="comment.id" placement="top">
           <el-card class="block">
-            <el-text size="large" tag="b" type="primary">{{ comment.author }}</el-text>
-            <br />
+            <div class="flex justify-between">
+              <el-text size="large" tag="b" type="primary">{{ comment.author }}</el-text>
+              <el-button size="small" :icon="Delete" @click="deleteComment(comment)" />
+            </div>
             <el-text size="default">{{ comment.content }}</el-text>
           </el-card>
         </el-timeline-item>
@@ -142,6 +144,7 @@
 import type { UploadProps, UploadUserFile } from "element-plus";
 import { ElLoading } from "element-plus";
 const { $api } = useNuxtApp();
+const { name } = useAuthStore();
 const i18n = useI18n();
 
 const router = useRouter();
@@ -192,10 +195,10 @@ async function fetchOrCreateTicket(id: string): Promise<ticket> {
   const ticketResult = await $api.ticket.get(id);
 
   if (ticketResult.error.value) {
-    if (ticketResult.error.value.status === 404) {
-      throw new Error(i18n.t("ticketNotFound"));
+    if (ticketResult.error.value.statusCode === 404) {
+      throw new Error(i18n.t("resourceNotFound"));
     }
-    if (ticketResult.error.value.status === 500) {
+    if (ticketResult.error.value.statusCode === 500) {
       throw new Error("serverError");
     }
     if (ticketResult.error.value.message) {
@@ -218,45 +221,106 @@ async function fetchOrCreateTicket(id: string): Promise<ticket> {
 }
 
 async function sendComment() {
-  if (newComment.value === "") {
+  try {
+    if (newComment.value === "") {
+      ElNotification({
+        title: i18n.t("error"),
+        message: i18n.t("commentEmpty"),
+        type: "error",
+        duration: 5000,
+      });
+      return;
+    }
+
+    if (newTicket.value) {
+      // TODO: Queue Commentpost when Ticket not jet created
+      return;
+    }
+
+    loading.value = true;
+    let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value, author: "someone" });
+
+    if (commentPostResult.error.value) {
+      loading.value = false;
+      if (commentPostResult.error.value.statusCode === 404) {
+        throw new Error(i18n.t("resourceNotFound"));
+      }
+      if (commentPostResult.error.value.statusCode === 500) {
+        throw new Error("serverError");
+      }
+      if (commentPostResult.error.value.message) {
+        throw new Error(commentPostResult.error.value.message);
+      }
+      if (commentPostResult.error.value.data) {
+        throw new Error(commentPostResult.error.value.data);
+      } else {
+        throw new Error(i18n.t("error"));
+      }
+    }
+
+    ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
+    newComment.value = "";
+    ElNotification({
+      title: i18n.t("success"),
+      message: i18n.t("commentPostSuccess"),
+      type: "success",
+      duration: 5000,
+    });
+  } catch (error) {
     ElNotification({
       title: i18n.t("error"),
-      message: i18n.t("commentEmpty"),
+      message: (error as Error).message,
       type: "error",
       duration: 5000,
     });
-    return;
-  }
-
-  if (newTicket.value) {
-    // TODO: Queue Commentpost when Ticket is created
-    return;
-  }
-
-  loading.value = true;
-  let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value, author: "someone" });
-
-  if (commentPostResult.error.value) {
+  } finally {
     loading.value = false;
-    if (commentPostResult.error.value.status === 404) {
-      throw new Error(i18n.t("ticketNotFound"));
-    }
-    if (commentPostResult.error.value.status === 500) {
-      throw new Error("serverError");
-    }
-    if (commentPostResult.error.value.message) {
-      throw new Error(commentPostResult.error.value.message);
-    }
-    if (commentPostResult.error.value.data) {
-      throw new Error(commentPostResult.error.value.data);
-    } else {
-      throw new Error(i18n.t("error"));
-    }
   }
+}
 
-  ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
-  newComment.value = "";
-  loading.value = false;
+async function deleteComment(comment: ticketComment) {
+  try {
+    loading.value = true;
+    let commentDeleteResult = await $api.comment.delete(comment.id);
+
+    if (commentDeleteResult.error.value) {
+      loading.value = false;
+      if (commentDeleteResult.error.value.statusCode === 404) {
+        throw new Error(i18n.t("resourceNotFound"));
+      }
+      if (commentDeleteResult.error.value.statusCode === 403) {
+        throw new Error(i18n.t("forbidden"));
+      }
+      if (commentDeleteResult.error.value.statusCode === 500) {
+        throw new Error("serverError");
+      }
+      if (commentDeleteResult.error.value.message) {
+        throw new Error(commentDeleteResult.error.value.message);
+      }
+      if (commentDeleteResult.error.value.data) {
+        throw new Error(commentDeleteResult.error.value.data);
+      } else {
+        throw new Error(i18n.t("error"));
+      }
+    }
+
+    ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
+    ElNotification({
+      title: i18n.t("success"),
+      message: i18n.t("commentDeleteSuccess"),
+      type: "success",
+      duration: 5000,
+    });
+  } catch (error) {
+    ElNotification({
+      title: i18n.t("error"),
+      message: (error as Error).message,
+      type: "error",
+      duration: 5000,
+    });
+  } finally {
+    loading.value = false;
+  }
 }
 
 function sortCommentsByDate(a: ticketComment, b: ticketComment) {

@@ -129,7 +129,7 @@
 
     <!-- buttons -->
     <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
-      <el-tooltip :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
+      <el-tooltip :disabled="!newTicket" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
         <el-button :disabled="newTicket" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
       </el-tooltip>
 

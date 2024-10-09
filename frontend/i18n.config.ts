@@ -71,6 +71,7 @@ export default defineI18nConfig(() => ({
       commentEmpty: "Comment cannot be empty",
       commentPostSuccess: "Comment posted successfully",
       commentDeleteSuccess: "Comment deleted successfully",
+      pdfExportNotOnUnsaved: "New Tickets must be saved first before exporting as PDF",
     },
     de: {
       welcome: "Willkommen",
@@ -141,6 +142,7 @@ export default defineI18nConfig(() => ({
       commentEmpty: "Kommentar kann nicht leer sein",
       commentPostSuccess: "Kommentar erfolgreich gesendet",
       commentDeleteSuccess: "Kommentar erfolgreich gelöscht",
+      pdfExportNotOnUnsaved: "Neue Tickets müssen vor dem Export als PDF erstmalig gespeichert sein",
     },
   },
 }));

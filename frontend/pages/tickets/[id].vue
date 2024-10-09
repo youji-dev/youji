@@ -70,14 +70,14 @@
     </div>
 
     <!-- meta data -->
-    <div class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-5 lg:row-end-6">
+    <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-5 lg:row-end-6">
       <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticket.author }}</el-text>
       <br />
       <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticket.creationDate).toLocaleString() }}</el-text>
     </div>
 
     <!-- files -->
-    <el-card class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
+    <el-card v-if="!newTicket" class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
       <el-text class="text-xl">{{ $t("files") }}</el-text>
       <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
         <template #file="{ file }">
@@ -108,7 +108,7 @@
     </el-card>
 
     <!-- comments -->
-    <el-card class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6">
+    <el-card v-if="!newTicket" class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6">
       <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
       <el-button class="mt-2 float-end" type="primary" size="small" @click="sendComment()">{{ $t("sendComment") }}</el-button>
 
@@ -129,7 +129,9 @@
 
     <!-- buttons -->
     <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
-      <el-button class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
+      <el-tooltip :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
+        <el-button :disabled="newTicket" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
+      </el-tooltip>
 
       <div class="flex">
         <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : updateTicket()">{{ $t("save") }}</el-button>
@@ -146,6 +148,7 @@ import { ElLoading } from "element-plus";
 const { $api } = useNuxtApp();
 const { name } = useAuthStore();
 const i18n = useI18n();
+const localePath = useLocaleRoute();
 
 const router = useRouter();
 const route = useRoute();
@@ -229,11 +232,6 @@ async function sendComment() {
         type: "error",
         duration: 5000,
       });
-      return;
-    }
-
-    if (newTicket.value) {
-      // TODO: Queue Commentpost when Ticket not jet created
       return;
     }
 
@@ -367,7 +365,51 @@ async function updateTicket() {
   }
 }
 
-async function createTicket() {}
+async function createTicket() {
+  try {
+    loading.value = true;
+    const ticketResult = await $api.ticket.create({
+      title: ticket.value.title,
+      description: ticket.value.description ?? null,
+      author: ticket.value.author,
+      stateId: ticket.value.state.id,
+      priorityValue: ticket.value.priority.value,
+      buildingId: ticket.value.building?.id ?? null,
+      object: ticket.value.object ?? null,
+      room: ticket.value.room ?? null,
+    });
+
+    if (ticketResult.error.value) {
+      if (ticketResult.error.value.statusCode === 403) {
+        throw new Error(i18n.t("forbidden"));
+      }
+      if (ticketResult.error.value.statusCode === 500) {
+        throw new Error("serverError");
+      }
+      if (ticketResult.error.value.message) {
+        throw new Error(ticketResult.error.value.message);
+      }
+      if (ticketResult.error.value.data) {
+        throw new Error(ticketResult.error.value.data);
+      } else {
+        throw new Error(i18n.t("error"));
+      }
+    }
+
+    if (ticketResult.data.value) {
+      router.push(localePath("/tickets/" + ticketResult.data.value.id)?.fullPath as string);
+    }
+  } catch (error) {
+    ElNotification({
+      title: i18n.t("error"),
+      message: (error as Error).message,
+      type: "error",
+      duration: 5000,
+    });
+  } finally {
+    loading.value = false;
+  }
+}
 
 async function exportToPDF() {
   console.log(i18n.locale.value);
@@ -383,6 +425,7 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import { fromTicketResponse } from "~/types/api/request/editTicket";
+import TicketRepository from "~/repositories/ticket";
 
 const width = ref("100vw");
 onNuxtReady(() => {

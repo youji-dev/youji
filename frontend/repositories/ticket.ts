@@ -3,6 +3,7 @@ import type CreateTicketRequest from "~/types/api/request/createTicket";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import type createCommentRequest from "~/types/api/request/createComment";
+import type EditTicketRequest from "~/types/api/request/editTicket";
 
 class TicketRepository {
   private path = "/api/Ticket";
@@ -28,7 +29,7 @@ class TicketRepository {
     return useFetchAuthenticated<ticket>(this.path, { method: "POST", body: ticket });
   }
 
-  async edit(ticket: CreateTicketRequest): Promise<ReturnType<typeof useFetchAuthenticated<ticket>>> {
+  async edit(ticket: EditTicketRequest): Promise<ReturnType<typeof useFetchAuthenticated<ticket>>> {
     return useFetchAuthenticated<ticket>(this.path, { method: "PUT", body: ticket });
   }
 

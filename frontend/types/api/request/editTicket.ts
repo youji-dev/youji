@@ -15,7 +15,7 @@ export function fromTicketResponse(ticket: ticketResponse): EditTicketRequest {
   return {
     id: ticket.id,
     title: ticket.title,
-    description: ticket.description,
+    description: ticket.description ?? null,
     priorityValue: ticket.priority.value,
     stateId: ticket.state.id,
     buildingId: ticket.building?.id || null,

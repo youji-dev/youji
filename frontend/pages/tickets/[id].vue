@@ -129,12 +129,12 @@
 
     <!-- buttons -->
     <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
-      <el-button class="text-sm drop-shadow-xl" type="default" :icon="Printer">{{ $t("pdfExport") }}</el-button>
+      <el-button class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
 
       <div class="flex">
-        <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary">{{ $t("save") }}</el-button>
+        <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : updateTicket()">{{ $t("save") }}</el-button>
 
-        <el-button class="text-sm justify-self-end drop-shadow-xl" type="default">{{ $t("close") }}</el-button>
+        <el-button class="text-sm justify-self-end drop-shadow-xl" type="default" @click="router.back()">{{ $t("close") }}</el-button>
       </div>
     </div>
   </div>
@@ -326,6 +326,52 @@ async function deleteComment(comment: ticketComment) {
 function sortCommentsByDate(a: ticketComment, b: ticketComment) {
   return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
 }
+
+async function updateTicket() {
+  try {
+    loading.value = true;
+    const ticketResult = await $api.ticket.edit(fromTicketResponse(ticket.value));
+
+    if (ticketResult.error.value) {
+      if (ticketResult.error.value.statusCode === 404) {
+        throw new Error(i18n.t("resourceNotFound"));
+      }
+      if (ticketResult.error.value.statusCode === 403) {
+        throw new Error(i18n.t("forbidden"));
+      }
+      if (ticketResult.error.value.statusCode === 500) {
+        throw new Error("serverError");
+      }
+      if (ticketResult.error.value.message) {
+        throw new Error(ticketResult.error.value.message);
+      }
+      if (ticketResult.error.value.data) {
+        throw new Error(ticketResult.error.value.data);
+      } else {
+        throw new Error(i18n.t("error"));
+      }
+    }
+
+    if (ticketResult.data.value) {
+      ticket.value = ticketResult.data.value;
+    }
+  } catch (error) {
+    ElNotification({
+      title: i18n.t("error"),
+      message: (error as Error).message,
+      type: "error",
+      duration: 5000,
+    });
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function createTicket() {}
+
+async function exportToPDF() {
+  console.log(i18n.locale.value);
+}
 </script>
 
 <script lang="ts">
@@ -336,6 +382,7 @@ import type building from "~/types/api/response/buildingResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
+import { fromTicketResponse } from "~/types/api/request/editTicket";
 
 const width = ref("100vw");
 onNuxtReady(() => {

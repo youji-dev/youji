@@ -30,10 +30,8 @@ namespace Application.WebApi.Controllers
                 RoleAssignment roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,
                     loginRequestDto.Password);
-
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
-
                 return this.Ok(new LoginResponseDto()
                 {
                     AccessToken = accessToken,

@@ -93,12 +93,17 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// create if the user logs in for the first time</returns>
         public async Task<RoleAssignment> LdapLogin(string username, string password)
         {
+            bool dev = bool.Parse(configuration["DevAuth"] ??
+                          throw new InvalidOperationException("Dev auth was empty"));
+            if (dev)
+            {
+                return await this.GetOrCreateRoleAssignment(username.ToLowerInvariant());
+            }
+
             var host = configuration["LDAPHost"] ?? throw new InvalidOperationException("LDAPHost");
             var port = int.Parse(configuration["LDAPPort"] ?? throw new InvalidOperationException("LDAPPort"));
             var baseDn = configuration["LDAPBaseDN"] ?? throw new InvalidOperationException("LDAPBaseDN");
-
             var connection = new LdapConnection();
-
             try
             {
                 connection.Connect(host, port);
@@ -106,7 +111,6 @@ namespace DomainLayer.BusinessLogic.Authentication
                     Native.LdapAuthMechanism.SIMPLE,
                     $"CN={username},{baseDn}",
                     password);
-
                 return await this.GetOrCreateRoleAssignment(username.ToLowerInvariant());
             }
             catch (LdapException ex)

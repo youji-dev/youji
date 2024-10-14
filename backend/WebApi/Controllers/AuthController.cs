@@ -11,7 +11,7 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class AuthController() : ControllerBase
+    public class AuthController : ControllerBase
     {
         /// <summary>
         /// Route used to exchange login credentials for an access and refresh token pair

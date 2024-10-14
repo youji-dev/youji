@@ -11,7 +11,7 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [ApiController]
     [Route("[controller]")]
-    public class AuthController(IConfiguration configuration) : ControllerBase
+    public class AuthController() : ControllerBase
     {
         /// <summary>
         /// Route used to exchange login credentials for an access and refresh token pair
@@ -27,13 +27,9 @@ namespace Application.WebApi.Controllers
         {
             try
             {
-                bool devAuth = bool.Parse(configuration["DevAuth"] ??
-                                          throw new InvalidOperationException("Dev auth was empty"));
-
                 RoleAssignment roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,
-                    loginRequestDto.Password,
-                    devAuth);
+                    loginRequestDto.Password);
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
                 return this.Ok(new LoginResponseDto()

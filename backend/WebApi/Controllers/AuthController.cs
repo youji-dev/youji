@@ -27,15 +27,8 @@ namespace Application.WebApi.Controllers
         {
             try
             {
-                bool devAuth;
-                try
-                {
-                    devAuth = bool.Parse(configuration["DevAuth"] ?? throw new InvalidOperationException("Dev auth was empty"));
-                }
-                catch
-                {
-                    devAuth = false;
-                }
+                bool devAuth = bool.Parse(configuration["DevAuth"] ??
+                                          throw new InvalidOperationException("Dev auth was empty"));
 
                 RoleAssignment roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,

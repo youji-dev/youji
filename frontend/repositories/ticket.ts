@@ -54,6 +54,24 @@ class TicketRepository {
     formData.append("attachmentFile", file);
     return useFetchAuthenticated<ticketAttachment>(`${this.path}/${id}/attachment`, { method: "POST", headers: { "Content-Type": "multipart/form-data" }, body: formData });
   }
+
+  async exportToPDF(id: string, language: string) {
+    const response = await useFetchAuthenticated<Blob>(`${this.path}/${id}/export`, {
+      method: "GET",
+      headers: {
+        "Accept-Language": language,
+      },
+      onResponse({ request, response }) {
+        const filename = response.headers.get("Content-Disposition")?.split("filename=")[1]?.trim();
+        const url = window.URL.createObjectURL(new Blob([response._data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filename ?? "ticket.pdf");
+        document.body.appendChild(link);
+        link.click();
+      },
+    });
+  }
 }
 
 export default TicketRepository;

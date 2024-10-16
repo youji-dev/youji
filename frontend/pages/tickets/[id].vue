@@ -412,7 +412,9 @@ async function createTicket() {
 }
 
 async function exportToPDF() {
-  console.log(i18n.locale.value);
+  loading.value = true;
+  await $api.ticket.exportToPDF(route.params.id as string, i18n.locale.value);
+  loading.value = false;
 }
 </script>
 
@@ -425,7 +427,6 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import { fromTicketResponse } from "~/types/api/request/editTicket";
-import TicketRepository from "~/repositories/ticket";
 
 const width = ref("100vw");
 onNuxtReady(() => {

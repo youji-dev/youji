@@ -2,15 +2,7 @@
   <!-- Route: /tickets/[ticketId] -->
   <!-- Page for detail view of a ticket -->
   <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
-    <!-- header -->
-    <div class="flex lg:col-span-full lg:row-start-1 lg:row-end-2">
-      <!-- backbutton -->
-      <el-button class="text-sm" link @click="router.back()" :icon="ArrowLeft">{{ $t("back") }}</el-button>
-      <!-- separator -->
-      <el-divider class="self-center" direction="vertical" />
-      <!-- Title -->
-      <el-text class="font-semibold truncate" size="large">{{ ticket.title }}</el-text>
-    </div>
+    <TicketHeader :ticket="ticket" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
 
     <!-- Title -->
     <div class="lg:col-start-1 lg:col-end-7 lg:row-start-2 lg:row-end-3">
@@ -18,50 +10,7 @@
       <el-input v-model="ticket.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
     </div>
 
-    <!-- Dropdown Group -->
-    <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center | lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-4">
-      <!-- State dropdown -->
-      <div>
-        <el-text>{{ $t("state") }}</el-text>
-        <el-select v-model="ticket.state" value-key="id" class="drop-shadow-xl" :placeholder="$t('select')">
-          <el-option v-for="state in availableStates" :key="state.id" :label="state.name" :value="state">
-            <el-tag :color="state.color">
-              <el-text :style="{ color: contrastColor({ bgColor: state.color }) }"> {{ state.name }}</el-text>
-            </el-tag>
-          </el-option>
-          <template #label>
-            <div class="flex items-center">
-              <el-tag :color="ticket.state.color" size="small" class="mr-2 aspect-square" />
-              <span class="truncate">{{ ticket.state.name }}</span>
-            </div>
-          </template>
-        </el-select>
-      </div>
-      <!-- Priority dropdown -->
-      <div>
-        <el-text>{{ $t("priority") }}</el-text>
-        <el-select v-model="ticket.priority" value-key="value" class="drop-shadow-xl" :placeholder="$t('select')">
-          <el-option v-for="priority in availablePriorities" :key="priority.value" :label="priority.name" :value="priority" />
-        </el-select>
-      </div>
-      <!-- Building dropdown -->
-      <div class="lg:col-span-full">
-        <el-text>{{ $t("building") }}</el-text>
-        <el-select v-model="ticket.building" class="drop-shadow-xl" value-key="id" :clearable="true" :placeholder="$t('select')">
-          <el-option v-for="building in availableBuildings" :key="building.id" :label="building.name" :value="building" />
-        </el-select>
-      </div>
-      <!-- Room textfield -->
-      <div class="lg:col-span-full">
-        <el-text>{{ $t("room") }}</el-text>
-        <el-input v-model="ticket.room" class="drop-shadow-xl" :placeholder="$t('enter')" />
-      </div>
-      <!-- Object -->
-      <div class="lg:col-span-full">
-        <el-text>{{ $t("object") }}</el-text>
-        <el-input v-model="ticket.object" class="drop-shadow-xl" :placeholder="$t('enter')" />
-      </div>
-    </div>
+    <DropdownGroup :ticket="ticket" class="lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-4" />
 
     <!-- Description -->
     <div class="lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-4">
@@ -76,56 +25,9 @@
       <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticket.creationDate).toLocaleString() }}</el-text>
     </div>
 
-    <!-- files -->
-    <el-card v-if="!newTicket" class="drop-shadow-xl base-bg-light dark:bg-black lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5">
-      <el-text class="text-xl">{{ $t("files") }}</el-text>
-      <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
-        <template #file="{ file }">
-          <div>
-            <img class="object-cover aspect-square w-full" :src="file.binary" />
-            <span class="el-upload-list__item-actions">
-              <span class="el-upload-list__item-preview" @click="">
-                <el-icon><zoom-in /></el-icon>
-              </span>
-              <span class="el-upload-list__item-delete" @click="">
-                <el-icon>
-                  <Download />
-                </el-icon>
-              </span>
-              <span class="el-upload-list__item-delete" @click="">
-                <el-icon>
-                  <Delete />
-                </el-icon>
-              </span>
-            </span>
-          </div>
-        </template>
+    <TicketFiles v-if="!newTicket" class="lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5" :ticket="ticket" />
 
-        <el-icon>
-          <Upload />
-        </el-icon>
-      </el-upload>
-    </el-card>
-
-    <!-- comments -->
-    <el-card v-if="!newTicket" class="drop-shadow-xl base-bg-light dark:bg-black self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6">
-      <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
-      <el-button class="mt-2 float-end" type="primary" size="small" @click="sendComment()">{{ $t("sendComment") }}</el-button>
-
-      <el-divider class="mt-10 mb-3" />
-
-      <el-timeline>
-        <el-timeline-item v-for="comment in ticket.comments" class="drop-shadow-xl" :timestamp="new Date(comment.creationDate).toLocaleString()" :key="comment.id" placement="top">
-          <el-card class="block">
-            <div class="flex justify-between">
-              <el-text size="large" tag="b" type="primary">{{ comment.author }}</el-text>
-              <el-button size="small" :icon="Delete" @click="deleteComment(comment)" />
-            </div>
-            <el-text size="default">{{ comment.content }}</el-text>
-          </el-card>
-        </el-timeline-item>
-      </el-timeline>
-    </el-card>
+    <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6" :ticket="ticket" />
 
     <!-- buttons -->
     <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
@@ -143,10 +45,7 @@
 </template>
 
 <script lang="ts" setup async>
-import type { UploadProps, UploadUserFile } from "element-plus";
-import { ElLoading } from "element-plus";
 const { $api } = useNuxtApp();
-const { name } = useAuthStore();
 const i18n = useI18n();
 const localePath = useLocaleRoute();
 
@@ -221,108 +120,6 @@ async function fetchOrCreateTicket(id: string): Promise<ticket> {
 
   ticketData.comments = ticketData.comments.sort(sortCommentsByDate);
   return ticketData;
-}
-
-async function sendComment() {
-  try {
-    if (newComment.value === "") {
-      ElNotification({
-        title: i18n.t("error"),
-        message: i18n.t("commentEmpty"),
-        type: "error",
-        duration: 5000,
-      });
-      return;
-    }
-
-    loading.value = true;
-    let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value, author: "someone" });
-
-    if (commentPostResult.error.value) {
-      loading.value = false;
-      if (commentPostResult.error.value.statusCode === 404) {
-        throw new Error(i18n.t("resourceNotFound"));
-      }
-      if (commentPostResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (commentPostResult.error.value.message) {
-        throw new Error(commentPostResult.error.value.message);
-      }
-      if (commentPostResult.error.value.data) {
-        throw new Error(commentPostResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    }
-
-    ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
-    newComment.value = "";
-    ElNotification({
-      title: i18n.t("success"),
-      message: i18n.t("commentPostSuccess"),
-      type: "success",
-      duration: 5000,
-    });
-  } catch (error) {
-    ElNotification({
-      title: i18n.t("error"),
-      message: (error as Error).message,
-      type: "error",
-      duration: 5000,
-    });
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function deleteComment(comment: ticketComment) {
-  try {
-    loading.value = true;
-    let commentDeleteResult = await $api.comment.delete(comment.id);
-
-    if (commentDeleteResult.error.value) {
-      loading.value = false;
-      if (commentDeleteResult.error.value.statusCode === 404) {
-        throw new Error(i18n.t("resourceNotFound"));
-      }
-      if (commentDeleteResult.error.value.statusCode === 403) {
-        throw new Error(i18n.t("forbidden"));
-      }
-      if (commentDeleteResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (commentDeleteResult.error.value.message) {
-        throw new Error(commentDeleteResult.error.value.message);
-      }
-      if (commentDeleteResult.error.value.data) {
-        throw new Error(commentDeleteResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    }
-
-    ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
-    ElNotification({
-      title: i18n.t("success"),
-      message: i18n.t("commentDeleteSuccess"),
-      type: "success",
-      duration: 5000,
-    });
-  } catch (error) {
-    ElNotification({
-      title: i18n.t("error"),
-      message: (error as Error).message,
-      type: "error",
-      duration: 5000,
-    });
-  } finally {
-    loading.value = false;
-  }
-}
-
-function sortCommentsByDate(a: ticketComment, b: ticketComment) {
-  return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
 }
 
 async function updateTicket() {
@@ -419,7 +216,7 @@ async function exportToPDF() {
 </script>
 
 <script lang="ts">
-import { ArrowLeft, EditPen, Upload, ZoomIn, Download, Delete, Printer } from "@element-plus/icons-vue";
+import { Upload, ZoomIn, Download, Delete, Printer } from "@element-plus/icons-vue";
 import { contrastColor } from "contrast-color";
 import type priority from "~/types/api/response/priorityResponse";
 import type building from "~/types/api/response/buildingResponse";
@@ -427,6 +224,9 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import { fromTicketResponse } from "~/types/api/request/editTicket";
+import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
+import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
+import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
 
 const width = ref("100vw");
 onNuxtReady(() => {

@@ -16,5 +16,3 @@ defineProps<{
 
 var router = useRouter();
 </script>
-
-<style></style>

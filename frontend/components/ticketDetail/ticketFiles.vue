@@ -37,5 +37,3 @@ defineProps<{
   ticket: ticket;
 }>();
 </script>
-
-<style></style>

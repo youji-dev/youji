@@ -6,32 +6,26 @@
     <el-divider class="mt-10 mb-3" />
 
     <el-timeline>
-      <el-timeline-item v-for="comment in ticket.value.comments" class="drop-shadow-xl" :timestamp="new Date(comment.creationDate).toLocaleString()" :key="comment.id" placement="top">
-        <el-card class="block">
-          <div class="flex justify-between">
-            <el-text size="large" tag="b" type="primary">{{ comment.author }}</el-text>
-            <el-button size="small" :icon="Delete" @click="deleteComment(comment)" />
-          </div>
-          <el-text size="default">{{ comment.content }}</el-text>
-        </el-card>
+      <el-timeline-item v-for="comment in sortedComments" class="drop-shadow-xl" :timestamp="new Date(comment.creationDate).toLocaleString()" :key="comment.id" placement="top">
+        <TicketComment :comment="comment" :ticket="ticketModel" />
       </el-timeline-item>
     </el-timeline>
   </el-card>
 </template>
 
 <script lang="ts" setup>
-import { Delete } from "@element-plus/icons-vue";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import type ticket from "~/types/api/response/ticketResponse";
-
-defineProps<{
-  ticket: Ref<ticket>;
-}>();
+import TicketComment from "./ticketComment.vue";
 
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 const route = useRoute();
 
+const ticketModel = defineModel<ticket>("ticket", { required: true });
+const sortedComments = computed(() => {
+  return ticketModel.value.comments?.sort(sortCommentsByDate) ?? [];
+});
 let newComment = ref("");
 let loading = ref(false);
 
@@ -68,7 +62,7 @@ async function sendComment() {
       }
     }
 
-    ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
+    ticketModel.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value ?? [];
     newComment.value = "";
     ElNotification({
       title: i18n.t("success"),
@@ -88,54 +82,7 @@ async function sendComment() {
   }
 }
 
-async function deleteComment(comment: ticketComment) {
-  try {
-    loading.value = true;
-    let commentDeleteResult = await $api.comment.delete(comment.id);
-
-    if (commentDeleteResult.error.value) {
-      loading.value = false;
-      if (commentDeleteResult.error.value.statusCode === 404) {
-        throw new Error(i18n.t("resourceNotFound"));
-      }
-      if (commentDeleteResult.error.value.statusCode === 403) {
-        throw new Error(i18n.t("forbidden"));
-      }
-      if (commentDeleteResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (commentDeleteResult.error.value.message) {
-        throw new Error(commentDeleteResult.error.value.message);
-      }
-      if (commentDeleteResult.error.value.data) {
-        throw new Error(commentDeleteResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    }
-
-    ticket.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value?.sort(sortCommentsByDate) ?? [];
-    ElNotification({
-      title: i18n.t("success"),
-      message: i18n.t("commentDeleteSuccess"),
-      type: "success",
-      duration: 5000,
-    });
-  } catch (error) {
-    ElNotification({
-      title: i18n.t("error"),
-      message: (error as Error).message,
-      type: "error",
-      duration: 5000,
-    });
-  } finally {
-    loading.value = false;
-  }
-}
-
 function sortCommentsByDate(a: ticketComment, b: ticketComment) {
   return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
 }
 </script>
-
-<style></style>

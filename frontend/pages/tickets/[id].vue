@@ -1,42 +1,36 @@
 <template>
-  <!-- Route: /tickets/[ticketId] -->
-  <!-- Page for detail view of a ticket -->
   <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
-    <TicketHeader :ticket="ticket" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
+    <TicketHeader :ticket="ticketModel" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
 
-    <!-- Title -->
     <div class="lg:col-start-1 lg:col-end-7 lg:row-start-2 lg:row-end-3">
       <el-text>{{ $t("title") }}</el-text>
-      <el-input v-model="ticket.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
+      <el-input v-model="ticketModel.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
     </div>
 
-    <DropdownGroup :ticket="ticket" class="lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-4" />
+    <DropdownGroup :ticket="ticketModel" class="lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-4" />
 
-    <!-- Description -->
     <div class="lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-4">
       <el-text>{{ $t("description") }}</el-text>
-      <el-input v-model="ticket.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
+      <el-input v-model="ticketModel.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
     </div>
 
-    <!-- meta data -->
     <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-5 lg:row-end-6">
-      <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticket.author }}</el-text>
+      <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text>
       <br />
-      <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticket.creationDate).toLocaleString() }}</el-text>
+      <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text>
     </div>
 
-    <TicketFiles v-if="!newTicket" class="lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5" :ticket="ticket" />
+    <TicketFiles v-if="!newTicket" class="lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
 
-    <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6" :ticket="ticket" />
+    <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
 
-    <!-- buttons -->
     <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
       <el-tooltip :disabled="!newTicket" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
         <el-button :disabled="newTicket" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
       </el-tooltip>
 
       <div class="flex">
-        <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : updateTicket()">{{ $t("save") }}</el-button>
+        <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : saveTicketChanges()">{{ $t("save") }}</el-button>
 
         <el-button class="text-sm justify-self-end drop-shadow-xl" type="default" @click="router.back()">{{ $t("close") }}</el-button>
       </div>
@@ -45,6 +39,17 @@
 </template>
 
 <script lang="ts" setup async>
+import { Printer } from "@element-plus/icons-vue";
+import type priority from "~/types/api/response/priorityResponse";
+import type building from "~/types/api/response/buildingResponse";
+import type ticket from "~/types/api/response/ticketResponse";
+import type state from "~/types/api/response/stateResponse";
+import { fromTicketResponse } from "~/types/api/request/editTicket";
+import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
+import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
+import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
+import TicketCommentCollection from "~/components/ticketDetail/ticketCommentCollection.vue";
+
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 const localePath = useLocaleRoute();
@@ -53,23 +58,22 @@ const router = useRouter();
 const route = useRoute();
 
 const width = ref("100vw");
-let newComment = ref("");
 let newTicket = ref((route.params.id as string).toLocaleLowerCase() == "new");
 let loading = ref(true);
 let loadingText = ref(i18n.t("loadingData"));
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);
-let ticket: Ref<ticket> = ref({} as ticket);
+let ticketModel: Ref<ticket> = ref({} as ticket);
 
 onNuxtReady(async () => {
   try {
-    const [states, priorities, buildings, ticketData] = await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrCreateTicket(route.params.id as string)]);
+    const [states, priorities, buildings, ticketData] = await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrInitializeTicket(route.params.id as string)]);
 
     availableStates.value = states.data.value ?? [];
     availablePriorities.value = priorities.data.value ?? [];
     availableBuildings.value = buildings.data.value ?? [];
-    ticket.value = ticketData;
+    ticketModel.value = ticketData;
 
     loading.value = false;
   } catch (error) {
@@ -81,9 +85,12 @@ onNuxtReady(async () => {
       duration: 5000,
     });
   }
+
+  determineViewWidth();
+  window.addEventListener("resize", determineViewWidth);
 });
 
-async function fetchOrCreateTicket(id: string): Promise<ticket> {
+async function fetchOrInitializeTicket(id: string): Promise<ticket> {
   if (id === "new") {
     const newTicket = {
       title: "",
@@ -115,17 +122,16 @@ async function fetchOrCreateTicket(id: string): Promise<ticket> {
   const ticketData = ticketResult.data.value;
 
   if (ticketData === null) {
-    return await fetchOrCreateTicket("new");
+    return await fetchOrInitializeTicket("new");
   }
-
-  ticketData.comments = ticketData.comments.sort(sortCommentsByDate);
   return ticketData;
 }
 
-async function updateTicket() {
+async function saveTicketChanges() {
   try {
+    loadingText.value = i18n.t("savingTicket");
     loading.value = true;
-    const ticketResult = await $api.ticket.edit(fromTicketResponse(ticket.value));
+    const ticketResult = await $api.ticket.edit(fromTicketResponse(ticketModel.value));
 
     if (ticketResult.error.value) {
       if (ticketResult.error.value.statusCode === 404) {
@@ -148,7 +154,7 @@ async function updateTicket() {
     }
 
     if (ticketResult.data.value) {
-      ticket.value = ticketResult.data.value;
+      ticketModel.value = ticketResult.data.value;
     }
   } catch (error) {
     ElNotification({
@@ -164,16 +170,17 @@ async function updateTicket() {
 
 async function createTicket() {
   try {
+    loadingText.value = i18n.t("creatingTicket");
     loading.value = true;
     const ticketResult = await $api.ticket.create({
-      title: ticket.value.title,
-      description: ticket.value.description ?? null,
-      author: ticket.value.author,
-      stateId: ticket.value.state.id,
-      priorityValue: ticket.value.priority.value,
-      buildingId: ticket.value.building?.id ?? null,
-      object: ticket.value.object ?? null,
-      room: ticket.value.room ?? null,
+      title: ticketModel.value.title,
+      description: ticketModel.value.description ?? null,
+      author: ticketModel.value.author,
+      stateId: ticketModel.value.state.id,
+      priorityValue: ticketModel.value.priority.value,
+      buildingId: ticketModel.value.building?.id ?? null,
+      object: ticketModel.value.object ?? null,
+      room: ticketModel.value.room ?? null,
     });
 
     if (ticketResult.error.value) {
@@ -209,30 +216,11 @@ async function createTicket() {
 }
 
 async function exportToPDF() {
+  loadingText.value = i18n.t("creatingPDFExport");
   loading.value = true;
   await $api.ticket.exportToPDF(route.params.id as string, i18n.locale.value);
   loading.value = false;
 }
-</script>
-
-<script lang="ts">
-import { Upload, ZoomIn, Download, Delete, Printer } from "@element-plus/icons-vue";
-import { contrastColor } from "contrast-color";
-import type priority from "~/types/api/response/priorityResponse";
-import type building from "~/types/api/response/buildingResponse";
-import type ticket from "~/types/api/response/ticketResponse";
-import type state from "~/types/api/response/stateResponse";
-import type ticketComment from "~/types/api/response/ticketCommentResponse";
-import { fromTicketResponse } from "~/types/api/request/editTicket";
-import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
-import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
-import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
-
-const width = ref("100vw");
-onNuxtReady(() => {
-  determineViewWidth();
-  window.addEventListener("resize", determineViewWidth);
-});
 
 function determineViewWidth() {
   if (typeof document === "undefined") return;

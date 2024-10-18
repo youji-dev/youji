@@ -1,6 +1,5 @@
 <template>
   <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center">
-    <!-- State dropdown -->
     <div>
       <el-text>{{ $t("state") }}</el-text>
       <el-select v-model="ticket.state" value-key="id" class="drop-shadow-xl" :placeholder="$t('select')">
@@ -17,26 +16,22 @@
         </template>
       </el-select>
     </div>
-    <!-- Priority dropdown -->
     <div>
       <el-text>{{ $t("priority") }}</el-text>
       <el-select v-model="ticket.priority" value-key="value" class="drop-shadow-xl" :placeholder="$t('select')">
         <el-option v-for="priority in availablePriorities" :key="priority.value" :label="priority.name" :value="priority" />
       </el-select>
     </div>
-    <!-- Building dropdown -->
     <div class="lg:col-span-full">
       <el-text>{{ $t("building") }}</el-text>
       <el-select v-model="ticket.building" class="drop-shadow-xl" value-key="id" :clearable="true" :placeholder="$t('select')">
         <el-option v-for="building in availableBuildings" :key="building.id" :label="building.name" :value="building" />
       </el-select>
     </div>
-    <!-- Room textfield -->
     <div class="lg:col-span-full">
       <el-text>{{ $t("room") }}</el-text>
       <el-input v-model="ticket.room" class="drop-shadow-xl" :placeholder="$t('enter')" />
     </div>
-    <!-- Object -->
     <div class="lg:col-span-full">
       <el-text>{{ $t("object") }}</el-text>
       <el-input v-model="ticket.object" class="drop-shadow-xl" :placeholder="$t('enter')" />
@@ -78,5 +73,3 @@ onNuxtReady(async () => {
   }
 });
 </script>
-
-<style></style>

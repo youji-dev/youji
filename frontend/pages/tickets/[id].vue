@@ -1,28 +1,28 @@
 <template>
-  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-10" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
+  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
     <TicketHeader :ticket="ticketModel" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
 
-    <div class="lg:col-start-1 lg:col-end-7 lg:row-start-2 lg:row-end-3">
+    <div class="lg:col-start-1 lg:col-end-2 lg:row-start-2 lg:row-end-3">
       <el-text>{{ $t("title") }}</el-text>
       <el-input v-model="ticketModel.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
     </div>
 
-    <DropdownGroup :ticket="ticketModel" class="lg:col-start-7 lg:col-end-11 lg:row-start-2 lg:row-end-4" />
+    <DropdownGroup :ticket="ticketModel" class="lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-4" />
 
-    <div class="lg:col-start-1 lg:col-end-7 lg:row-start-3 lg:row-end-4">
+    <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
       <el-text>{{ $t("description") }}</el-text>
       <el-input v-model="ticketModel.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
     </div>
 
-    <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-7 lg:col-end-11 lg:row-start-5 lg:row-end-6">
+    <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
       <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text>
       <br />
       <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text>
     </div>
 
-    <TicketFiles v-if="!newTicket" class="lg:col-start-7 lg:col-end-11 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
+    <TicketFiles v-if="!newTicket" class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
 
-    <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-7 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
+    <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
 
     <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
       <el-tooltip :disabled="!newTicket" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">

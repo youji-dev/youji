@@ -1,55 +1,74 @@
 <template>
-  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]" :style="{ width: width }" v-loading="loading" :element-loading-text="loadingText">
-    <TicketHeader :ticket="ticketModel" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
+  <div>
+    <div
+      v-loading="loading"
+      v-if="!is404 && ticketModel != null"
+      class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
+      :style="{ width: width }"
+      :element-loading-text="loadingText"
+    >
+      <TicketHeader :ticket="ticketModel" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
 
-    <div class="lg:col-start-1 lg:col-end-2 lg:row-start-2 lg:row-end-3">
-      <el-text>{{ $t("title") }}</el-text>
-      <el-input v-model="ticketModel.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
-    </div>
-
-    <DropdownGroup :ticket="ticketModel" class="lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-4" />
-
-    <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
-      <el-text>{{ $t("description") }}</el-text>
-      <el-input v-model="ticketModel.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
-    </div>
-
-    <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
-      <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text>
-      <br />
-      <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text>
-    </div>
-
-    <TicketFiles v-if="!newTicket" class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
-
-    <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
-
-    <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
-      <el-tooltip :disabled="!newTicket" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
-        <el-button :disabled="newTicket" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
-      </el-tooltip>
-
-      <div class="flex">
-        <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : saveTicketChanges()">{{ $t("save") }}</el-button>
-
-        <el-button class="text-sm justify-self-end drop-shadow-xl" type="default" @click="router.back()">{{ $t("close") }}</el-button>
+      <div class="lg:col-start-1 lg:col-end-2 lg:row-start-2 lg:row-end-3">
+        <el-text>{{ $t("title") }}</el-text>
+        <el-input v-model="ticketModel.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
       </div>
+
+      <DropdownGroup :ticket="ticketModel" class="lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-4" />
+
+      <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
+        <el-text>{{ $t("description") }}</el-text>
+        <el-input v-model="ticketModel.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
+      </div>
+
+      <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
+        <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text>
+        <br />
+        <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text>
+      </div>
+
+      <TicketFiles v-if="!newTicket" class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
+
+      <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
+
+      <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
+        <el-tooltip :disabled="!newTicket" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
+          <el-button :disabled="newTicket" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
+        </el-tooltip>
+
+        <div class="flex">
+          <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : saveTicketChanges()">{{ $t("save") }}</el-button>
+
+          <el-button class="text-sm justify-self-end drop-shadow-xl" type="default" @click="router.back()">{{ $t("close") }}</el-button>
+        </div>
+      </div>
+    </div>
+    <div v-if="is404" class="h-screen flex justify-center items-center" :style="{ width: width }">
+      <el-result class="" icon="error" :title="$t('resourceNotFound')">
+        <template #extra>
+          <el-button @click="router.back()" type="primary">{{ $t("back") }}</el-button>
+        </template>
+      </el-result>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup async>
 import { Printer } from "@element-plus/icons-vue";
-import type priority from "~/types/api/response/priorityResponse";
 import type building from "~/types/api/response/buildingResponse";
-import type ticket from "~/types/api/response/ticketResponse";
+import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
-import { fromTicketResponse } from "~/types/api/request/editTicket";
-import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
-import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
-import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
-import TicketCommentCollection from "~/components/ticketDetail/ticketCommentCollection.vue";
+import type ticket from "~/types/api/response/ticketResponse";
+import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
+import type ticketComment from "~/types/api/response/ticketCommentResponse";
 
+import { fromTicketResponse } from "~/types/api/request/editTicket";
+import TicketNotFoundError from "~/types/error/ticketNotFound";
+
+import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
+import TicketCommentCollection from "~/components/ticketDetail/ticketCommentCollection.vue";
+import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
+import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 const localePath = useLocaleRoute();
@@ -59,32 +78,36 @@ const route = useRoute();
 
 const width = ref("100vw");
 let newTicket = ref((route.params.id as string).toLocaleLowerCase() == "new");
+let is404 = ref(false);
 let loading = ref(true);
 let loadingText = ref(i18n.t("loadingData"));
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);
-let ticketModel: Ref<ticket> = ref({} as ticket);
+let ticketModel: Ref<ticket | null> = ref(null);
 
 onNuxtReady(async () => {
-  try {
-    const [states, priorities, buildings, ticketData] = await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrInitializeTicket(route.params.id as string)]);
-
-    availableStates.value = states.data.value ?? [];
-    availablePriorities.value = priorities.data.value ?? [];
-    availableBuildings.value = buildings.data.value ?? [];
-    ticketModel.value = ticketData;
-
-    loading.value = false;
-  } catch (error) {
-    loading.value = false;
-    ElNotification({
-      title: i18n.t("error"),
-      message: (error as Error).message,
-      type: "error",
-      duration: 5000,
-    });
-  }
+  await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrInitializeTicket(route.params.id as string)])
+    .then(([states, priorities, buildings, ticketData]) => {
+      availableStates.value = states.data.value ?? [];
+      availablePriorities.value = priorities.data.value ?? [];
+      availableBuildings.value = buildings.data.value ?? [];
+      ticketModel.value = ticketData;
+      is404.value = false;
+    })
+    .catch(error => {
+      if (error instanceof TicketNotFoundError) {
+        is404.value = true;
+      } else {
+        ElNotification({
+          title: i18n.t("error"),
+          message: (error as Error).message,
+          type: "error",
+          duration: 5000,
+        });
+      }
+    })
+    .finally(() => (loading.value = false));
 
   determineViewWidth();
   window.addEventListener("resize", determineViewWidth);
@@ -96,6 +119,8 @@ async function fetchOrInitializeTicket(id: string): Promise<ticket> {
       title: "",
       description: "",
       author: "",
+      attachments: [] as ticketAttachment[],
+      comments: [] as ticketComment[],
     } as ticket;
 
     return newTicket;
@@ -104,8 +129,9 @@ async function fetchOrInitializeTicket(id: string): Promise<ticket> {
   const ticketResult = await $api.ticket.get(id);
 
   if (ticketResult.error.value) {
+    console.log(ticketResult.error);
     if (ticketResult.error.value.statusCode === 404) {
-      throw new Error(i18n.t("resourceNotFound"));
+      throw new TicketNotFoundError("Ticket not found");
     }
     if (ticketResult.error.value.statusCode === 500) {
       throw new Error("serverError");
@@ -131,7 +157,7 @@ async function saveTicketChanges() {
   try {
     loadingText.value = i18n.t("savingTicket");
     loading.value = true;
-    const ticketResult = await $api.ticket.edit(fromTicketResponse(ticketModel.value));
+    const ticketResult = await $api.ticket.edit(fromTicketResponse(ticketModel.value!));
 
     if (ticketResult.error.value) {
       if (ticketResult.error.value.statusCode === 404) {
@@ -173,14 +199,14 @@ async function createTicket() {
     loadingText.value = i18n.t("creatingTicket");
     loading.value = true;
     const ticketResult = await $api.ticket.create({
-      title: ticketModel.value.title,
-      description: ticketModel.value.description ?? null,
-      author: ticketModel.value.author,
-      stateId: ticketModel.value.state.id,
-      priorityValue: ticketModel.value.priority.value,
-      buildingId: ticketModel.value.building?.id ?? null,
-      object: ticketModel.value.object ?? null,
-      room: ticketModel.value.room ?? null,
+      title: ticketModel.value!.title,
+      description: ticketModel.value!.description ?? null,
+      author: ticketModel.value!.author,
+      stateId: ticketModel.value!.state.id,
+      priorityValue: ticketModel.value!.priority.value,
+      buildingId: ticketModel.value!.building?.id ?? null,
+      object: ticketModel.value!.object ?? null,
+      room: ticketModel.value!.room ?? null,
     });
 
     if (ticketResult.error.value) {

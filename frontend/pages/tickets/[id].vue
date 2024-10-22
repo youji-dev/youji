@@ -1,10 +1,9 @@
 <template>
-  <div>
+  <div :style="{ width: width }">
     <div
       v-loading="loading"
       v-if="!is404 && ticketModel != null"
       class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
-      :style="{ width: width }"
       :element-loading-text="loadingText"
     >
       <TicketHeader :ticket="ticketModel" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
@@ -43,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div v-if="is404" class="h-screen flex justify-center items-center" :style="{ width: width }">
+    <div v-if="is404" class="h-screen flex justify-center items-center">
       <el-result class="" icon="error" :title="$t('resourceNotFound')">
         <template #extra>
           <el-button @click="router.back()" type="primary">{{ $t("back") }}</el-button>

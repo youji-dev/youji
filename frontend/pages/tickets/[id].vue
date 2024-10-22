@@ -1,42 +1,37 @@
 <template>
-  <div :style="{ width: width }">
-    <div
-      v-loading="loading"
-      v-if="!is404 && ticketModel != null"
-      class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3 grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
-      :element-loading-text="loadingText"
-    >
-      <TicketHeader :ticket="ticketModel" class="lg:col-span-full lg:row-start-1 lg:row-end-2"></TicketHeader>
+  <div class="py-20 mt-17 mx-5 lg:py-5 lg:mt-0 lg-mx-3" :style="{ width: width }">
+    <div v-loading="loading" v-if="!is404 && ticketModel" class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]" :element-loading-text="loadingText">
+      <TicketHeader :ticket="ticketModel" class="lg:col-span-full"></TicketHeader>
 
       <div class="lg:col-start-1 lg:col-end-2 lg:row-start-2 lg:row-end-3">
         <el-text>{{ $t("title") }}</el-text>
         <el-input v-model="ticketModel.title" :placeholder="$t('enter')" class="drop-shadow-xl" />
       </div>
 
-      <DropdownGroup :ticket="ticketModel" class="lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-4" />
+      <DropdownGroup :ticket="ticketModel" class="lg:col-start-2 lg:col-end-3 lg:row-start-2 lg:row-end-4 self-center" />
 
       <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
         <el-text>{{ $t("description") }}</el-text>
         <el-input v-model="ticketModel.description" type="textarea" class="drop-shadow-xl max-h-full" :rows="15" resize="vertical" :placeholder="$t('enter')" />
       </div>
 
-      <div v-if="!newTicket" class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
+      <div v-if="!isNew" class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
         <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text>
         <br />
         <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text>
       </div>
 
-      <TicketFiles v-if="!newTicket" class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
+      <TicketFiles v-if="!isNew" class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
 
-      <TicketCommentCollection v-if="!newTicket" class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
+      <TicketCommentCollection v-if="!isNew" class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6" v-model:ticket="ticketModel" />
 
       <div class="flex justify-between lg:col-span-full lg:row-start-6 lg:row-end-7">
-        <el-tooltip :disabled="!newTicket" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
-          <el-button :disabled="newTicket" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
+        <el-tooltip :disabled="!isNew" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
+          <el-button :disabled="isNew" class="text-sm drop-shadow-xl" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
         </el-tooltip>
 
         <div class="flex">
-          <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="newTicket ? createTicket() : saveTicketChanges()">{{ $t("save") }}</el-button>
+          <el-button class="text-sm justify-self-end drop-shadow-xl" type="primary" @click="isNew ? createTicket() : saveTicketChanges()">{{ $t("save") }}</el-button>
 
           <el-button class="text-sm justify-self-end drop-shadow-xl" type="default" @click="router.back()">{{ $t("close") }}</el-button>
         </div>
@@ -48,6 +43,9 @@
           <el-button @click="router.back()" type="primary">{{ $t("back") }}</el-button>
         </template>
       </el-result>
+    </div>
+    <div v-else-if="ticketModel == null">
+      <TicketDetailTicketLoadingSkeleton />
     </div>
   </div>
 </template>
@@ -76,7 +74,7 @@ const router = useRouter();
 const route = useRoute();
 
 const width = ref("100vw");
-let newTicket = ref((route.params.id as string).toLocaleLowerCase() == "new");
+let isNew = ref((route.params.id as string).toLocaleLowerCase() == "new");
 let is404 = ref(false);
 let loading = ref(true);
 let loadingText = ref(i18n.t("loadingData"));

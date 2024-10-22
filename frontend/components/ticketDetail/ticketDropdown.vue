@@ -1,5 +1,5 @@
 <template>
-  <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1 self-center">
+  <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1">
     <div>
       <el-text>{{ $t("state") }}</el-text>
       <el-select v-model="ticket.state" value-key="id" class="drop-shadow-xl" :placeholder="$t('select')">

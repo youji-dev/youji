@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
 using Common.Enums;

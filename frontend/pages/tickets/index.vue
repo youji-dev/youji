@@ -13,6 +13,8 @@
       <div v-if="loading" class="w-full h-full p-10">
         <el-skeleton :rows="23" animated />
       </div>
+      <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possbile sorting arrows are clicked, the data has to be fetched again completely.
+       The page should stay the same. -->
       <el-table v-if="!loading" :data="filterTableData" :height="tableDimensions['height']"
         style="width: 100%; height: 100%" class="overflow-x-scroll"
         :default-sort="{ prop: 'create_date', order: 'descending' }">
@@ -47,7 +49,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination class="mr-auto" v-if="!loading" layout="prev, pager, next" :total="1000" />
+      <el-pagination class="mr-auto" v-if="!loading" layout="prev, pager, next" :total="1000" @current-change="fetchTickets"/>
     </div>
   </div>
 </template>
@@ -96,8 +98,12 @@ function determineViewWidth() {
   width.value = window.innerWidth - navbar?.offsetWidth + "px";
   const table = document.querySelector("el-table__inner-wrapper");
   if (!!!table) return;
-
   return;
+}
+
+function fetchTickets(page: number) {
+  const skip = page * 20; // Assumes page size is always 20, if configurable this has to be changed
+  data.value = Array.from({ length: 20 }).map(dataGenerator);
 }
 
 let id = 0;
@@ -117,7 +123,7 @@ const dataGenerator = () => ({
 
 const data = ref([] as Array<Ticket>);
 onMounted(async () => {
-  data.value = Array.from({ length: 200 }).map(dataGenerator);
+  data.value = Array.from({ length: 20 }).map(dataGenerator);
   getTableDimensions();
   await fetchStatusOptions();
   parseStatusOptions();

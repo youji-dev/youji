@@ -32,8 +32,8 @@ namespace Application.WebApi.Controllers
                 Author = "Author",
                 Object = "Some object",
                 Room = "New room",
-                Comments = [new() { Id = Guid.NewGuid(), Author = "Comment author", Content = "Hier ist ein toller Kommentar", CreationDate = DateTime.Now}, new() { Id = Guid.NewGuid(), Author = "Comment author", Content = "Hier ist ein toller Kommentar", CreationDate = DateTime.Now }],
-                Attachments = [new() { Id = Guid.NewGuid(), Name = "NewFile.pdf", Binary = [], FileType = "pdf" }, new() { Id = Guid.NewGuid(), Name = "NewFile.pdf", Binary = [], FileType = "pdf" }],
+                Comments = [new() { TicketId = ticket.Id ,Id = Guid.NewGuid(), Author = "Comment author", Content = "Hier ist ein toller Kommentar", CreationDate = DateTime.Now}, new() { TicketId = ticket.Id, Id = Guid.NewGuid(), Author = "Comment author", Content = "Hier ist ein toller Kommentar", CreationDate = DateTime.Now }],
+                Attachments = [new() { TicketId = ticket.Id, Id = Guid.NewGuid(), Name = "NewFile.pdf", Binary = [], FileType = "pdf" }, new() { TicketId = ticket.Id, Id = Guid.NewGuid(), Name = "NewFile.pdf", Binary = [], FileType = "pdf" }],
             };
 
             var mailBody = mailService.GenerateTicketChangedMail(changedTicket, ticket);

@@ -96,7 +96,11 @@ namespace DomainLayer.BusinessLogic.Authentication
             bool dev = bool.Parse(configuration["DevAuth"] ?? "false");
 
             if (dev)
-                return await this.GetOrCreateUser(username.ToLowerInvariant());
+            {
+                var user = await this.GetOrCreateUser(username.ToLowerInvariant());
+                user.Type = Roles.Admin;
+                return user;
+            }
 
             var host = configuration.GetValueOrThrow("LDAPHost");
             var port = int.Parse(configuration.GetValueOrThrow("LDAPPort"));

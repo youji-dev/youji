@@ -27,12 +27,18 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
         {
-            return this.Ok(await ticketRepo.GetAsync(ticketId));
+            var ticket = await ticketRepo.GetAsync(ticketId);
+
+            if (ticket is null)
+                return this.NotFound($"Ticket with id '{ticketId}' doesn't exist!");
+
+            return this.Ok(ticket);
         }
 
         /// <summary>

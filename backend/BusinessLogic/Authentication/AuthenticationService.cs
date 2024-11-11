@@ -17,7 +17,7 @@ namespace DomainLayer.BusinessLogic.Authentication
     /// Service used for TokenHandling and LDAP Communication
     /// </summary>
     public class AuthenticationService(
-        UserRepository roleAssignmentRepository,
+        UserRepository userRepository,
         RefreshTokenRepository refreshTokenRepository,
         IConfiguration configuration)
     {
@@ -36,7 +36,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                 claims:
                 [
                     new Claim("username", roleAssignment.UserId),
-                    new Claim("role", roleAssignment.Type.ToString()),
+                    new Claim(ClaimTypes.Role, roleAssignment.Type.ToString()),
                 ],
                 expires: DateTime.UtcNow.AddMinutes(15),
                 issuer: "youji",
@@ -81,7 +81,7 @@ namespace DomainLayer.BusinessLogic.Authentication
 
             await refreshTokenRepository.DeleteAsync(refreshTokenEntry);
 
-            return await this.GetOrCreateRoleAssignment(refreshTokenEntry.UserId);
+            return await this.GetOrCreateUser(refreshTokenEntry.UserId);
         }
 
         /// <summary>
@@ -93,12 +93,16 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// create if the user logs in for the first time</returns>
         public async Task<User> LdapLogin(string username, string password)
         {
+            bool dev = bool.Parse(configuration["DevAuth"] ?? "false");
+
+            if (dev)
+                return await this.GetOrCreateUser(username.ToLowerInvariant());
+
             var host = configuration.GetValueOrThrow("LDAPHost");
             var port = int.Parse(configuration.GetValueOrThrow("LDAPPort"));
             var baseDn = configuration.GetValueOrThrow("LDAPBaseDN");
 
             var connection = new LdapConnection();
-
             try
             {
                 connection.Connect(host, port);
@@ -127,7 +131,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                 {
                 }
 
-                return await this.GetOrCreateRoleAssignment(username.ToLowerInvariant(), email);
+                return await this.GetOrCreateUser(username.ToLowerInvariant(), email);
             }
             catch (LdapException ex)
             {
@@ -139,29 +143,29 @@ namespace DomainLayer.BusinessLogic.Authentication
             }
         }
 
-        private async Task<User> GetOrCreateRoleAssignment(string username, string? email = null)
+        private async Task<User> GetOrCreateUser(string username, string? email = null)
         {
-            var assignment = await roleAssignmentRepository
+            var user = await userRepository
                 .Find(x => x.UserId.Equals(username))
                 .FirstOrDefaultAsync();
 
-            if (assignment is not null)
+            if (user is not null)
             {
-                assignment.Email = email is not null ? email : assignment.Email;
-                await roleAssignmentRepository.UpdateAsync(assignment);
+                user.Email = email is not null ? email : user.Email;
+                await userRepository.UpdateAsync(user);
 
-                return assignment;
+                return user;
             }
 
-            var newAssignment = new User
+            var newUser = new User
             {
                 UserId = username.ToLowerInvariant(),
                 Type = Roles.Teacher,
                 Email = email,
             };
 
-            await roleAssignmentRepository.AddAsync(newAssignment);
-            return newAssignment;
+            await userRepository.AddAsync(newUser);
+            return newUser;
         }
     }
 }

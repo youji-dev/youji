@@ -55,6 +55,18 @@ namespace PersistenceLayer.DataAccess
             // Adds the Postgres Extension for UUID generation
             modelBuilder.HasPostgresExtension("uuid-ossp");
 
+            modelBuilder.Entity<TicketAttachment>()
+                .HasOne(attachment => attachment.Ticket)
+                .WithMany(ticket => ticket.Attachments)
+                .HasForeignKey(attachment => attachment.TicketId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TicketComment>()
+                .HasOne(comment => comment.Ticket)
+                .WithMany(ticket => ticket.Comments)
+                .HasForeignKey(comment => comment.TicketId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.ApplyConfiguration(new BuildingConfiguration());
             modelBuilder.ApplyConfiguration(new PriorityConfiguration());
             modelBuilder.ApplyConfiguration(new UserConfiguration());

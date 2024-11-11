@@ -30,10 +30,8 @@ namespace Application.WebApi.Controllers
                 User roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,
                     loginRequestDto.Password);
-
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
-
                 return this.Ok(new LoginResponseDto()
                 {
                     AccessToken = accessToken,
@@ -42,7 +40,7 @@ namespace Application.WebApi.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                 return this.Unauthorized();
+                return this.Unauthorized();
             }
         }
 

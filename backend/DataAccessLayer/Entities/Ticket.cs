@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace PersistenceLayer.DataAccess.Entities
@@ -47,6 +48,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The state of the ticket.
         /// </summary>
+        [DeleteBehavior(DeleteBehavior.Restrict)]
         public required State State { get; set; }
 
         /// <summary>

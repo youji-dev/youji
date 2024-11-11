@@ -13,7 +13,7 @@ namespace Application.WebApi.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AuthorizeRoles(Roles.Admin)]
-    public class RoleAssignmentController : ControllerBase
+    public class UserController : ControllerBase
     {
         /// <summary>
         /// Gets all role assignments.

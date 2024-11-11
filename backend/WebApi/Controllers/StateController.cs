@@ -68,11 +68,16 @@ namespace Application.WebApi.Controllers
             [FromServices] StateRepository stateRepo,
             [FromBody] State state)
         {
-            if (await stateRepo.GetAsync(state.Id) is null)
+            var updatableState = await stateRepo.GetAsync(state.Id);
+
+            if (updatableState is null)
                 return this.NotFound($"A state with the id '{state.Id}' doesn´t exist.");
 
-            await stateRepo.UpdateAsync(state);
-            return this.Ok(state);
+            updatableState.Name = state.Name;
+            updatableState.Color = state.Color;
+
+            await stateRepo.UpdateAsync(updatableState);
+            return this.Ok(updatableState);
         }
 
         /// <summary>

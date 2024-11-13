@@ -1,10 +1,5 @@
 <template>
-      <el-button
-        @click="toggleTheme"
-        circle
-        type="primary"
-        :icon="determineIcon()"
-      ></el-button>
+  <el-button @click="toggleTheme" circle type="primary" :icon="determineIcon()"></el-button>
 </template>
 
 <script lang="ts" setup>
@@ -37,5 +32,3 @@ function determineIcon() {
   }
 }
 </script>
-
-<style></style>

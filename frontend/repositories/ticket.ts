@@ -56,12 +56,12 @@ class TicketRepository {
   }
 
   async exportToPDF(id: string, language: string) {
-    const response = await useFetchAuthenticated<Blob>(`${this.path}/${id}/export`, {
+    await useFetchAuthenticated<Blob>(`${this.path}/${id}/export`, {
       method: "GET",
       headers: {
         "Accept-Language": language,
       },
-      onResponse({ request, response }) {
+      onResponse({ response }) {
         const filename = response.headers.get("Content-Disposition")?.split("filename=")[1]?.trim();
         const url = window.URL.createObjectURL(new Blob([response._data]));
         const link = document.createElement("a");

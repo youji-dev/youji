@@ -14,7 +14,7 @@ interface IApiInstance {
   attachment: AttachmentRepository;
 }
 
-export default defineNuxtPlugin(nuxtApp => {
+export default defineNuxtPlugin(() => {
   const modules: IApiInstance = {
     ticket: new TicketRepository(),
     state: new StateRepository(),

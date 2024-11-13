@@ -1,5 +1,3 @@
-import type ticket from "../response/ticketResponse";
-
 export default interface CreateTicketRequest {
   title: string;
   description: string | null;

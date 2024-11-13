@@ -8,7 +8,7 @@
         /// <summary>
         /// The main mail title
         /// </summary>
-        public required string Title { get; set; }
+        public required string MailTitle { get; set; }
 
         /// <summary>
         /// The youji logo src

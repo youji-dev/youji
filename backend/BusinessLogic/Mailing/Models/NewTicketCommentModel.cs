@@ -21,8 +21,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         {
             return new NewTicketCommentModel()
             {
-#warning TODO: Platzhalter mit Ticket Titel ersetzten
-                Title = $"Neuer Kommentar an {"N/A"}",
+                MailTitle = $"Neuer Kommentar an '{comment.Ticket.Title}'",
                 Author = comment.Author,
                 Content = comment.Content,
             };

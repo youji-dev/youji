@@ -31,24 +31,42 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <returns>The generated mail body</returns>
         public MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
         {
-            BodyBuilder bodyBuilder = new();
-
             TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket);
-            this.AddResourcesToModel(bodyBuilder, mailModel);
-
-            string layout = TemplateHelper.GetTemplate("MailBase")
-                ?? throw new InvalidOperationException("Could not find mail layout");
 
             string template = TemplateHelper.GetTemplate("TicketDataChanged")
                 ?? throw new InvalidOperationException("Could not find template");
 
-            Engine.Razor.AddTemplate("mailLayout", layout);
-            var html = Engine.Razor.RunCompile(template, "template", typeof(TicketDataChangedModel), mailModel);
+            return this.GenerateMail(mailModel, template, "ticketChanged");
+        }
 
-            bodyBuilder.HtmlBody = html;
-            bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);
+        /// <summary>
+        /// Generate a mail body for a new attachement
+        /// </summary>
+        /// <param name="newAttachment">The new attachment</param>
+        /// <returns>The generated mail body</returns>
+        public MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment)
+        {
+            NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment);
 
-            return bodyBuilder.ToMessageBody();
+            string template = TemplateHelper.GetTemplate("NewTicketAttachment")
+                ?? throw new InvalidOperationException("Could not find template");
+
+            return this.GenerateMail(mailModel, template, "newAttachment");
+        }
+
+        /// <summary>
+        /// Generate a mail body for a new comment
+        /// </summary>
+        /// <param name="newComment">The new comment</param>
+        /// <returns>The generated mail body</returns>
+        public MimeEntity GenerateNewTicketCommentMail(TicketComment newComment)
+        {
+            NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment);
+
+            string template = TemplateHelper.GetTemplate("NewTicketComment")
+                ?? throw new InvalidOperationException("Could not find template");
+
+            return this.GenerateMail(mailModel, template, "newComment");
         }
 
         /// <summary>
@@ -98,6 +116,31 @@ namespace DomainLayer.BusinessLogic.Mailing
             mailModel.LogoSrc = $"cid:{logo.ContentId}";
             mailModel.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
             mailModel.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
+        }
+
+        /// <summary>
+        /// Generate an mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
+        /// </summary>
+        /// <param name="mailModel">The model to use as a data provider</param>
+        /// <param name="mailTemplate">The razor html template</param>
+        /// <param name="mailTemplateName">A name to register the template under (must be unique for each template; not each call)</param>
+        /// <returns>The generated mail body</returns>
+        private MimeEntity GenerateMail(MailModel mailModel, string mailTemplate, string mailTemplateName)
+        {
+            BodyBuilder bodyBuilder = new();
+
+            this.AddResourcesToModel(bodyBuilder, mailModel);
+
+            string layout = TemplateHelper.GetTemplate("MailBase")
+                ?? throw new InvalidOperationException("Could not find mail layout");
+
+            Engine.Razor.AddTemplate("mailLayout", layout);
+            var html = Engine.Razor.RunCompile(mailTemplate, mailTemplateName, mailModel.GetType(), mailModel);
+
+            bodyBuilder.HtmlBody = html;
+            bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);
+
+            return bodyBuilder.ToMessageBody();
         }
     }
 }

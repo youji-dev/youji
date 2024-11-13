@@ -21,8 +21,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         {
             return new NewTicketAttachmentModel()
             {
-#warning TODO: Platzhalter mit Ticket Titel ersetzten
-                Title = $"Neue Anhang an '{"N/A"}'",
+                MailTitle = $"Neue Anhang an '{attachment.Ticket.Title}'",
                 Name = attachment.Name,
             };
         }

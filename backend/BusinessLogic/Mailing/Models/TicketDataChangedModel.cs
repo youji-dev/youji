@@ -50,7 +50,10 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         /// <returns>The generated model</returns>
         public static TicketDataChangedModel FromTickets(Ticket newTicket, Ticket oldTicket)
         {
-            TicketDataChangedModel result = new() { Title = $"Ticket '{newTicket.Title}' wurde geändert" };
+            TicketDataChangedModel result = new()
+            {
+                MailTitle = $"Ticket '{newTicket.Title}' wurde geändert",
+            };
 
             if (newTicket.Title != oldTicket.Title)
             {

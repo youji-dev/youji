@@ -6,11 +6,6 @@
     public class CommentPostDTO
     {
         /// <summary>
-        /// The author of the comment.
-        /// </summary>
-        public required string Author { get; set; }
-
-        /// <summary>
         /// The content of the comment.
         /// </summary>
         public required string Content { get; set; }

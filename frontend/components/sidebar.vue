@@ -1,6 +1,6 @@
 <template>
   <div
-    class="max-h-[100vh] px-6 py-3 md:min-w-[39%] lg:min-w-[25%] xl:min-w-[20%] 2xl:min-w-[15%] w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
+    class="max-h-[100vh] px-6 py-3 max-w-fit min-w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
     id="navbar"
   >
     <Logo/>
@@ -13,7 +13,7 @@
         <el-icon>
             <Files />
           </el-icon>
-          <el-badge :value="9" type="primary" :offset="[-135, 15]">
+          <el-badge :value="9" type="primary" :offset="[-125, 15]">
             <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
           </el-badge>
         </el-menu-item>

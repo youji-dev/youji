@@ -15,15 +15,15 @@ export const useTicketsStore = defineStore("tickets", {
             this.statusOptions = [
                 {
                     text: 'Neu',
-                    color: 'primary'
+                    color: '#e01d41'
                 },
                 {
                     text: 'In Arbeit',
-                    color: "warning"
+                    color: "#ffc43b"
                 },
                 {
                     text: "Abgeschlossen",
-                    color: "success"
+                    color: "#62c451"
                 }
             ]
         }

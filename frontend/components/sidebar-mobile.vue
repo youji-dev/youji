@@ -16,7 +16,7 @@
       v-model="drawer"
       :title="$t('navigation')"
       :direction="'ltr'"
-      style="min-width: fit-content; max-height: 100vh"
+      style="min-width: fit-content; max-width: fit-content; max-height: 100vh"
     >
       <template #header="{}" style="margin-bottom: 0"> </template>
       <template #body style="overflow-y: hidden"></template>
@@ -26,7 +26,7 @@
             <el-icon>
               <Files />
             </el-icon>
-            <el-badge :value="9" type="primary" :offset="[10, 15]">
+            <el-badge :value="9" type="primary" :offset="[-125, 15]">
               <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
             </el-badge>
           </el-menu-item>

@@ -24,15 +24,16 @@
         <el-table-column prop="status.text" :label="$t('status')" :filters="parsedStatusOptions"
           :filter-method="filterTag" filter-placement="bottom-end" width="300" sortable>
           <template #default="scope">
-            <div class="flex justtify-around items-center">
-              <el-select class="w-2/3 mx-1" v-model="scope.row.status" value-key="text"
+            <div class="flex justify-start items-center">
+              <ColoredSelect :color="scope.row.color" :change-callback="updateTicketStatus" :change-call-back-params="[scope.row.id, scope.row.status]" :current="scope.row.status" :options="statusOptions.map(option => {return option.text})"></ColoredSelect>
+              <!-- <el-select class="w-2/3 mx-1 rounded-md"  v-model="scope.row.status" value-key="text"
                 @change="updateTicketStatus(scope.row.id, scope.row.status)">
                 <el-option v-for="option in statusOptions" :key="option.text" :label="option.text"
                   :value="option"></el-option>
-              </el-select>
-              <el-tag class="w-1/3 mx-1 hidden lg:flex" :type="scope.row.status.color" disable-transitions>
+              </el-select> -->
+              <!-- <el-tag class="w-1/3 mx-1 hidden lg:flex" :type="scope.row.status.color" disable-transitions>
                 {{ scope.row.status.text }}
-              </el-tag>
+              </el-tag> -->
             </div>
           </template>
         </el-table-column>
@@ -60,6 +61,8 @@ import { ref } from "vue";
 const search = ref("");
 import { ElTag } from "element-plus";
 import type { Status } from "~/stores/tickets";
+import ColoredSelect from "~/components/coloredSelect.vue";
+import { ElRow } from "#build/components";
 const { statusOptions } = storeToRefs(useTicketsStore());
 const parsedStatusOptions = ref([]) as Ref<Array<any>>;
 const { fetchStatusOptions } = useTicketsStore();
@@ -113,7 +116,7 @@ const dataGenerator = () => ({
   title: { title: "Test Ticket", id: id },
   status: {
     text: id % 2 === 0 ? "Neu" : "Abgeschlossen",
-    color: id % 2 === 0 ? "primary" : "success",
+    color: id % 2 === 0 ? "#e01d41" : "#ffc43b",
   },
   building: "Hauptgebäude",
   room: "222",
@@ -166,7 +169,7 @@ function parseStatusOptions() {
   });
 }
 
-async function updateTicketStatus(ticket_id: number, new_status: Status) {
+function updateTicketStatus(ticket_id: number, new_status: Status) {
   // Update actual Ticket Status in backend
   ElMessage({
     message: i18n.t("updated"),

@@ -1,5 +1,5 @@
 ﻿using Application.WebApi.Decorators;
-using Common.Contracts.Put;
+using Common.Contracts.Patch;
 using Common.Enums;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
@@ -51,11 +51,11 @@ namespace Application.WebApi.Controllers
         /// <param name="userId">The id of the user to update</param>
         /// <param name="userUpdate">An update </param>
         /// <returns>The updated user</returns>
-        [HttpPut("{userId}")]
+        [HttpPatch("{userId}")]
         public async Task<ActionResult<User>> UpdateRole(
             [FromServices] UserRepository userRepository,
             [FromRoute] string userId,
-            [FromBody] UserPutDTO userUpdate)
+            [FromBody] UserPatch userUpdate)
         {
             User? user = await userRepository.GetAsync(userId);
             if (user is null)

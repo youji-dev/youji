@@ -1,7 +1,7 @@
-﻿using Application.WebApi.Decorators;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi.Controllers
@@ -14,6 +14,32 @@ namespace Application.WebApi.Controllers
     [Authorize]
     public class TicketAttachmentController : ControllerBase
     {
+        /// <summary>
+        /// Serves an attachment from a specific ID.
+        /// </summary>
+        /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
+        /// <param name="attachmentId">The specific ID of the attachment.</param>
+        /// <returns>A <see cref="FileResult"/> with the attachment data.</returns>
+        [HttpGet("{attachmentId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> Serve(
+            [FromServices] TicketAttachmentRepository attachmentRepo,
+            [FromRoute] Guid attachmentId)
+        {
+            var attachment = await attachmentRepo
+                .Find(x => x.Id == attachmentId)
+                .FirstOrDefaultAsync();
+
+            if (attachment is null)
+                return this.NotFound($"An attachment with the id '{attachmentId}' doesn´t exist.");
+
+            var mimetype = MimeTypes.GetMimeType($".{attachment.FileType.ToLowerInvariant()}");
+
+            return this.File(attachment.Binary, mimetype, attachment.Name);
+        }
+
+
         /// <summary>
         /// Deletes the attachment with the specific id.
         /// </summary>

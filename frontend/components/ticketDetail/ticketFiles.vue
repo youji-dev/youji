@@ -1,5 +1,5 @@
 <template>
-  <el-card class="drop-shadow-xl base-bg-light dark:bg-black">
+  <el-card class="drop-shadow-xl base-bg-light dark:base-bg-dark lg:min-h-[13.9rem]">
     <el-text class="text-xl">{{ $t("files") }}</el-text>
     <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
       <template #file="{ file }">

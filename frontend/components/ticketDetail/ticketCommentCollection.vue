@@ -1,5 +1,5 @@
 <template>
-  <el-card v-loading="loading" class="drop-shadow-xl base-bg-light dark:bg-black">
+  <el-card v-loading="loading" class="drop-shadow-xl base-bg-light dark:base-bg-dark lg:min-h-[13.9rem]">
     <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
     <el-button class="mt-2 float-end" type="primary" size="small" @click="sendComment()">{{ $t("sendComment") }}</el-button>
 

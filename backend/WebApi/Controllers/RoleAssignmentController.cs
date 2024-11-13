@@ -1,6 +1,5 @@
 ﻿using Application.WebApi.Decorators;
 using Common.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;

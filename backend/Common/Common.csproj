@@ -19,9 +19,5 @@
 		</AdditionalFiles>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Contracts\Post\" />
-	</ItemGroup>
-
 
 </Project>

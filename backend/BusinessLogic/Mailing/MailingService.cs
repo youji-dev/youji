@@ -93,6 +93,33 @@ namespace DomainLayer.BusinessLogic.Mailing
             await client.DisconnectAsync(true);
         }
 
+        /// <summary>
+        /// Send same mail to many recipients
+        /// </summary>
+        /// <param name="recipients">List of all recipients</param>
+        /// <param name="subject">The mail subject</param>
+        /// <param name="body">The mail body</param>
+        /// <returns>A Task representing the asynchronous operation</returns>
+        public async Task SendMany(IEnumerable<MailboxAddress> recipients, string subject, MimeEntity body)
+        {
+            using SmtpClient client = new();
+            await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
+
+            foreach (var recipient in recipients)
+            {
+                MimeMessage message = new();
+                message.From.Add(new MailboxAddress(this.mailSenderName, this.mailSenderAddress));
+                message.To.Add(recipient);
+                message.Subject = subject;
+
+                message.Body = body;
+
+                await client.SendAsync(message);
+            }
+
+            await client.DisconnectAsync(true);
+        }
+
         private void AddResourcesToModel(BodyBuilder bodyBuilder, MailModel mailModel)
         {
             Assembly assembly = Assembly.GetExecutingAssembly()

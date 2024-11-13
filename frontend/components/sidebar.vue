@@ -13,7 +13,7 @@
         <el-icon>
             <Files />
           </el-icon>
-          <el-badge :value="9" type="primary" :offset="[10, 15]">
+          <el-badge :value="9" type="primary" :offset="[-135, 15]">
             <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
           </el-badge>
         </el-menu-item>

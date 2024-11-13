@@ -152,14 +152,20 @@ namespace Application.WebApi.Controllers
             if (state is null)
                 return this.BadRequest("The ticket to be created must have a valid state.");
 
+            var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
+
+            if (priority is null)
+                return this.BadRequest("The ticket to be created must have a valid priority.");
+
             Building? building = null;
 
             if (ticketData.BuildingId is not null)
             {
                 building = await buildingRepo.GetAsync((Guid)ticketData.BuildingId);
-            }
 
-            var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
+                if (building is null)
+                    return this.BadRequest("The given building id doesn´t exist.");
+            }
 
             Ticket ticket = new()
             {
@@ -297,7 +303,7 @@ namespace Application.WebApi.Controllers
 
             var state = await stateRepo.GetAsync(ticketData.StateId);
             var building = await buildingRepo.GetAsync(ticketData.BuildingId);
-            var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
+            var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
 
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;

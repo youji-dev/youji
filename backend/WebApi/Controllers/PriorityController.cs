@@ -1,4 +1,6 @@
 ﻿using Application.WebApi.Decorators;
+using Common.Contracts.Post;
+using Common.Contracts.Put;
 using Common.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,16 +34,24 @@ namespace Application.WebApi.Controllers
         /// Adds a new priority entity.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="priority">The <see cref="Priority"/> that will be added.</param>
+        /// <param name="priorityData">The <see cref="Priority"/> that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added priority entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Post(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] Priority priority)
+            [FromBody] PriorityPostDTO priorityData)
         {
+            var priority = new Priority()
+            {
+                Id = default,
+                Name = priorityData.Name,
+                Value = priorityData.Value,
+            };
+
             await priorityRepo.AddAsync(priority);
+
             return this.Ok(priority);
         }
 
@@ -57,25 +67,26 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] Priority priorityData)
+            [FromBody] PriorityPutDTO priorityData)
         {
-            var priority = await priorityRepo.GetAsync(priorityData.Value);
-
+            var priority = await priorityRepo.GetAsync(priorityData.Id);
+            
             if (priority is null)
-                return this.NotFound($"A priority with the value {priorityData.Value} doesn´t exist.");
+                return this.NotFound($"A priority with the id '{priorityData.Id}' doesn´t exist.");
 
-            priority.Value = priorityData.Value;
             priority.Name = priorityData.Name;
+            priority.Value = priorityData.Value;
 
             await priorityRepo.UpdateAsync(priority);
-            return this.Ok(priorityData);
+
+            return this.Ok(priority);
         }
 
         /// <summary>
         /// Deletes the priority with the specific id.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="priorityValue">The specific id of the priority that will be deleted.</param>
+        /// <param name="priorityId">The specific id of the priority that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{priorityValue}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -83,16 +94,16 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] PriorityRepository priorityRepo,
-            [FromRoute] int priorityValue)
+            [FromRoute] Guid priorityId)
         {
-            var deletePriority = await priorityRepo.GetAsync(priorityValue);
+            var deletePriority = await priorityRepo.GetAsync(priorityId);
 
             if (deletePriority is null)
-                return this.NotFound($"A priority with the value {priorityValue} doesn´t exist.");
+                return this.NotFound($"A priority with the value {priorityId} doesn´t exist.");
 
             await priorityRepo.DeleteAsync(deletePriority);
 
-            return this.Ok($"The priority with the value {priorityValue} was deleted.");
+            return this.Ok($"The priority with the value {priorityId} was deleted.");
         }
     }
 }

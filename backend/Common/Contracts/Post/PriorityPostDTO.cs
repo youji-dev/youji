@@ -1,18 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace PersistenceLayer.DataAccess.Entities
+﻿namespace Common.Contracts.Post
 {
     /// <summary>
-    /// Represents the ticket priority.
+    /// Represents a priority data transfer object for post operation.
     /// </summary>
-    public class Priority
+    public class PriorityPostDTO
     {
-        /// <summary>
-        /// The id of the priority.
-        /// </summary>
-        [Key]
-        public required Guid Id { get; set; }
-
         /// <summary>
         /// The value of the priority.
         /// </summary>

@@ -19,9 +19,6 @@ namespace PersistenceLayer.DataAccess.Entities.Configuration
             builder.Property(e => e.CreationDate)
                 .HasDefaultValueSql("select current_timestamp at time zone 'utc';");
 
-            builder.Property(e => e.LastChangedDate)
-                .HasComputedColumnSql("select current_timestamp at time zone 'utc';");
-
             builder.Navigation(x => x.Building).AutoInclude();
             builder.Navigation(x => x.State).AutoInclude();
             builder.Navigation(x => x.Priority).AutoInclude();

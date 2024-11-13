@@ -41,11 +41,6 @@ namespace PersistenceLayer.DataAccess.Entities
         public DateTime CreationDate { get; set; }
 
         /// <summary>
-        /// The date the ticket was last changed
-        /// </summary>
-        public DateTime LastChangedDate { get; set; }
-
-        /// <summary>
         /// The state of the ticket.
         /// </summary>
         [DeleteBehavior(DeleteBehavior.Restrict)]

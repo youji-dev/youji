@@ -49,7 +49,7 @@ namespace Application.WebApi.Controllers
         /// Updates the specific priority.
         /// </summary>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
-        /// <param name="priority">The <see cref="Priority"/> that will be updated.</param>
+        /// <param name="priorityData">The <see cref="Priority"/> that will be updated.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated priority.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -57,13 +57,18 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] Priority priority)
+            [FromBody] Priority priorityData)
         {
-            if (await priorityRepo.GetAsync(priority.Value) is null)
-                return this.NotFound($"A priority with the value {priority.Value} doesn´t exist.");
+            var priority = await priorityRepo.GetAsync(priorityData.Value);
+
+            if (priority is null)
+                return this.NotFound($"A priority with the value {priorityData.Value} doesn´t exist.");
+
+            priority.Value = priorityData.Value;
+            priority.Name = priorityData.Name;
 
             await priorityRepo.UpdateAsync(priority);
-            return this.Ok(priority);
+            return this.Ok(priorityData);
         }
 
         /// <summary>

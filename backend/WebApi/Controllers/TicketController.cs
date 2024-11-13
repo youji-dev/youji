@@ -301,9 +301,12 @@ namespace Application.WebApi.Controllers
                 return this.Forbid();
             }
 
-            var state = await stateRepo.GetAsync(ticketData.StateId);
-            var building = await buildingRepo.GetAsync(ticketData.BuildingId);
-            var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
+            State? state = await stateRepo.GetAsync(ticketData.StateId);
+            Building? building = ticketData.BuildingId is null
+                ? null
+                : await buildingRepo.GetAsync(ticketData.BuildingId.Value);
+
+            Priority? priority = await priorityRepo.GetAsync(ticketData.PriorityId);
 
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;

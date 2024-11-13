@@ -1,4 +1,5 @@
 ﻿using DomainLayer.BusinessLogic.Mailing;
+using MailKit;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 
@@ -10,8 +11,8 @@ namespace Application.WebApi.Controllers
     [Route("mail")]
     public class TestController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult SendMail([FromServices] MailingService mailService)
+        [HttpGet("ticketChanged")]
+        public IActionResult SendTicketChanged([FromServices] MailingService mailService)
         {
             Ticket ticket = new()
             {
@@ -39,6 +40,66 @@ namespace Application.WebApi.Controllers
             var mailBody = mailService.GenerateTicketChangedMail(changedTicket, ticket);
 
             mailService.Send(new("Test", "Test@user.com"), "Some subject", mailBody);
+
+            return this.Ok();
+        }
+
+        [HttpGet("newAttachment")]
+        public IActionResult SendNewAttachment([FromServices] MailingService mailingService)
+        {
+            Ticket ticket = new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Some title",
+                State = new State() { Id = Guid.NewGuid(), Name = "Some state", Color = "hui" },
+                Description = "<b>Some description</b>",
+                Author = "Author",
+                Object = "Some object",
+            };
+
+            TicketAttachment newAttachment = new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "NewFile.pdf",
+                FileType = "pdf",
+                Binary = [],
+                TicketId = ticket.Id,
+                Ticket = ticket,
+            };
+
+            var mailBody = mailingService.GenerateNewTicketAttachmentMail(newAttachment);
+
+            mailingService.Send(new("Test", "Test@user.com"), "Some subject", mailBody);
+
+            return this.Ok();
+        }
+
+        [HttpGet("newComment")]
+        public IActionResult SendNewComment([FromServices] MailingService mailingService)
+        {
+            Ticket ticket = new()
+            {
+                Id = Guid.NewGuid(),
+                Title = "Some title",
+                State = new State() { Id = Guid.NewGuid(), Name = "Some state", Color = "hui" },
+                Description = "<b>Some description</b>",
+                Author = "Author",
+                Object = "Some object",
+            };
+
+            TicketComment newComment = new()
+            {
+                Id = Guid.NewGuid(),
+                Author = "The author",
+                CreationDate = DateTime.Now,
+                Content = "Some cool content",
+                TicketId= ticket.Id,
+                Ticket = ticket,
+            };
+
+            var mailBody = mailingService.GenerateNewTicketCommentMail(newComment);
+
+            mailingService.Send(new("Test", "Test@user.com"), "Some subject", mailBody);
 
             return this.Ok();
         }

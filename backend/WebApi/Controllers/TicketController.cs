@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Drawing.Blurhash;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
 using Common.Enums;
@@ -243,6 +245,10 @@ namespace Application.WebApi.Controllers
             using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
+            using var image = Image.FromStream(stream);
+            string blurHash = Blurhasher.Encode(image, 5, 5);
+
+
             TicketAttachment attachment = new()
             {
                 Id = default,
@@ -250,6 +256,7 @@ namespace Application.WebApi.Controllers
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
                 TicketId = ticketId,
+                BlurHash = blurHash,
             };
 
             await attachmentRepo.AddAsync(attachment);

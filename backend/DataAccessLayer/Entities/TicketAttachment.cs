@@ -23,6 +23,11 @@ namespace PersistenceLayer.DataAccess.Entities
         public byte[] Binary { get; set; } = null!;
 
         /// <summary>
+        /// Hash that is used to generate the preview of the attachment
+        /// </summary>
+        public required string BlurHash { get; set; }
+
+        /// <summary>
         /// The name of the attachment.
         /// </summary>
         public required string Name { get; set; }

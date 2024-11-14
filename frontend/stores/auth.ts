@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import useFetchAuthenticated from "~/composables/api";
+import useFetchAuthenticated from "~/composables/useFetchAuthenticated";
 
 // In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
 // All of these actions and variables can be used and called in our vue files.
@@ -27,17 +27,14 @@ export const useAuthStore = defineStore("auth", {
       this.authErrors = [];
 
       try {
-        const { data, pending, error }: any = await useFetch(
-          `${BACKEND_URL}/Auth/login`,
-          {
-            body: {
-              username: name,
-              password,
-            },
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
+          body: {
+            username: name,
+            password,
+          },
+          method: "post",
+          headers: { "Content-Type": "application/json" },
+        });
 
         this.loading = pending;
 
@@ -48,8 +45,7 @@ export const useAuthStore = defineStore("auth", {
           this.authErrors.push(error.value);
         }
 
-        if (!data.value)
-          return;
+        if (!data.value) return;
 
         useCookie(ACCESS_TOKEN_NAME, { secure: true, sameSite: "strict" }).value = data.value.accessToken;
         useCookie(REFRESH_TOKEN_NAME, { secure: true, sameSite: "strict" }).value = data.value.refreshToken;
@@ -74,7 +70,7 @@ export const useAuthStore = defineStore("auth", {
       } catch {
         return false;
       }
-    }
+    },
   },
 });
 

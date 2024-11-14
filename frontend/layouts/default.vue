@@ -1,13 +1,11 @@
 <template>
-  <div
-    class="page-bg-light dark:page-bg-dark w-full min-h-[100vh] max-h-full flex"
-    >
+  <div class="page-bg-light dark:page-bg-dark w-full min-h-[100vh] max-h-full flex overflow-x-hidden overflow-y-scroll">
     <div class="fixed right-5 bottom-5 z-50">
       <Theme />
       <Language />
     </div>
-    <Sidebar />
-    <SidebarMobile />
+    <Sidebar class="flex-none" />
+    <SidebarMobile class="flex-none" />
     <slot />
   </div>
 </template>

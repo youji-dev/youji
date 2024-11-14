@@ -85,6 +85,7 @@ function getPageIndex() {
   min-height: 0;
   height: calc(100vh - 72px);
 }
+
 .menu-item {
   width: 100%;
   height: fit-content;

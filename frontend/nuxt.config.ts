@@ -2,6 +2,10 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
+  sourcemap: {
+    server: true,
+    client: true,
+  },
   routeRules: {
     "**/login": { ssr: false },
   },
@@ -21,18 +25,11 @@ export default defineNuxtConfig({
         BASE_BG_DARK: "#141414",
         BASE_BG_LIGHT: "#FFFFFF",
         PAGE_BG_DARK: "#0A0A0A",
-        PAGE_BG_LIGHT: "#F2F3F5"
-      }
+        PAGE_BG_LIGHT: "#F2F3F5",
+      },
     },
   },
-  modules: [
-    "@nuxtjs/tailwindcss",
-    "@pinia/nuxt",
-    "@nuxtjs/color-mode",
-    "@nuxt/icon",
-    "@nuxtjs/i18n",
-    "@element-plus/nuxt",
-  ],
+  modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "@nuxtjs/color-mode", "@nuxt/icon", "@nuxtjs/i18n", "@element-plus/nuxt"],
   i18n: {
     strategy: "prefix",
     // Icons from https://www.npmjs.com/package/@iconify-json/flag
@@ -58,8 +55,8 @@ export default defineNuxtConfig({
     themes: ["dark"],
   },
   colorMode: {
-    classSuffix: '',
-    preference: 'system', // default value of $colorMode.preference
-    fallback: 'light', // fallback value if not system preference found
+    classSuffix: "",
+    preference: "system", // default value of $colorMode.preference
+    fallback: "light", // fallback value if not system preference found
   },
 });

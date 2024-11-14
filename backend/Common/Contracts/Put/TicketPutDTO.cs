@@ -23,7 +23,7 @@
         /// <summary>
         /// The priority of the ticket
         /// </summary>
-        public int PriorityValue { get; set; }
+        public Guid PriorityId { get; set; }
 
         /// <summary>
         /// The state of the ticket.
@@ -33,7 +33,7 @@
         /// <summary>
         /// The building where the issue of the ticket was located.
         /// </summary>
-        public Guid BuildingId { get; set; }
+        public Guid? BuildingId { get; set; }
 
         /// <summary>
         /// The room where the issue of the ticket was located.

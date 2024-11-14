@@ -68,8 +68,7 @@ namespace Application.WebApi.Controllers
                     || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm)
-                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                    || ticket.Author.ToLower().Contains(searchTerm));
             }
 
             ticketQuery =

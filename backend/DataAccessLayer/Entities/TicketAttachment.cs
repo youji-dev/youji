@@ -16,8 +16,11 @@ namespace PersistenceLayer.DataAccess.Entities
 
         /// <summary>
         /// The binaries of the attachment.
+        /// null! is required because json serializer can't serialize properties
+        /// that are required and null at the same time
         /// </summary>
-        public required byte[] Binary { get; set; }
+        [JsonIgnore]
+        public byte[] Binary { get; set; } = null!;
 
         /// <summary>
         /// The name of the attachment.

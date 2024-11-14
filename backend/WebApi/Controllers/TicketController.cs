@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Blurhash;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
+using Blurhash.ImageSharp;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Application.WebApi.Controllers
 {
@@ -251,9 +252,12 @@ namespace Application.WebApi.Controllers
             using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
-            using var image = Image.FromStream(stream);
-            string blurHash = Blurhasher.Encode(image, 5, 5);
-
+            string? blurHash = null;
+            if (attachmentFile.ContentType.StartsWith("image/"))
+            {
+                using var image = Image.Load<Rgba32>(stream.ToArray());
+                blurHash = Blurhasher.Encode(image, 9, 9);
+            }
 
             TicketAttachment attachment = new()
             {

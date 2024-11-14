@@ -25,7 +25,7 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// Hash that is used to generate the preview of the attachment
         /// </summary>
-        public required string BlurHash { get; set; }
+        public string? BlurHash { get; set; }
 
         /// <summary>
         /// The name of the attachment.

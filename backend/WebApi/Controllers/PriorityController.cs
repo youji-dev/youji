@@ -67,10 +67,10 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] PriorityPutDTO priorityData)
+            [FromBody] Priority priorityData)
         {
             var priority = await priorityRepo.GetAsync(priorityData.Id);
-            
+
             if (priority is null)
                 return this.NotFound($"A priority with the id '{priorityData.Id}' doesn´t exist.");
 

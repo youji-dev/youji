@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 using Common.Extensions;
+using DomainLayer.BusinessLogic.Mailing.Models;
+using MimeKit.Utils;
+using MimeKit;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
@@ -30,6 +33,36 @@ namespace DomainLayer.BusinessLogic.Mailing
 
             html = RazorDeclaresRegex().Replace(html, string.Empty);
             return html;
+        }
+
+        /// <summary>
+        /// Adds common resources (icon's, ...) to the <paramref name="bodyBuilder"/> and makes them available for templates
+        /// </summary>
+        /// <param name="bodyBuilder">The mail body builder to add resources to</param>
+        /// <param name="mailModel">The mail model to provide resources in</param>
+        public static void AddResourcesToModel(BodyBuilder bodyBuilder, MailModel mailModel)
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly()
+                ?? throw new InvalidOperationException("Could not get assembly while loading logo file");
+
+            var logo = bodyBuilder.LinkedResources.Add(
+                "Logo.svg",
+                assembly.GetResource("Logo.svg"));
+            logo.ContentId = MimeUtils.GenerateMessageId();
+
+            var arrowRight = bodyBuilder.LinkedResources.Add(
+                "arrow_right.svg",
+                assembly.GetResource("arrow_right.svg"));
+            arrowRight.ContentId = MimeUtils.GenerateMessageId();
+
+            var arrowDown = bodyBuilder.LinkedResources.Add(
+                "arrow_down.svg",
+                assembly.GetResource("arrow_down.svg"));
+            arrowDown.ContentId = MimeUtils.GenerateMessageId();
+
+            mailModel.LogoSrc = $"cid:{logo.ContentId}";
+            mailModel.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
+            mailModel.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
         }
     }
 

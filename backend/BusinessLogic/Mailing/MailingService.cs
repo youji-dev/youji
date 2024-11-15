@@ -134,31 +134,6 @@ namespace DomainLayer.BusinessLogic.Mailing
         public string FormatMailSubject(string subjectText)
             => string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectText);
 
-        private void AddResourcesToModel(BodyBuilder bodyBuilder, MailModel mailModel)
-        {
-            Assembly assembly = Assembly.GetExecutingAssembly()
-                ?? throw new InvalidOperationException("Could not get assembly while loading logo file");
-
-            var logo = bodyBuilder.LinkedResources.Add(
-                "Logo.svg",
-                assembly.GetResource("Logo.svg"));
-            logo.ContentId = MimeUtils.GenerateMessageId();
-
-            var arrowRight = bodyBuilder.LinkedResources.Add(
-                "arrow_right.svg",
-                assembly.GetResource("arrow_right.svg"));
-            arrowRight.ContentId = MimeUtils.GenerateMessageId();
-
-            var arrowDown = bodyBuilder.LinkedResources.Add(
-                "arrow_down.svg",
-                assembly.GetResource("arrow_down.svg"));
-            arrowDown.ContentId = MimeUtils.GenerateMessageId();
-
-            mailModel.LogoSrc = $"cid:{logo.ContentId}";
-            mailModel.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
-            mailModel.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
-        }
-
         /// <summary>
         /// Generate an mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
         /// </summary>
@@ -170,7 +145,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             BodyBuilder bodyBuilder = new();
 
-            this.AddResourcesToModel(bodyBuilder, mailModel);
+            TemplateHelper.AddResourcesToModel(bodyBuilder, mailModel);
 
             string layout = TemplateHelper.GetTemplate("MailBase")
                 ?? throw new InvalidOperationException("Could not find mail layout");

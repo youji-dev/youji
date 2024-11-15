@@ -24,6 +24,8 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly string mailServerAddress = configuration.GetValueOrThrow("SmtpAddress", ["Mail"]);
         private readonly int mailServerPort = int.Parse(configuration.GetValueOrThrow("SmtpPort", ["Mail"]));
         private readonly bool useSsl = bool.Parse(configuration.GetValueOrThrow("UseSsl", ["Mail"]));
+        private readonly CompositeFormat mailSubjectFormat = CompositeFormat.Parse(
+            configuration.GetValueOrThrow("SubjectFormat", ["Mail"]));
 
         private readonly CompositeFormat mailSubjectFormat = CompositeFormat.Parse("[youji] {0}");
 

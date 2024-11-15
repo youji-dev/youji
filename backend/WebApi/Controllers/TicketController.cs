@@ -230,7 +230,7 @@ namespace Application.WebApi.Controllers
                 .Select(u => new MailboxAddress(u.UserId, u.Email));
 
             var mail = mailingService.GenerateNewTicketCommentMail(comment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject("New comment"), mail);
+            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Kommentar an Ticket '{ticket.Title}'"), mail);
 
             return this.Ok(comment);
         }
@@ -282,7 +282,7 @@ namespace Application.WebApi.Controllers
                 .Select(u => new MailboxAddress(u.UserId, u.Email));
 
             var mail = mailingService.GenerateNewTicketAttachmentMail(attachment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject("New attachment"), mail);
+            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Anhang an Ticket '{ticket.Title}'"), mail);
 
             return this.Ok(attachment);
         }
@@ -351,7 +351,7 @@ namespace Application.WebApi.Controllers
                 .Select(u => new MailboxAddress(u.UserId, u.Email));
 
             var mail = mailingService.GenerateTicketChangedMail(ticket, oldTicket);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Ticket '{ticket.Title}' changed"), mail);
+            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Ticket '{ticket.Title}' wurde geändert"), mail);
 
             return this.Ok(ticket);
         }

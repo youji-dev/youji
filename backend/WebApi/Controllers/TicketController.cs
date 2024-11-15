@@ -161,7 +161,10 @@ namespace Application.WebApi.Controllers
 
             var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
 
-            var author = this.User.FindFirst("username")?.Value ?? "Unbekannter Author";
+            var author = this.User.FindFirst("username")?.Value;
+
+            if (author is null)
+                return this.Unauthorized();
 
             Ticket ticket = new()
             {
@@ -205,7 +208,10 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
-            var author = this.User.FindFirst("username")?.Value ?? "Unbekannter Author";
+            var author = this.User.FindFirst("username")?.Value;
+
+            if (author is null)
+                return this.Unauthorized();
 
             TicketComment comment = new()
             {

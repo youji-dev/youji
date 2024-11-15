@@ -130,12 +130,12 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             BodyBuilder bodyBuilder = new();
 
-            TemplateHelper.AddResourcesToModel(bodyBuilder, mailModel);
+            MailingHelper.AddResourcesToModel(bodyBuilder, mailModel);
 
-            string layout = TemplateHelper.GetTemplate("MailBase")
+            string layout = MailingHelper.GetTemplate("MailBase")
                 ?? throw new InvalidOperationException("Could not find resource file for mail layout");
 
-            string template = TemplateHelper.GetTemplate(mailModel.TemplateName)
+            string template = MailingHelper.GetTemplate(mailModel.TemplateName)
                 ?? throw new InvalidOperationException($"Could not find resource file for mail template with name '{mailModel.TemplateName}'");
 
             Engine.Razor.AddTemplate("mailLayout", layout);

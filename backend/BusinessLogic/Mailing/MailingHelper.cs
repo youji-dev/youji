@@ -10,7 +10,7 @@ namespace DomainLayer.BusinessLogic.Mailing
     /// <summary>
     /// Helper class for razor templates
     /// </summary>
-    internal static partial class TemplateHelper
+    internal static partial class MailingHelper
     {
         /// <summary>
         /// Get the template with the given name
@@ -69,7 +69,7 @@ namespace DomainLayer.BusinessLogic.Mailing
     /// <summary>
     /// Partial class for Regex
     /// </summary>
-    internal static partial class TemplateHelper
+    internal static partial class MailingHelper
     {
         [GeneratedRegex(@"^.*<!-- Begin document -->\s*", RegexOptions.Singleline)]
         private static partial Regex RazorDeclaresRegex();

@@ -11,16 +11,16 @@
 @if (Model.TitleChange is not null)
 {
     <h2>Titel geändert</h2>
-    <p>@Model.TitleChange?.NewValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon"/> @Model.TitleChange?.OldValue</p>
+    <p>@Model.TitleChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon" /> @Model.TitleChange?.NewValue</p>
 }
 
 @if (Model.DescriptionChange is not null)
 {
     <h2>Beschreibung geändert</h2>
     <div class="card">
-        <p>@Model.DescriptionChange?.NewValue</p>
-        <img src="@Model.ArrowDownIconSrc" alt="v" class="icon card-seperator" />
         <p>@Model.DescriptionChange?.OldValue</p>
+        <img src="@Model.ArrowDownIconSrc" alt="v" class="icon card-seperator" />
+        <p>@Model.DescriptionChange?.NewValue</p>
     </div>
 }
 

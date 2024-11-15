@@ -1,8 +1,12 @@
 class AttachmentRepository {
   private path = "/api/TicketAttachment";
 
-  async getBlob(id: string): Promise<ReturnType<typeof useFetchAuthenticated<Blob>>> {
-    return useFetchAuthenticated<Blob>(`${this.path}/${id}`, { method: "GET" });
+  generateAttachmentURL(id: string): string {
+    const {
+      public: { BACKEND_URL },
+    } = useRuntimeConfig();
+
+    return `${BACKEND_URL}${this.path}/${id}`;
   }
 
   async delete(id: string): Promise<ReturnType<typeof useFetchAuthenticated<string>>> {

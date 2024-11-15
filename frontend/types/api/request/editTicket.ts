@@ -4,8 +4,8 @@ export default interface EditTicketRequest {
   id: string;
   title: string | null;
   description: string | null;
-  priorityValue: number;
-  stateId: string;
+  priorityId: string | null;
+  stateId: string | null;
   buildingId: string | null;
   room: string | null;
   object: string | null;
@@ -16,7 +16,7 @@ export function fromTicketResponse(ticket: ticketResponse): EditTicketRequest {
     id: ticket.id,
     title: ticket.title,
     description: ticket.description ?? null,
-    priorityValue: ticket.priority.value,
+    priorityId: ticket.priority.id,
     stateId: ticket.state.id,
     buildingId: ticket.building?.id || null,
     room: ticket.room || null,

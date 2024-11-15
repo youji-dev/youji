@@ -11,7 +11,6 @@ namespace Application.WebApi.Controllers
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class TicketAttachmentController : ControllerBase
     {
         /// <summary>
@@ -49,6 +48,7 @@ namespace Application.WebApi.Controllers
         [HttpDelete("{attachmentId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        [Authorize]
         public async Task<ActionResult<string>> Delete(
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromRoute] Guid attachmentId)

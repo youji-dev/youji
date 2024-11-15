@@ -3,8 +3,14 @@
     <el-text class="text-xl">{{ $t("files") }}</el-text>
     <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
       <template #file="{ file }">
+        <UnLazyImage v-if="file.blurHash" class="object-cover aspect-square w-full" :src="$api.attachment.generateAttachmentURL(file.id)" :blurhash="file.blurHash" :lazy-load="true" />
+
+        <div v-else class="justify-center align-center text-center w-full h-full flex flex-col">
+          <FileIcons class="self-center" :width="30" :height="30" :name="file.name" />
+          <p>{{ file.name }}</p>
+        </div>
+
         <div>
-          <img class="object-cover aspect-square w-full" :src="file.binary" />
           <span class="el-upload-list__item-actions">
             <span class="el-upload-list__item-preview" @click="">
               <el-icon><zoom-in /></el-icon>
@@ -32,6 +38,9 @@
 <script lang="ts" setup>
 import type ticket from "~/types/api/response/ticketResponse";
 import { Upload, ZoomIn, Download, Delete } from "@element-plus/icons-vue";
+import FileIcons from "file-icons-vue";
+
+const { $api } = useNuxtApp();
 
 defineProps<{
   ticket: ticket;

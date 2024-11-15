@@ -3,9 +3,15 @@
  */
 export default interface priority {
     /**
-     * The value of the priority.
+     * The id of the priority.
+     */
+    id: string;
+
+    /**
+     * The value of the priority. Used for sort order.
      */
     value: number;
+
     /**
      * The name of the priority.
      */

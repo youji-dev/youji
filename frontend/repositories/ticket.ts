@@ -69,6 +69,7 @@ class TicketRepository {
         link.setAttribute("download", filename ?? "ticket.pdf");
         document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
       },
     });
   }

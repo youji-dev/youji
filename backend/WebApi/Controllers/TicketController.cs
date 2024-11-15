@@ -256,7 +256,7 @@ namespace Application.WebApi.Controllers
             if (attachmentFile.ContentType.StartsWith("image/"))
             {
                 using var image = Image.Load<Rgba32>(stream.ToArray());
-                blurHash = Blurhasher.Encode(image, 9, 9);
+                blurHash = Blurhasher.Encode(image, 5, 5);
             }
 
             TicketAttachment attachment = new()

@@ -58,7 +58,7 @@ namespace Application.WebApi.Controllers
         /// Updates the specific state.
         /// </summary>
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/></param>
-        /// <param name="state">The <see cref="State"/> that will be updated.</param>
+        /// <param name="stateData">The <see cref="State"/> that will be updated.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -66,10 +66,15 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Put(
             [FromServices] StateRepository stateRepo,
-            [FromBody] State state)
+            [FromBody] State stateData)
         {
-            if (await stateRepo.GetAsync(state.Id) is null)
-                return this.NotFound($"A state with the id '{state.Id}' doesn´t exist.");
+            var state = await stateRepo.GetAsync(stateData.Id);
+
+            if (state is null)
+                return this.NotFound($"A state with the id '{stateData.Id}' doesn´t exist.");
+
+            state.Name = stateData.Name;
+            state.Color = stateData.Color;
 
             await stateRepo.UpdateAsync(state);
             return this.Ok(state);

@@ -30,12 +30,18 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
         {
-            return this.Ok(await ticketRepo.GetAsync(ticketId));
+            var ticket = await ticketRepo.GetAsync(ticketId);
+
+            if (ticket is null)
+                return this.NotFound($"Ticket with id '{ticketId}' doesn't exist!");
+
+            return this.Ok(ticket);
         }
 
         /// <summary>
@@ -71,8 +77,7 @@ namespace Application.WebApi.Controllers
                     || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm)
-                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                    || ticket.Author.ToLower().Contains(searchTerm));
             }
 
             ticketQuery =

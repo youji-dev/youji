@@ -28,7 +28,8 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// The priority of the ticket
         /// </summary>
-        public Priority? Priority { get; set; }
+        [DeleteBehavior(DeleteBehavior.Restrict)]
+        public required Priority Priority { get; set; }
 
         /// <summary>
         /// The author of the ticket.

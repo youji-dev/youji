@@ -30,12 +30,18 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
         {
-            return this.Ok(await ticketRepo.GetAsync(ticketId));
+            var ticket = await ticketRepo.GetAsync(ticketId);
+
+            if (ticket is null)
+                return this.NotFound($"Ticket with id '{ticketId}' doesn't exist!");
+
+            return this.Ok(ticket);
         }
 
         /// <summary>
@@ -71,8 +77,7 @@ namespace Application.WebApi.Controllers
                     || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm)
-                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                    || ticket.Author.ToLower().Contains(searchTerm));
             }
 
             ticketQuery =
@@ -155,14 +160,20 @@ namespace Application.WebApi.Controllers
             if (state is null)
                 return this.BadRequest("The ticket to be created must have a valid state.");
 
+            var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
+
+            if (priority is null)
+                return this.BadRequest("The ticket to be created must have a valid priority.");
+
             Building? building = null;
 
             if (ticketData.BuildingId is not null)
             {
                 building = await buildingRepo.GetAsync((Guid)ticketData.BuildingId);
-            }
 
-            var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
+                if (building is null)
+                    return this.BadRequest("The given building id doesn´t exist.");
+            }
 
             Ticket ticket = new()
             {
@@ -330,9 +341,12 @@ namespace Application.WebApi.Controllers
                 return this.Forbid();
             }
 
-            var state = await stateRepo.GetAsync(ticketData.StateId);
-            var building = await buildingRepo.GetAsync(ticketData.BuildingId);
-            var priority = await priorityRepo.GetAsync(ticketData.PriorityValue);
+            State? state = await stateRepo.GetAsync(ticketData.StateId);
+            Building? building = ticketData.BuildingId is null
+                ? null
+                : await buildingRepo.GetAsync(ticketData.BuildingId.Value);
+
+            Priority? priority = await priorityRepo.GetAsync(ticketData.PriorityId);
 
             var oldTicket = ticket with { };
 

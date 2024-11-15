@@ -1,5 +1,4 @@
 ﻿using System.Globalization;
-using System.Reflection;
 using System.Text;
 using Common.Extensions;
 using Common.Helpers;
@@ -7,7 +6,6 @@ using DomainLayer.BusinessLogic.Mailing.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using MimeKit.Utils;
 using PersistenceLayer.DataAccess.Entities;
 using RazorEngine;
 using RazorEngine.Templating;
@@ -27,8 +25,6 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly CompositeFormat mailSubjectFormat = CompositeFormat.Parse(
             configuration.GetValueOrThrow("SubjectFormat", ["Mail"]));
 
-        private readonly CompositeFormat mailSubjectFormat = CompositeFormat.Parse("[youji] {0}");
-
         /// <summary>
         /// Generate a mail body for a changed ticket
         /// </summary>
@@ -39,10 +35,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket);
 
-            string template = TemplateHelper.GetTemplate("TicketDataChanged")
-                ?? throw new InvalidOperationException("Could not find template");
-
-            return this.GenerateMail(mailModel, template, "ticketChanged");
+            return this.GenerateMail(mailModel);
         }
 
         /// <summary>
@@ -54,10 +47,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment);
 
-            string template = TemplateHelper.GetTemplate("NewTicketAttachment")
-                ?? throw new InvalidOperationException("Could not find template");
-
-            return this.GenerateMail(mailModel, template, "newAttachment");
+            return this.GenerateMail(mailModel);
         }
 
         /// <summary>
@@ -69,10 +59,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         {
             NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment);
 
-            string template = TemplateHelper.GetTemplate("NewTicketComment")
-                ?? throw new InvalidOperationException("Could not find template");
-
-            return this.GenerateMail(mailModel, template, "newComment");
+            return this.GenerateMail(mailModel);
         }
 
         /// <summary>
@@ -138,20 +125,21 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// Generate an mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
         /// </summary>
         /// <param name="mailModel">The model to use as a data provider</param>
-        /// <param name="mailTemplate">The razor html template</param>
-        /// <param name="mailTemplateName">A name to register the template under (must be unique for each template; not each call)</param>
         /// <returns>The generated mail body</returns>
-        private MimeEntity GenerateMail(MailModel mailModel, string mailTemplate, string mailTemplateName)
+        private MimeEntity GenerateMail(MailModel mailModel)
         {
             BodyBuilder bodyBuilder = new();
 
             TemplateHelper.AddResourcesToModel(bodyBuilder, mailModel);
 
             string layout = TemplateHelper.GetTemplate("MailBase")
-                ?? throw new InvalidOperationException("Could not find mail layout");
+                ?? throw new InvalidOperationException("Could not find resource file for mail layout");
+
+            string template = TemplateHelper.GetTemplate(mailModel.TemplateName)
+                ?? throw new InvalidOperationException($"Could not find resource file for mail template with name '{mailModel.TemplateName}'");
 
             Engine.Razor.AddTemplate("mailLayout", layout);
-            var html = Engine.Razor.RunCompile(mailTemplate, mailTemplateName, mailModel.GetType(), mailModel);
+            var html = Engine.Razor.RunCompile(template, mailModel.TemplateName, mailModel.GetType(), mailModel);
 
             bodyBuilder.HtmlBody = html;
             bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);

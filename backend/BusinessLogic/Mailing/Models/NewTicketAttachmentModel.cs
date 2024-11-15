@@ -7,6 +7,9 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// </summary>
     public record NewTicketAttachmentModel : MailModel
     {
+        /// <inheritdoc/>
+        public override string TemplateName { get; } = "NewTicketAttachment";
+
         /// <summary>
         /// Name of the attachment
         /// </summary>

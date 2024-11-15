@@ -7,6 +7,9 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// </summary>
     public record TicketDataChangedModel : MailModel
     {
+        /// <inheritdoc/>
+        public override string TemplateName { get; } = "TicketDataChanged";
+
         /// <summary>
         /// Change of the ticket title
         /// </summary>

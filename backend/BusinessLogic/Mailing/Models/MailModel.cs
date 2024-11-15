@@ -3,8 +3,13 @@
     /// <summary>
     /// Base mail model
     /// </summary>
-    public record MailModel
+    public abstract record MailModel
     {
+        /// <summary>
+        /// Filename of the corresponding Razor-Template
+        /// </summary>
+        public abstract string TemplateName { get; }
+
         /// <summary>
         /// The main mail title
         /// </summary>

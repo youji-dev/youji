@@ -24,9 +24,9 @@ namespace DomainLayer.BusinessLogic.Authentication
         /// <summary>
         /// Generate JWT AccessToken
         /// </summary>
-        /// <param name="roleAssignment">User and Role that will be stored in the token</param>
+        /// <param name="user">User that will be stored in the token</param>
         /// <returns>A short living JWT AccessToken</returns>
-        public string CreateAccessToken(User roleAssignment)
+        public string CreateAccessToken(User user)
         {
             var jwtKey = configuration.GetValueOrThrow("JWTKey");
 
@@ -35,8 +35,8 @@ namespace DomainLayer.BusinessLogic.Authentication
             var token = new JwtSecurityToken(
                 claims:
                 [
-                    new Claim("username", roleAssignment.UserId),
-                    new Claim(ClaimTypes.Role, roleAssignment.Type.ToString()),
+                    new Claim("username", user.UserId),
+                    new Claim(ClaimTypes.Role, user.Type.ToString()),
                 ],
                 expires: DateTime.UtcNow.AddMinutes(15),
                 issuer: "youji",

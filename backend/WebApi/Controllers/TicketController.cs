@@ -224,7 +224,7 @@ namespace Application.WebApi.Controllers
 
             await commentRepo.AddAsync(comment);
 
-            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket);
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [commentData.Author]);
             var mailAddresses = userRepository.GetMany(mailRecipientIds)
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
                 .Select(u => new MailboxAddress(u.UserId, u.Email));
@@ -276,7 +276,8 @@ namespace Application.WebApi.Controllers
 
             await attachmentRepo.AddAsync(attachment);
 
-            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket);
+            string performingUser = this.User.FindFirstValue("username") ?? string.Empty;
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [performingUser]);
             var mailAddresses = userRepository.GetMany(mailRecipientIds)
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
                 .Select(u => new MailboxAddress(u.UserId, u.Email));
@@ -345,7 +346,7 @@ namespace Application.WebApi.Controllers
 
             await ticketRepo.UpdateAsync(ticket);
 
-            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket);
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);
             var mailAddresses = userRepository.GetMany(mailRecipientIds)
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
                 .Select(u => new MailboxAddress(u.UserId, u.Email));

@@ -1,12 +1,9 @@
 <template>
   <div
-    class="max-h-[100vh] px-6 py-3 md:w-[40%] lg:w-[30%] xl:w-[20%] 2xl:w-[15%] w-fit base-bg-light dark:base-bg-dark hidden md:block lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
-  >
-    <Logo/>
-    <el-menu
-      default-active="2"
-      class="el-menu-vertical-demo pt-5"
-    >
+    id="navbar"
+    class="max-h-[100vh] px-6 py-3 md:w-[40%] lg:w-[30%] xl:w-[20%] 2xl:w-[15%] w-fit base-bg-light dark:base-bg-dark hidden md:block lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height">
+    <Logo />
+    <el-menu default-active="2" class="el-menu-vertical-demo pt-5">
       <div>
         <el-menu-item index="2">
           <el-icon>
@@ -60,6 +57,7 @@ import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
   min-height: 0;
   height: calc(100vh - 72px);
 }
+
 .menu-item {
   width: 100%;
   height: fit-content;

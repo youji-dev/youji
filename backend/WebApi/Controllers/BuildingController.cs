@@ -56,7 +56,7 @@ namespace Application.WebApi.Controllers
         /// Updates the specific building.
         /// </summary>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/></param>
-        /// <param name="building">The <see cref="Building"/> that will updated.</param>
+        /// <param name="buildingData">The <see cref="Building"/> that will updated.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated building.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -64,13 +64,17 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Building>> Put(
             [FromServices] BuildingRepository buildingRepo,
-            [FromBody] Building building)
+            [FromBody] Building buildingData)
         {
-            if (await buildingRepo.GetAsync(building.Id) is null)
-                return this.NotFound($"A building with the id '{building.Id}' doesn´t exist.");
+            var building = await buildingRepo.GetAsync(buildingData.Id);
+
+            if (building is null)
+                return this.NotFound($"A building with the id '{buildingData.Id}' doesn´t exist.");
+
+            building.Name = buildingData.Name;
 
             await buildingRepo.UpdateAsync(building);
-            return this.Ok(building);
+            return this.Ok(buildingData);
         }
 
         /// <summary>

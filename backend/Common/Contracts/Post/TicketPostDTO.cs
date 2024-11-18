@@ -18,7 +18,7 @@
         /// <summary>
         /// The priority of the ticket
         /// </summary>
-        public required int PriorityValue { get; set; }
+        public required Guid PriorityId { get; set; }
 
         /// <summary>
         /// The state of the ticket.

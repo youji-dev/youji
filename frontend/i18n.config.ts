@@ -129,7 +129,7 @@ export default defineI18nConfig(() => ({
       priority: "Priorität",
       room: "Raum",
       building: "Gebäude",
-      object: "Das vom schaden betroffene Objekt",
+      object: "Das vom Schaden betroffene Objekt",
       createdBy: "Erstellt von",
       createdOn: "Erstellt am",
       files: "Dateien",

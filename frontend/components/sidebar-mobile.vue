@@ -22,7 +22,7 @@
       <template #body style="overflow-y: hidden"></template>
       <el-menu :default-active="getPageIndex()" class="el-menu-vertical-demo pt-5" style="height: calc(100vh - 180px)">
         <div>
-          <el-menu-item index="2" @click="router.push(localeRoute('/tickets')?.fullPath as string)">
+          <el-menu-item index="1" @click="router.push(localeRoute('/tickets')?.fullPath as string)">
             <el-icon>
               <Files />
             </el-icon>
@@ -31,7 +31,7 @@
             </el-badge>
           </el-menu-item>
 
-          <el-menu-item index="1" class="menu-item" @click="router.push(localeRoute('/tickets/new')?.fullPath as string)">
+          <el-menu-item index="2" class="menu-item" @click="router.push(localeRoute('/tickets/new')?.fullPath as string)">
             <el-icon>
               <Plus />
             </el-icon>

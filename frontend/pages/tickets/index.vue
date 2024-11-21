@@ -12,7 +12,7 @@
           class="w-full"
           :placeholder="$t('searchVerb')"
           :prefix-icon="Search"
-          @change="fetchTicketsFromStart()"
+          @change="fetchTicketsFromStart(true)"
         />
       </div>
     </div>
@@ -43,11 +43,11 @@
           width="150"
           sortable
         />
-        <el-table-column prop="title" :label="$t('title')" width="250" sortable />
+        <el-table-column prop="title" :label="$t('title')" width="250" show-overflow-tooltip sortable />
         <el-table-column
-          prop="state.name"
+          prop="state.name" 
           :label="$t('status')"
-          :filters="[]"
+          :filters="statusOptions.map((opt : state) => {return {text: opt.name, value: opt.id}})"
           :filter-method="filterTag"
           filter-placement="bottom-end"
           width="200"
@@ -96,7 +96,7 @@
           width="200"
           sortable
         />
-        <el-table-column fixed="right"  min-width="120">
+        <el-table-column fixed="right" min-width="120">
           <template #default="scope">
             <el-button
               link

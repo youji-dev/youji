@@ -1,16 +1,19 @@
 <template>
     <select v-if="changeCallback" v-model="current" class="colored-select"
-        :style="{ border: 'solid 0.5px ' + color, 'background-color': convertHexToRGBA(color, 0.35) }"
+        :style="{ border: 'solid 0.5px ' + color, 'background-color': convertHexToRGBA(color, 0.35), color: contrastColor({bgColor: color})}"
         @change="changeCallback(changeCallBackParams, addCurrentValueToCallback ? current : null)">
-        <option v-for="option in options" :value="option" :key="keyText ? option[keyText] : option" :label="labelText ? option[labelText] : option">{{ labelText ? option[labelText] : option }}</option>
+        <option v-for="option in options" :style="{color: contrastColor({bgColor: color}) }" :value="option" :key="keyText ? option[keyText] : option" :label="labelText ? option[labelText] : option">{{ labelText ? option[labelText] : option }}</option>
     </select>
     <select v-else v-model="current"
-        :style="{ border: 'solid 1px ' + color, 'background-color': convertHexToRGBA(color, 0.35) }" class="colored-select">
-        <option v-for="option in options" :value="keyText ? option[keyText] : option" :key="keyText ? option[keyText] : option" :label="labelText ? option[labelText] : option">{{ labelText ? option[labelText] : option }}</option>
+        :style="{ border: 'solid 1px ' + color, 'background-color': convertHexToRGBA(color, 0.35), color: contrastColor({bgColor: color}) }" class="colored-select">
+        <option v-for="option in options" :style="{color: contrastColor({bgColor: color})}" :value="keyText ? option[keyText] : option" :key="keyText ? option[keyText] : option" :label="labelText ? option[labelText] : option">{{ labelText ? option[labelText] : option }}</option>
     </select>
 </template>
 
 <script lang="ts" setup>
+import { contrastColor } from 'contrast-color';
+
+// const colorMode = useColorMode();
 
 const props = defineProps({
     color: {
@@ -22,7 +25,7 @@ const props = defineProps({
         required: true
     },
     current: {
-        type: String,
+        type: null,
         required: true
     },
     keyText: {
@@ -49,7 +52,6 @@ const props = defineProps({
 const { color, options, current, changeCallback, changeCallBackParams, addCurrentValueToCallback = false, keyText, labelText } = props;
 
 const convertHexToRGBA = (hexCode : string, opacity = 1) => {  
-    console.log(color);
     let hex = hexCode.replace('#', '');
     
     if (hex.length === 3) {

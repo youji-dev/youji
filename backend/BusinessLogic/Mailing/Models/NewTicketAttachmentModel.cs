@@ -24,7 +24,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         {
             return new NewTicketAttachmentModel()
             {
-                MailTitle = $"Neue Anhang an '{attachment.Ticket.Title}'",
+                MailTitle = $"Neuer Anhang an '{attachment.Ticket?.Title ?? "unbekannt"}'",
                 Name = attachment.Name,
             };
         }

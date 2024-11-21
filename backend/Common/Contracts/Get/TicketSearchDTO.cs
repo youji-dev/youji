@@ -1,3 +1,5 @@
+using PersistenceLayer.DataAccess.Entities;
+
 namespace Common.Contracts.Get
 {
     /// <summary>
@@ -13,6 +15,6 @@ namespace Common.Contracts.Get
         /// <summary>
         /// The results.
         /// </summary>
-        public required Array Results { get; set; }
+        public required Ticket[] Results { get; set; }
     }
 }

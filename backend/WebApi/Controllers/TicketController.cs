@@ -7,6 +7,7 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
+using Common.Contracts.Get;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,7 +37,7 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term.
+        /// Gets a ticket filtert by a specific search term and the max amount of results used for pagination.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
@@ -87,10 +88,10 @@ namespace Application.WebApi.Controllers
             tickets = [.. ticketQuery];
 
             return this.Ok(
-                new
+                new TicketSearchDTO()
                 {
-                    results = tickets,
-                    total = totalCount,
+                    Total = totalCount,
+                    Results = tickets,
                 });
         }
 

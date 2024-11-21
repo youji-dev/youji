@@ -19,5 +19,9 @@
 		</AdditionalFiles>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\DataAccessLayer\PersistenceLayer.DataAccess.csproj" />
+	</ItemGroup>
+
 
 </Project>

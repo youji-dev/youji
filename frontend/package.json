@@ -6,7 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "dev:host": "nuxt dev --hostname '10.0.2.15' --host",
+    "dev:host": "nuxt dev --hostname '172.16.221.51' --host",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare"
   },

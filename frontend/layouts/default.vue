@@ -1,5 +1,7 @@
 <template>
-  <div class="page-bg-light dark:page-bg-dark w-full min-h-[100vh] max-h-full flex overflow-x-hidden overflow-y-scroll">
+  <div
+    class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll"
+  >
     <div class="fixed right-5 bottom-5 z-50">
       <Theme />
       <Language />
@@ -18,6 +20,11 @@ import Theme from "~/components/theme.vue";
 </script>
 
 <style>
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

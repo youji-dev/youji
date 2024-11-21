@@ -75,6 +75,10 @@ export default defineI18nConfig(() => ({
       commentPostSuccess: "Comment posted successfully",
       commentDeleteSuccess: "Comment deleted successfully",
       pdfExportNotOnUnsaved: "New Tickets must be saved first before exporting as PDF",
+      detail: "Detail",
+      status: "Status",
+      createDate: "Creation Date",
+      updated: "Updated",
     },
     de: {
       welcome: "Willkommen",
@@ -149,6 +153,10 @@ export default defineI18nConfig(() => ({
       commentPostSuccess: "Kommentar erfolgreich gesendet",
       commentDeleteSuccess: "Kommentar erfolgreich gelöscht",
       pdfExportNotOnUnsaved: "Neue Tickets müssen vor dem Export als PDF erstmalig gespeichert sein",
+      detail: "Detail",
+      status: "Status",
+      createDate: "Erstellt am",
+      updated: "Aktualisiert",
     },
   },
 }));

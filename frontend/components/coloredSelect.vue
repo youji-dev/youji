@@ -1,12 +1,12 @@
 <template>
     <select v-if="changeCallback" v-model="current" class="colored-select"
-        :style="{ border: 'solid 1px ' + color, 'background-color': hexToRgbAHalfOpacity(color) }"
-        @change="changeCallback(changeCallBackParams)">
-        <option v-for="option in options" :value="option" :key="option" :label="option">{{ option }}</option>
+        :style="{ border: 'solid 0.5px ' + color, 'background-color': convertHexToRGBA(color, 0.35) }"
+        @change="changeCallback(changeCallBackParams, addCurrentValueToCallback ? current : null)">
+        <option v-for="option in options" :value="option" :key="keyText ? option[keyText] : option" :label="labelText ? option[labelText] : option">{{ labelText ? option[labelText] : option }}</option>
     </select>
     <select v-else v-model="current"
-        :style="{ border: 'solid 1px ' + color, 'background-color': hexToRgbAHalfOpacity(color) }" class="colored-select">
-        <option v-for="option in options" :value="option" :key="option" :label="option">{{ option }}</option>
+        :style="{ border: 'solid 1px ' + color, 'background-color': convertHexToRGBA(color, 0.35) }" class="colored-select">
+        <option v-for="option in options" :value="keyText ? option[keyText] : option" :key="keyText ? option[keyText] : option" :label="labelText ? option[labelText] : option">{{ labelText ? option[labelText] : option }}</option>
     </select>
 </template>
 
@@ -25,6 +25,14 @@ const props = defineProps({
         type: String,
         required: true
     },
+    keyText: {
+        type: String,
+        required: false
+    },
+    labelText: {
+        type: String,
+        required: false
+    },
     changeCallback: {
         type: Function,
         required: false
@@ -32,27 +40,37 @@ const props = defineProps({
     changeCallBackParams: {
         type: Array<any>,
         required: false
+    },
+    addCurrentValueToCallback: {
+        type: Boolean,
+        required: false
     }
 });
-const { color, options, current, changeCallback, changeCallBackParams } = props;
+const { color, options, current, changeCallback, changeCallBackParams, addCurrentValueToCallback = false, keyText, labelText } = props;
 
-function hexToRgbAHalfOpacity(hex: string) {
-    let c: any;
-    console.log(hex)
-    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
-        c = hex.substring(1).split('');
-        if (c.length == 3) {
-            c = [c[0], c[0], c[1], c[1], c[2], c[2]];
-        }
-        c = '0x' + c.join('');
-        return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',0.5)';
+const convertHexToRGBA = (hexCode : string, opacity = 1) => {  
+    console.log(color);
+    let hex = hexCode.replace('#', '');
+    
+    if (hex.length === 3) {
+        hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+    }    
+    
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    /* Backward compatibility for whole number based opacity values. */
+    if (opacity > 1 && opacity <= 100) {
+        opacity = opacity / 100;   
     }
-    throw new Error('Bad Hex');
-}
+
+    return `rgba(${r},${g},${b},${opacity})`;
+};
 </script>
 
 <style>
 .colored-select {
-    @apply px-4 py-2
+    @apply px-2 py-[0.15rem] rounded-md
 }
 </style>

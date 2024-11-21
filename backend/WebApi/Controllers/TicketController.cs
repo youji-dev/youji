@@ -72,6 +72,8 @@ namespace Application.WebApi.Controllers
                     || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
             }
 
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
             ticketQuery =
             orderDesc
             ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
@@ -82,9 +84,14 @@ namespace Application.WebApi.Controllers
                 ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
             }
 
-            Ticket[] tickets = [.. ticketQuery];
+            tickets = [.. ticketQuery];
 
-            return this.Ok(tickets);
+            return this.Ok(
+                new
+                {
+                    results = tickets,
+                    total = totalCount,
+                });
         }
 
         /// <summary>

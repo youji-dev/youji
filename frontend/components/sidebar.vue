@@ -27,7 +27,7 @@
       </div>
       <div>
         <el-divider></el-divider>
-        <el-menu-item class="menu-item"  @click="logUserOut()">
+        <el-menu-item class="menu-item"  @click="router.push(localeRoute('/logout')?.fullPath as string)">
           <el-icon class="-rotate-90" color="#EF4444">
             <Upload />
           </el-icon>
@@ -49,7 +49,6 @@ import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
 const localeRoute = useLocaleRoute();
 const route = useRoute();
 const routeObject = reactive({ route });
-const {logUserOut} = useAuthStore();
 const { locale } = useI18n();
 const router = useRouter();
 

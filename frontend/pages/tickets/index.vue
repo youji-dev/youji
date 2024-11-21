@@ -1,56 +1,123 @@
 <template>
-  <div class="w-full h-[100vh] p-6 mt-8 lg:mt-0" style="height: calc(100vh - 72px)" :style="{ width: width }"
-    :onresize="determineViewWidth()">
-    <div class="flex flex-row items-center justify-between w-full py-2">
-      <PageHeader :text="$t('ticketOverview')"/>
-      <div class="w-1/2 md:lg-1/6">
-        <el-input v-model="search" style="width: 100%" :placeholder="$t('searchVerb')" :prefix-icon="Search" />
+  <div
+    class="w-full h-full py-6 lg:py-0 px-6 mt-6 lg:mt-0"
+    style="height: calc(100vh - 72px)"
+    :style="{ width: width }"
+    :onresize="determineViewWidth()"
+  >
+    <div class="flex flex-row items-center justify-end w-full py-2">
+      <div class="w-1/2 md:w-1/3 lg:w-1/5">
+        <el-input
+          v-model="search"
+          class="w-full"
+          :placeholder="$t('searchVerb')"
+          :prefix-icon="Search"
+          @change="fetchTicketsFromStart()"
+        />
       </div>
     </div>
     <div
-      class="w-full h-[100%] overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md"
-      id="table_container">
+      class="w-full h-full overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md"
+      id="table_container"
+    >
       <div v-if="loading" class="w-full h-full p-10">
-        <el-skeleton :rows="23" animated />
+        <el-skeleton :rows="18" animated />
+      </div>
+      <div v-if="pageLoading" class="w-full h-full p-10 flex justify-center items-center">
+        <ElIconLoading class="animate-spin w-5"></ElIconLoading>
       </div>
       <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possbile sorting arrows are clicked, the data has to be fetched again completely.
        The page should stay the same. -->
-      <el-table v-if="!loading" :data="filterTableData" :height="tableDimensions['height']"
-        style="width: 100%; height: 100%" class="overflow-x-scroll"
-        :default-sort="{ prop: 'create_date', order: 'descending' }">
-          <el-table-column prop="id" :label="$t('id')" width="100" sortable />
-        <el-table-column class="hidden lg:block" prop="name" :label="$t('username')" width="150" sortable />
-        <el-table-column prop="title.title" :label="$t('title')" width="250" sortable />
-        <el-table-column prop="status.text" :label="$t('status')" :filters="parsedStatusOptions"
-          :filter-method="filterTag" filter-placement="bottom-end" width="300" sortable>
+      <el-table
+        v-if="!loading && !pageLoading"
+        :data="parsedTickets"
+        :height="tableDimensions['height']"
+        style="width: 100%; height: min-content"
+        class="overflow-x-scroll"
+        :default-sort="{ prop: 'create_date', order: 'descending' }"
+      >
+        <el-table-column
+          class="hidden lg:block"
+          prop="author"
+          :label="$t('username')"
+          width="150"
+          sortable
+        />
+        <el-table-column prop="title" :label="$t('title')" width="250" sortable />
+        <el-table-column
+          prop="state.name"
+          :label="$t('status')"
+          :filters="[]"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+          width="200"
+          sortable
+        > 
           <template #default="scope">
             <div class="flex justify-start items-center">
-              <ColoredSelect :color="scope.row.color" :change-callback="updateTicketStatus" :change-call-back-params="[scope.row.id, scope.row.status]" :current="scope.row.status" :options="statusOptions.map(option => {return option.text})"></ColoredSelect>
-              <!-- <el-select class="w-2/3 mx-1 rounded-md"  v-model="scope.row.status" value-key="text"
-                @change="updateTicketStatus(scope.row.id, scope.row.status)">
-                <el-option v-for="option in statusOptions" :key="option.text" :label="option.text"
-                  :value="option"></el-option>
-              </el-select> -->
-              <!-- <el-tag class="w-1/3 mx-1 hidden lg:flex" :type="scope.row.status.color" disable-transitions>
-                {{ scope.row.status.text }}
-              </el-tag> -->
+              <ColoredSelect
+                :color="scope.row.state.color"
+                :change-callback="updateTicketStatus"
+                :change-call-back-params="[scope.row.id]"
+                :add-current-value-to-callback="true"
+                :current="scope.row.state"
+                :options="statusOptions"
+                :keyText="'id'"
+                :labelText="'name'"
+              ></ColoredSelect>
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="building" class="hidden lg:block" :label="$t('building')" width="150" sortable />
-        <el-table-column prop="room" class="hidden lg:block" :label="$t('room')" width="100" sortable />
-        <el-table-column prop="priority" class="hidden lg:block" :label="$t('priority')" width="100" sortable />
-        <el-table-column class="hidden lg:block" prop="create_date" :label="$t('createDate')" width="200" sortable />
-        <el-table-column fixed="right" label="Operations" min-width="120">
+        <el-table-column
+          prop="building.name"
+          class="hidden lg:block"
+          :label="$t('building')"
+          width="150"
+          sortable
+        />
+        <el-table-column
+          prop="room"
+          class="hidden lg:block"
+          :label="$t('room')"
+          width="100"
+          sortable
+        />
+        <el-table-column
+          prop="priority.name"
+          class="hidden lg:block"
+          :label="$t('priority')"
+          width="120"
+          sortable
+        />
+        <el-table-column
+          class="hidden lg:block"
+          prop="creationDate"
+          :label="$t('createDate')"
+          width="200"
+          sortable
+        />
+        <el-table-column fixed="right"  min-width="120">
           <template #default="scope">
-            <el-button link type="primary" size="small"
-              @click="router.push(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)">
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="router.push(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)"
+            >
               {{ $t("detail") }}
+              <ElIconEdit class="w-5 mx-2"></ElIconEdit>
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      <el-pagination class="mr-auto" v-if="!loading" layout="prev, pager, next" :total="1000" @current-change="fetchTickets"/>
+      <el-pagination
+        class="mr-auto"
+        v-if="!loading"
+        layout="prev, pager, next"
+        :total="totalCount"
+        :page-size="25"
+        @current-change="fetchNewPage"
+      />
     </div>
   </div>
 </template>
@@ -59,17 +126,16 @@
 import { Search } from "@element-plus/icons-vue";
 import { ref } from "vue";
 const search = ref("");
-import { ElTag } from "element-plus";
-import type { Status } from "~/stores/tickets";
 import ColoredSelect from "~/components/coloredSelect.vue";
-import { ElRow } from "#build/components";
-const { statusOptions } = storeToRefs(useTicketsStore());
-const parsedStatusOptions = ref([]) as Ref<Array<any>>;
-const { fetchStatusOptions } = useTicketsStore();
+import type state from "~/types/api/response/stateResponse";
+const { statusOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
+const { fetchStatusOptions, fetchTickets } = useTicketsStore();
 const loading = ref(true);
+const pageLoading = ref(false);
 const localeRoute = useLocaleRoute();
 const router = useRouter();
 const i18n = useI18n();
+const width = ref("100vw");
 interface Ticket {
   id: number;
   name: string;
@@ -86,12 +152,24 @@ const tableDimensions = ref({
   height: 0,
 });
 
-const width = ref("100vw");
+onMounted(async () => {
+  getTableDimensions();
+});
 
-onNuxtReady(() => {
+onNuxtReady(async () => {
+  await fetchStatusOptions();
+  await fetchTicketsFromStart(false);
   determineViewWidth();
   window.addEventListener("resize", determineViewWidth);
 });
+
+async function fetchTicketsFromStart(fromSearch : boolean) {
+  pageLoading.value = fromSearch;
+  loading.value = !fromSearch;
+  await fetchTickets(search.value, 0, 25);
+  pageLoading.value = false;
+  loading.value = false;
+}
 
 function determineViewWidth() {
   if (typeof document === "undefined") return;
@@ -104,50 +182,29 @@ function determineViewWidth() {
   return;
 }
 
-function fetchTickets(page: number) {
-  const skip = page * 20; // Assumes page size is always 20, if configurable this has to be changed
-  data.value = Array.from({ length: 20 }).map(dataGenerator);
-}
-
-let id = 0;
-const dataGenerator = () => ({
-  id: ++id,
-  name: "Tom",
-  title: { title: "Test Ticket", id: id },
-  status: {
-    text: id % 2 === 0 ? "Neu" : "Abgeschlossen",
-    color: id % 2 === 0 ? "#e01d41" : "#ffc43b",
-  },
-  building: "Hauptgebäude",
-  room: "222",
-  priority: "3",
-  create_date: id % 2 === 0 ? "20.09.2024" : "21.09.2024",
-});
-
-const data = ref([] as Array<Ticket>);
-onMounted(async () => {
-  data.value = Array.from({ length: 20 }).map(dataGenerator);
-  getTableDimensions();
-  await fetchStatusOptions();
-  parseStatusOptions();
-  loading.value = false;
-});
 const filterTag = (value: string, row: Ticket) => {
   return row.status.text === value;
 };
-const filterTableData = computed(() =>
-  data.value.filter(
-    (data) =>
-      !search.value ||
-      data.name.toLowerCase().includes(search.value.toLowerCase()) ||
-      data.building.toLowerCase().includes(search.value.toLowerCase()) ||
-      data.room.toLowerCase().includes(search.value.toLowerCase()) ||
-      data.id.toString().includes(search.value.toLowerCase()) ||
-      data.priority.toLowerCase().includes(search.value.toLowerCase()) ||
-      data.title.title.toLowerCase().includes(search.value.toLowerCase()) ||
-      data.status.text.toLowerCase().includes(search.value.toLowerCase())
-  )
-);
+
+const parsedTickets = computed(() => {
+  return tickets.value.map((ticket) => {
+    return {
+      id: ticket.id,
+      title: ticket.title,
+      description: ticket.description,
+      author: ticket.author,
+      creationDate: new Date(ticket.creationDate).toLocaleString(),
+      priority: ticket.priority,
+      state: ticket.state,
+      building: ticket.building,
+      room: ticket.room,
+      object: ticket.object,
+      comments: ticket.comments,
+      attachments: ticket.attachments
+    }
+  }
+)});
+
 function getTableDimensions() {
   const element = document.getElementById("table_container");
   if (element) {
@@ -160,23 +217,21 @@ function getTableDimensions() {
   }
 }
 
-function parseStatusOptions() {
-  statusOptions.value.forEach((element) => {
-    parsedStatusOptions.value.push({
-      text: element.text,
-      value: element.text,
-    });
-  });
-}
-
-function updateTicketStatus(ticket_id: number, new_status: Status) {
-  // Update actual Ticket Status in backend
+function updateTicketStatus(ticket_id: number, new_status: state) {
   ElMessage({
     message: i18n.t("updated"),
     type: "success",
   });
   return;
 }
+
+async function fetchNewPage(page: number) {
+  pageLoading.value = true;
+  await fetchTickets(search.value, page * 25, 25);
+  pageLoading.value = false;
+}
+
+
 </script>
 
 <style></style>

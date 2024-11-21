@@ -38,7 +38,6 @@ namespace Application.WebApi.Controllers
             return this.File(attachment.Binary, mimetype, attachment.Name);
         }
 
-
         /// <summary>
         /// Deletes the attachment with the specific id.
         /// </summary>

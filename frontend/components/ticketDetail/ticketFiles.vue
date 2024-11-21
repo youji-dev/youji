@@ -1,7 +1,15 @@
 <template>
   <el-card :v-loading="loading" class="drop-shadow-xl base-bg-light dark:base-bg-dark lg:min-h-[13.9rem]">
     <el-text class="text-xl">{{ $t("files") }}</el-text>
-    <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
+    <el-upload
+      v-model:file-list="ticket.attachments"
+      list-type="picture-card"
+      :action="getUploadUrl()"
+      :headers="getUploadRequestHeaders()"
+      name="attachmentFile"
+      :on-error="onUploadError"
+      :on-success="onUploadSuccess"
+    >
       <template #file="{ file }">
         <UnLazyImage v-if="file.blurHash" class="object-cover aspect-square w-full" :src="$api.attachment.generateAttachmentURL(file.id)" :blurhash="file.blurHash" :lazy-load="true" />
 
@@ -37,18 +45,48 @@
 
 <script lang="ts" setup>
 import type ticket from "~/types/api/response/ticketResponse";
-import { Upload, ZoomIn, Download, Delete } from "@element-plus/icons-vue";
+import { Upload, ZoomIn, Download, Delete, Ticket, Files } from "@element-plus/icons-vue";
 import FileIcons from "file-icons-vue";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
+import type { UploadFile } from "element-plus";
+
+const props = defineProps<{
+  ticket: ticket;
+}>();
 
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 
 const { setImagePreviewDisplay, setImagePreviewSrc } = useImagePreviewDisplayStore();
 
-const props = defineProps<{
-  ticket: ticket;
-}>();
+const {
+  public: { BACKEND_URL, ACCESS_TOKEN_NAME },
+} = useRuntimeConfig();
+
+function getUploadRequestHeaders(): Record<string, any> {
+  const token = useCookie(ACCESS_TOKEN_NAME, { secure: true, sameSite: "strict" }).value;
+
+  return {
+    Authorization: `Bearer ${token}`,
+  };
+}
+
+async function onUploadSuccess(response: any, uploadFile: UploadFile) {
+  props.ticket.attachments.pop();
+  props.ticket.attachments = [...props.ticket.attachments, response];
+}
+
+function onUploadError(error: Error, file: UploadFile) {
+  ElNotification({
+    title: `${i18n.t("attachmentUploadError")}: ${file.name}`,
+    message: error.message,
+    type: "error",
+  });
+}
+
+function getUploadUrl(): string {
+  return `${BACKEND_URL}/api/Ticket/${props.ticket.id}/attachment`;
+}
 
 let loading = ref(false);
 
@@ -89,26 +127,7 @@ async function deleteFile(file: ticketAttachment) {
       }
     }
 
-    var attachmentFetchResult = await $api.ticket.getAttachments(props.ticket.id);
-
-    if (attachmentFetchResult.error.value) {
-      if (attachmentFetchResult.error.value.statusCode === 403) {
-        throw new Error(i18n.t("forbidden"));
-      }
-      if (attachmentFetchResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (attachmentFetchResult.error.value.message) {
-        throw new Error(attachmentFetchResult.error.value.message);
-      }
-      if (attachmentFetchResult.error.value.data) {
-        throw new Error(attachmentFetchResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    }
-
-    props.ticket.attachments = attachmentFetchResult.data.value ?? [];
+    props.ticket.attachments = props.ticket.attachments.filter(attachment => attachment.id !== file.id);
   } catch (error) {
     ElNotification({
       title: i18n.t("error"),

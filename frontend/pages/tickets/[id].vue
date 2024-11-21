@@ -50,6 +50,9 @@
       </div>
     </div>
   </div>
+  <el-dialog v-model="imagePreviewDisplay">
+    <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
+  </el-dialog>
 </template>
 
 <script lang="ts" setup async>
@@ -72,6 +75,8 @@ import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 const localePath = useLocaleRoute();
+
+const { imagePreviewDisplay, imagePreviewSrc } = storeToRefs(useImagePreviewDisplayStore());
 
 const router = useRouter();
 const route = useRoute();

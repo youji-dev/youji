@@ -3,8 +3,7 @@
     <el-text class="text-xl">{{ $t("files") }}</el-text>
     <el-upload v-model:file-list="ticket.attachments" list-type="picture-card">
       <template #file="{ file }">
-        <UnLazyImage v-if="file.blurHash" class="object-cover aspect-square w-full"
-          :src="$api.attachment.generateAttachmentURL(file.id)" :blurhash="file.blurHash" :lazy-load="true" />
+        <UnLazyImage v-if="file.blurHash" class="object-cover aspect-square w-full" :src="$api.attachment.generateAttachmentURL(file.id)" :blurhash="file.blurHash" :lazy-load="true" />
 
         <div v-else class="justify-center align-center text-center w-full h-full flex flex-col">
           <FileIcons class="self-center" :width="30" :height="30" :name="file.name" />
@@ -34,9 +33,6 @@
       </el-icon>
     </el-upload>
   </el-card>
-  <el-dialog v-model="dialogVisible">
-    <img w-full :src="dialogImageUrl" alt="Preview Image" class="w-full" />
-  </el-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -48,25 +44,24 @@ import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 
+const { setImagePreviewDisplay, setImagePreviewSrc } = useImagePreviewDisplayStore();
+
 const props = defineProps<{
   ticket: ticket;
 }>();
 
-let dialogVisible = ref(false);
-let dialogImageUrl = ref("");
 let loading = ref(false);
 
-
 function openPreview(file: ticketAttachment) {
-  dialogImageUrl.value = $api.attachment.generateAttachmentURL(file.id);
-  dialogVisible.value = true;
+  setImagePreviewSrc($api.attachment.generateAttachmentURL(file.id));
+  setImagePreviewDisplay(true);
 }
 
 function downloadFile(file: ticketAttachment) {
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = $api.attachment.generateAttachmentURL(file.id);
-  link.setAttribute('download', file.name);
-  link.style.display = 'none';
+  link.setAttribute("download", file.name);
+  link.style.display = "none";
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -94,7 +89,7 @@ async function deleteFile(file: ticketAttachment) {
       }
     }
 
-    var attachmentFetchResult = await $api.ticket.getAttachments(props.ticket.id)
+    var attachmentFetchResult = await $api.ticket.getAttachments(props.ticket.id);
 
     if (attachmentFetchResult.error.value) {
       if (attachmentFetchResult.error.value.statusCode === 403) {
@@ -121,10 +116,8 @@ async function deleteFile(file: ticketAttachment) {
       type: "error",
       duration: 5000,
     });
-  }
-  finally {
+  } finally {
     loading.value = false;
   }
-
 }
 </script>

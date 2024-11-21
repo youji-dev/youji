@@ -94,26 +94,7 @@ async function deleteFile(file: ticketAttachment) {
       }
     }
 
-    var attachmentFetchResult = await $api.ticket.getAttachments(props.ticket.id)
-
-    if (attachmentFetchResult.error.value) {
-      if (attachmentFetchResult.error.value.statusCode === 403) {
-        throw new Error(i18n.t("forbidden"));
-      }
-      if (attachmentFetchResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (attachmentFetchResult.error.value.message) {
-        throw new Error(attachmentFetchResult.error.value.message);
-      }
-      if (attachmentFetchResult.error.value.data) {
-        throw new Error(attachmentFetchResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    }
-
-    props.ticket.attachments = attachmentFetchResult.data.value ?? [];
+    props.ticket.attachments = props.ticket.attachments.filter((attachment) => attachment.id !== file.id);
   } catch (error) {
     ElNotification({
       title: i18n.t("error"),

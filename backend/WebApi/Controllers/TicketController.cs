@@ -202,9 +202,10 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="commentData">The comment data that will be added.</param>
+        /// <param name="commentContent">The comment content that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
+        [Consumes("text/plain")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
@@ -212,7 +213,7 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] Guid ticketId,
-            [FromBody] CommentPostDTO commentData)
+            [FromBody] string commentContent)
         {
             Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
@@ -228,7 +229,7 @@ namespace Application.WebApi.Controllers
             {
                 Id = default,
                 Author = author,
-                Content = commentData.Content,
+                Content = commentContent,
                 CreationDate = DateTime.UtcNow,
                 TicketId = ticketId,
             };

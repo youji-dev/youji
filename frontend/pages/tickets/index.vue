@@ -66,7 +66,7 @@
             <div class="flex justify-start items-center">
               <ColoredSelect
                 :change-callback="updateTicketStatus"
-                :change-call-back-params="[scope.row.id, scope.row.state]"
+                :change-call-back-params="[scope.row.id]"
                 :add-current-value-to-callback="true"
                 :current="
                   new ColoredSelectOption(
@@ -238,19 +238,12 @@ function getTableDimensions() {
   }
 }
 
-function updateTicketStatus(
-  ticket_id: string,
-  new_status: state,
-  prev_state: state
-) {
-  console.log("ticketid", ticket_id);
+function updateTicketStatus(ticket_id: string, new_status: state) {
   let ticket: ticket[] = tickets.value.filter(
     (ticket) => ticket.id === ticket_id
   );
-  console.log(ticket);
   if (!!ticket[0]) {
     let foundTicket: ticket = ticket[0];
-    foundTicket.state = new_status;
     $api.ticket
       .edit({
         id: foundTicket.id,
@@ -274,10 +267,18 @@ function updateTicketStatus(
               cancelable: true,
             })
           );
-          ElMessage({
-            message: i18n.t("savingFailed"),
-            type: "error",
-          });
+          if (resp.error.value.statusCode === 403) {
+            ElMessage({
+              message: i18n.t("forbidden"),
+              type: "error",
+            });
+          } else {
+            ElMessage({
+              message: i18n.t("savingFailed"),
+              type: "error",
+            });
+          }
+
           return;
         }
         ElMessage({
@@ -301,7 +302,6 @@ function updateTicketStatus(
         });
       });
   }
-
   return;
 }
 

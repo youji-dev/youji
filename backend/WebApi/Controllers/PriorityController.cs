@@ -67,18 +67,15 @@ namespace Application.WebApi.Controllers
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Priority>> Put(
             [FromServices] PriorityRepository priorityRepo,
-            [FromBody] PriorityPutDTO priorityData)
+            [FromBody] Priority priorityData)
         {
             var priority = await priorityRepo.GetAsync(priorityData.Id);
+
             if (priority is null)
                 return this.NotFound($"A priority with the id '{priorityData.Id}' doesn´t exist.");
 
-            priority = new Priority()
-            {
-                Id = priorityData.Id,
-                Name = priorityData.Name ?? priority.Name,
-                Value = priorityData.Value ?? priority.Value,
-            };
+            priority.Name = priorityData.Name;
+            priority.Value = priorityData.Value;
 
             await priorityRepo.UpdateAsync(priority);
 
@@ -91,7 +88,7 @@ namespace Application.WebApi.Controllers
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
         /// <param name="priorityId">The specific id of the priority that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete("{priorityValue}")]
+        [HttpDelete("{priorityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]

@@ -1,12 +1,14 @@
 <template>
   <el-card v-loading="loading" class="drop-shadow-xl base-bg-light dark:base-bg-dark lg:min-h-[13.9rem]">
     <el-input v-model="newComment" type="textarea" resize="vertical" :rows="3" :placeholder="$t('newComment')" />
-    <el-button class="mt-2 float-end" type="primary" size="small" @click="sendComment()">{{ $t("sendComment") }}</el-button>
+    <el-button class="mt-2 float-end" type="primary" size="small" @click="sendComment()">{{ $t("sendComment")
+      }}</el-button>
 
     <el-divider class="mt-10 mb-3" />
 
     <el-timeline>
-      <el-timeline-item v-for="comment in sortedComments" class="drop-shadow-xl" :timestamp="new Date(comment.creationDate).toLocaleString()" :key="comment.id" placement="top">
+      <el-timeline-item v-for="comment in sortedComments" class="drop-shadow-xl"
+        :timestamp="new Date(comment.creationDate).toLocaleString()" :key="comment.id" placement="top">
         <TicketComment :comment="comment" :ticket="ticketModel" />
       </el-timeline-item>
     </el-timeline>
@@ -42,7 +44,7 @@ async function sendComment() {
     }
 
     loading.value = true;
-    let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value, author: "someone" });
+    let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value });
 
     if (commentPostResult.error.value) {
       loading.value = false;

@@ -28,12 +28,18 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with specific <see cref="Ticket"/>.</returns>
         [HttpGet("{ticketId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
         public async Task<ActionResult<Ticket>> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
         {
-            return this.Ok(await ticketRepo.GetAsync(ticketId));
+            var ticket = await ticketRepo.GetAsync(ticketId);
+
+            if (ticket is null)
+                return this.NotFound($"Ticket with id '{ticketId}' doesn't exist!");
+
+            return this.Ok(ticket);
         }
 
         /// <summary>
@@ -69,8 +75,7 @@ namespace Application.WebApi.Controllers
                     || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm)
-                    || ticket.CreationDate.ToString().ToLower().Contains(searchTerm));
+                    || ticket.Author.ToLower().Contains(searchTerm));
             }
 
             Ticket[] tickets = [.. ticketQuery];
@@ -175,11 +180,16 @@ namespace Application.WebApi.Controllers
                     return this.BadRequest("The given building id doesn´t exist.");
             }
 
+            var author = this.User.FindFirst("username")?.Value;
+
+            if (author is null)
+                return this.Unauthorized();
+
             Ticket ticket = new()
             {
                 Id = default,
                 Title = ticketData.Title,
-                Author = ticketData.Author,
+                Author = author,
                 CreationDate = DateTime.UtcNow,
                 State = state,
                 Description = ticketData.Description,
@@ -200,9 +210,10 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="commentData">The comment data that will be added.</param>
+        /// <param name="commentContent">The comment content that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
+        [Consumes("text/plain")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
@@ -210,18 +221,23 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] Guid ticketId,
-            [FromBody] CommentPostDTO commentData)
+            [FromBody] string commentContent)
         {
             Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
+            var author = this.User.FindFirst("username")?.Value;
+
+            if (author is null)
+                return this.Unauthorized();
+
             TicketComment comment = new()
             {
                 Id = default,
-                Author = commentData.Author,
-                Content = commentData.Content,
+                Author = author,
+                Content = commentContent,
                 CreationDate = DateTime.UtcNow,
                 TicketId = ticketId,
             };

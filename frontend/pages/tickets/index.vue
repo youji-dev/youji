@@ -23,7 +23,10 @@
       <div v-if="loading" class="w-full h-full p-10">
         <el-skeleton :rows="18" animated />
       </div>
-      <div v-if="pageLoading" class="w-full h-full p-10 flex justify-center items-center">
+      <div
+        v-if="pageLoading"
+        class="w-full h-full p-10 flex justify-center items-center"
+      >
         <ElIconLoading class="animate-spin w-5"></ElIconLoading>
       </div>
       <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possbile sorting arrows are clicked, the data has to be fetched again completely.
@@ -43,27 +46,42 @@
           width="150"
           sortable
         />
-        <el-table-column prop="title" :label="$t('title')" width="250" show-overflow-tooltip sortable />
         <el-table-column
-          prop="state.name" 
+          prop="title"
+          :label="$t('title')"
+          width="250"
+          show-overflow-tooltip
+          sortable
+        />
+        <el-table-column
+          prop="state.name"
           :label="$t('status')"
           :filters="statusOptions.map((opt : state) => {return {text: opt.name, value: opt.id}})"
           :filter-method="filterTag"
           filter-placement="bottom-end"
           width="200"
           sortable
-        > 
+        >
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
-                :color="scope.row.state.color"
                 :change-callback="updateTicketStatus"
-                :change-call-back-params="[scope.row.id]"
+                :change-call-back-params="[scope.row.id, scope.row.state]"
                 :add-current-value-to-callback="true"
-                :current="scope.row.state"
-                :options="statusOptions"
+                :current="
+                  new ColoredSelectOption(
+                    scope.row.state,
+                    scope.row.state.color
+                  )
+                "
+                :options="
+                  statusOptions.map((opt) => {
+                    return new ColoredSelectOption(opt, opt.color);
+                  })
+                "
                 :keyText="'id'"
                 :labelText="'name'"
+                :id="scope.row.id"
               ></ColoredSelect>
             </div>
           </template>
@@ -128,6 +146,8 @@ import { ref } from "vue";
 const search = ref("");
 import ColoredSelect from "~/components/coloredSelect.vue";
 import type state from "~/types/api/response/stateResponse";
+import type ticket from "~/types/api/response/ticketResponse";
+import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
 const { statusOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
 const { fetchStatusOptions, fetchTickets } = useTicketsStore();
 const loading = ref(true);
@@ -136,6 +156,7 @@ const localeRoute = useLocaleRoute();
 const router = useRouter();
 const i18n = useI18n();
 const width = ref("100vw");
+const { $api } = useNuxtApp();
 interface Ticket {
   id: number;
   name: string;
@@ -163,7 +184,7 @@ onNuxtReady(async () => {
   window.addEventListener("resize", determineViewWidth);
 });
 
-async function fetchTicketsFromStart(fromSearch : boolean) {
+async function fetchTicketsFromStart(fromSearch: boolean) {
   pageLoading.value = fromSearch;
   loading.value = !fromSearch;
   await fetchTickets(search.value, 0, 25);
@@ -200,10 +221,10 @@ const parsedTickets = computed(() => {
       room: ticket.room,
       object: ticket.object,
       comments: ticket.comments,
-      attachments: ticket.attachments
-    }
-  }
-)});
+      attachments: ticket.attachments,
+    };
+  });
+});
 
 function getTableDimensions() {
   const element = document.getElementById("table_container");
@@ -217,11 +238,70 @@ function getTableDimensions() {
   }
 }
 
-function updateTicketStatus(ticket_id: number, new_status: state) {
-  ElMessage({
-    message: i18n.t("updated"),
-    type: "success",
-  });
+function updateTicketStatus(
+  ticket_id: string,
+  new_status: state,
+  prev_state: state
+) {
+  console.log("ticketid", ticket_id);
+  let ticket: ticket[] = tickets.value.filter(
+    (ticket) => ticket.id === ticket_id
+  );
+  console.log(ticket);
+  if (!!ticket[0]) {
+    let foundTicket: ticket = ticket[0];
+    foundTicket.state = new_status;
+    $api.ticket
+      .edit({
+        id: foundTicket.id,
+        title: foundTicket.title,
+        description: foundTicket.description,
+        priorityValue: foundTicket.priority.value,
+        stateId: new_status.id,
+        buildingId: foundTicket.building?.id,
+        room: foundTicket.room,
+        object: foundTicket.object,
+      })
+      .then((resp) => {
+        if (resp.error.value) {
+          console.error(resp.error.value);
+          let selectEl: HTMLSelectElement | null = document.getElementById(
+            ticket_id
+          ) as HTMLSelectElement;
+          selectEl.dispatchEvent(
+            new Event("error", {
+              bubbles: false,
+              cancelable: true,
+            })
+          );
+          ElMessage({
+            message: i18n.t("savingFailed"),
+            type: "error",
+          });
+          return;
+        }
+        ElMessage({
+          message: i18n.t("updated"),
+          type: "success",
+        });
+      })
+      .catch((e) => {
+        let selectEl: HTMLSelectElement | null = document.getElementById(
+          ticket_id
+        ) as HTMLSelectElement;
+        selectEl.dispatchEvent(
+          new Event("error", {
+            bubbles: false,
+            cancelable: true,
+          })
+        );
+        ElMessage({
+          message: i18n.t("savingFailed"),
+          type: "error",
+        });
+      });
+  }
+
   return;
 }
 
@@ -230,8 +310,6 @@ async function fetchNewPage(page: number) {
   await fetchTickets(search.value, page * 25, 25);
   pageLoading.value = false;
 }
-
-
 </script>
 
 <style></style>

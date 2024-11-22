@@ -79,6 +79,7 @@ export default defineI18nConfig(() => ({
       status: "Status",
       createDate: "Creation Date",
       updated: "Updated",
+      savingFailed: "Saving failed",
     },
     de: {
       welcome: "Willkommen",
@@ -157,6 +158,7 @@ export default defineI18nConfig(() => ({
       status: "Status",
       createDate: "Erstellt am",
       updated: "Aktualisiert",
+      savingFailed: "Speichern fehlgeschlagen",
     },
   },
 }));

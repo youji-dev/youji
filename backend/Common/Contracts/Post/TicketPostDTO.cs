@@ -21,11 +21,6 @@
         public required Guid PriorityId { get; set; }
 
         /// <summary>
-        /// The author of the ticket.
-        /// </summary>
-        public required string Author { get; set; }
-
-        /// <summary>
         /// The state of the ticket.
         /// </summary>
         public required Guid StateId { get; set; }

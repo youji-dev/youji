@@ -307,7 +307,7 @@ function updateTicketStatus(ticket_id: string, new_status: state) {
 
 async function fetchNewPage(page: number) {
   pageLoading.value = true;
-  await fetchTickets(search.value, page * 25, 25);
+  await fetchTickets(search.value, page * 25 - 25, 25);
   pageLoading.value = false;
 }
 </script>

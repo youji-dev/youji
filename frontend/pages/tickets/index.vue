@@ -6,14 +6,15 @@
     :onresize="determineViewWidth()"
   >
     <div class="flex flex-row items-center justify-end w-full py-2">
-      <div class="w-1/2 md:w-1/3 lg:w-1/5">
+      <div class="w-1/2 flex justify-center items-center md:w-1/3 lg:w-1/5">
         <el-input
           v-model="search"
-          class="w-full"
+          class="w-full mr-1"
           :placeholder="$t('searchVerb')"
           :prefix-icon="Search"
           @change="fetchTicketsFromStart(true)"
         />
+        <el-button class="ml-1" type="primary" :icon="ElIconSearch" round></el-button>
       </div>
     </div>
     <div
@@ -31,12 +32,17 @@
       </div>
       <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possbile sorting arrows are clicked, the data has to be fetched again completely.
        The page should stay the same. -->
+      <div
+        class="h-full w-full flex items-center justify-center"
+        v-if="tickets.length === 0 && !loading && !pageLoading"
+      >
+        <el-empty :description="$t('nothingFound')"/>
+      </div>
       <el-table
-        v-if="!loading && !pageLoading"
+        v-if="!loading && !pageLoading && tickets.length > 0"
         :data="parsedTickets"
         :height="tableDimensions['height']"
-        style="width: 100%; height: min-content"
-        class="overflow-x-scroll"
+        class="h-full w-full overflow-x-scroll"
         :default-sort="{ prop: 'create_date', order: 'descending' }"
       >
         <el-table-column
@@ -49,7 +55,7 @@
         <el-table-column
           prop="title"
           :label="$t('title')"
-          width="250"
+          min-width="250"
           show-overflow-tooltip
           sortable
         />
@@ -130,7 +136,7 @@
       </el-table>
       <el-pagination
         class="mr-auto"
-        v-if="!loading"
+        v-if="!loading && tickets.length > 0"
         layout="prev, pager, next"
         :total="totalCount"
         :page-size="25"
@@ -141,6 +147,7 @@
 </template>
 
 <script lang="tsx" setup>
+import { LazyElIconSearch } from "#build/components";
 import { Search } from "@element-plus/icons-vue";
 import { ref } from "vue";
 const search = ref("");
@@ -249,7 +256,7 @@ function updateTicketStatus(ticket_id: string, new_status: state) {
         id: foundTicket.id,
         title: foundTicket.title,
         description: foundTicket.description,
-        priorityValue: foundTicket.priority.value,
+        priorityId: foundTicket.priority.id,
         stateId: new_status.id,
         buildingId: foundTicket.building?.id,
         room: foundTicket.room,

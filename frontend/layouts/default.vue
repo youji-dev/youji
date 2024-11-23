@@ -2,10 +2,6 @@
   <div
     class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll"
   >
-    <div class="fixed right-5 bottom-5 z-50">
-      <Theme />
-      <Language />
-    </div>
     <Sidebar class="flex-none" />
     <SidebarMobile class="flex-none" />
     <slot />

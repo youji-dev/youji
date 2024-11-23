@@ -4,7 +4,7 @@ export default interface EditTicketRequest {
   id: string;
   title: string | undefined;
   description: string | undefined;
-  priorityValue: number;
+  priorityId: string;
   stateId: string;
   buildingId: string | undefined;
   room: string | undefined;
@@ -16,7 +16,7 @@ export function fromTicketResponse(ticket: ticketResponse): EditTicketRequest {
     id: ticket.id,
     title: ticket.title,
     description: ticket.description ?? undefined,
-    priorityValue: ticket.priority.value,
+    priorityId: ticket.priority.id,
     stateId: ticket.state.id,
     buildingId: ticket.building?.id || undefined,
     room: ticket.room || undefined,

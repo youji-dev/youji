@@ -80,6 +80,8 @@ export default defineI18nConfig(() => ({
       createDate: "Creation Date",
       updated: "Updated",
       savingFailed: "Saving failed",
+      saved: "Saved",
+      nothingFound: "Nothing found",
     },
     de: {
       welcome: "Willkommen",
@@ -159,6 +161,8 @@ export default defineI18nConfig(() => ({
       createDate: "Erstellt am",
       updated: "Aktualisiert",
       savingFailed: "Speichern fehlgeschlagen",
+      saved: "Gespeichert",
+      nothingFound: "Nichts gefunden",
     },
   },
 }));

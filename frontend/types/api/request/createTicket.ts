@@ -1,7 +1,7 @@
 export default interface CreateTicketRequest {
   title: string;
   description: string | null;
-  priorityValue: number;
+  priorityId: string;
   author: string;
   stateId: string;
   buildingId: string | null;

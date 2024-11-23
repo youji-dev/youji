@@ -13,8 +13,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     logUserOut();
     return navigateTo(localeRoute("/login")?.fullPath);
   }
-  console.log(to.fullPath)
-  if (to.fullPath === localeRoute("/")?.fullPath) {
+  if (to.fullPath === localeRoute("/")?.fullPath + "/" || to.fullPath === localeRoute("/")?.fullPath) {
     return navigateTo(localeRoute("/tickets")?.fullPath);
   }
 

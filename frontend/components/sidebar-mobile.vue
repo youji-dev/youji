@@ -15,13 +15,15 @@
     <el-drawer
       v-model="drawer"
       :title="$t('youji')"
+      :with-header="false"
       :direction="'ltr'"
-      style="min-width: fit-content; max-width: fit-content; max-height: 100%"
+      style="min-width: fit-content; max-width: fit-content; height: 100vh"
     >
-      <template #header="{}" style="margin-bottom: 0"> </template>
+      <template #header="{}" style="margin-bottom: 0;"> </template>
       <template #body style="overflow-y: hidden"></template>
-      <el-menu :default-active="getPageIndex()" class="el-menu-vertical-demo pt-5" style="height: calc(100vh - 180px)">
+      <el-menu :default-active="getPageIndex()" class="el-menu-vertical-demo h-full">
         <div>
+          <h1 class="text-lg py-3">youji</h1>
           <el-menu-item index="1" @click="router.push(localeRoute('/tickets')?.fullPath as string)">
             <el-icon>
               <Files />
@@ -98,7 +100,7 @@ function getPageIndex() {
   flex-direction: column;
   flex-flow: column;
   min-height: 0;
-  height: 95%;
+  height: 100%;
 }
 
 .menu-item {

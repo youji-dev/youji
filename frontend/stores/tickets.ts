@@ -32,6 +32,9 @@ export const useTicketsStore = defineStore("tickets", {
                 this.tickets = resp.data.value.results;
             }
 
+        },
+        async fetchNewTickets() {
+            const { $api } = useNuxtApp();
         }
     }
 })

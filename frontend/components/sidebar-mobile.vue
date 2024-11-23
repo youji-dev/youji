@@ -19,12 +19,24 @@
       :direction="'ltr'"
       style="min-width: fit-content; max-width: fit-content; height: 100vh"
     >
-      <template #header="{}" style="margin-bottom: 0;"> </template>
+      <template #header="{}" style="margin-bottom: 0"> </template>
       <template #body style="overflow-y: hidden"></template>
-      <el-menu :default-active="getPageIndex()" class="el-menu-vertical-demo h-full">
+      <el-menu
+        :default-active="getPageIndex()"
+        class="el-menu-vertical-demo h-full"
+      >
         <div>
-          <h1 class="text-lg py-3">youji</h1>
-          <el-menu-item index="1" @click="router.push(localeRoute('/tickets')?.fullPath as string)">
+          <div class="flex items-center justify-between">
+            <Logo />
+            <div class="flex items-center justify-end">
+              <Theme />
+              <Language />
+            </div>
+          </div>
+          <el-menu-item
+            index="1"
+            @click="router.push(localeRoute('/tickets')?.fullPath as string)"
+          >
             <el-icon>
               <Files />
             </el-icon>
@@ -33,7 +45,13 @@
             </el-badge>
           </el-menu-item>
 
-          <el-menu-item index="2" class="menu-item" @click="router.push(localeRoute('/tickets/new')?.fullPath as string)">
+          <el-menu-item
+            index="2"
+            class="menu-item"
+            @click="
+              router.push(localeRoute('/tickets/new')?.fullPath as string)
+            "
+          >
             <el-icon>
               <Plus />
             </el-icon>
@@ -42,13 +60,20 @@
         </div>
         <div>
           <el-divider></el-divider>
-          <el-menu-item class="menu-item" @click="router.push(localeRoute('/logout')?.fullPath as string)">
+          <el-menu-item
+            class="menu-item"
+            @click="router.push(localeRoute('/logout')?.fullPath as string)"
+          >
             <el-icon class="-rotate-90" color="#EF4444">
               <Upload />
             </el-icon>
             <span>{{ $t("logout") }}</span>
           </el-menu-item>
-          <el-menu-item class="menu-item" index="3" @click="router.push(localeRoute('/settings')?.fullPath as string)">
+          <el-menu-item
+            class="menu-item"
+            index="3"
+            @click="router.push(localeRoute('/settings')?.fullPath as string)"
+          >
             <el-icon class="-rotate-90">
               <Setting />
             </el-icon>
@@ -71,7 +96,10 @@ const routeObject = reactive({ route });
 const { locale } = useI18n();
 
 function getPageIndex() {
-  if (routeObject.route.fullPath == localeRoute("/tickets", locale.value)?.fullPath) {
+  if (
+    routeObject.route.fullPath ==
+    localeRoute("/tickets", locale.value)?.fullPath
+  ) {
     return "1";
   } else if (
     routeObject.route.fullPath ==

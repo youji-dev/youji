@@ -1,4 +1,4 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMiddleware(async (to) => {
   const { authenticated, name } = storeToRefs(useAuthStore());
   const { $locally } = useNuxtApp();
   const { public: { ACCESS_TOKEN_NAME } } = useRuntimeConfig()

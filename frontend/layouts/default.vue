@@ -9,10 +9,8 @@
 </template>
 
 <script lang="ts" setup>
-import Language from "~/components/language.vue";
 import SidebarMobile from "~/components/sidebar-mobile.vue";
 import Sidebar from "~/components/sidebar.vue";
-import Theme from "~/components/theme.vue";
 </script>
 
 <style>

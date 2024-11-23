@@ -14,7 +14,7 @@
           :prefix-icon="Search"
           @change="fetchTicketsFromStart(true)"
         />
-        <el-button class="ml-1" type="primary" :icon="ElIconSearch" round></el-button>
+        <el-button class="ml-1" type="primary" :icon="ElIconSearch" @click="fetchTicketsFromStart(true)" :loading="searchLoading" round></el-button>
       </div>
     </div>
     <div
@@ -147,7 +147,6 @@
 </template>
 
 <script lang="tsx" setup>
-import { LazyElIconSearch } from "#build/components";
 import { Search } from "@element-plus/icons-vue";
 import { ref } from "vue";
 const search = ref("");
@@ -159,6 +158,7 @@ const { statusOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
 const { fetchStatusOptions, fetchTickets } = useTicketsStore();
 const loading = ref(true);
 const pageLoading = ref(false);
+const searchLoading = ref(false);
 const localeRoute = useLocaleRoute();
 const router = useRouter();
 const i18n = useI18n();
@@ -193,10 +193,12 @@ onNuxtReady(async () => {
 
 async function fetchTicketsFromStart(fromSearch: boolean) {
   pageLoading.value = fromSearch;
+  searchLoading.value = fromSearch;
   loading.value = !fromSearch;
   await fetchTickets(search.value, 0, 25);
   pageLoading.value = false;
   loading.value = false;
+  searchLoading.value = false;
 }
 
 function determineViewWidth() {

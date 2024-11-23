@@ -63,8 +63,6 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async checkIfTokenIsValid(): Promise<boolean> {
-      const { $api } = useNuxtApp();
-
       try {
         await useFetchAuthenticated("/Auth/verify-token");
         return true;

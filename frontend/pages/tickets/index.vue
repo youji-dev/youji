@@ -50,6 +50,7 @@
           prop="author"
           :label="$t('username')"
           width="150"
+          show-overflow-tooltip
           sortable
         />
         <el-table-column
@@ -97,6 +98,7 @@
           class="hidden lg:block"
           :label="$t('building')"
           width="150"
+          show-overflow-tooltip
           sortable
         />
         <el-table-column
@@ -104,6 +106,7 @@
           class="hidden lg:block"
           :label="$t('room')"
           width="100"
+          show-overflow-tooltip
           sortable
         />
         <el-table-column
@@ -111,6 +114,7 @@
           class="hidden lg:block"
           :label="$t('priority')"
           width="120"
+          show-overflow-tooltip
           sortable
         />
         <el-table-column
@@ -118,6 +122,7 @@
           prop="creationDate"
           :label="$t('createDate')"
           width="200"
+          show-overflow-tooltip
           sortable
         />
         <el-table-column fixed="right" min-width="120">

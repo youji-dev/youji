@@ -104,7 +104,8 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
         /// <param name="property">The property to be searched</param>
-        /// <param name="propertyValue">The value to be used if the property is an object type</param>
+        /// <param name="classPropertyName">The name of the property to be compared in case the ticket property is a class</param>
+        /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
         /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
         /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
         /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
@@ -116,33 +117,26 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string property = "Title",
-            [FromQuery] string propertyValue = "Id",
+            [FromQuery] string classPropertyName = "Id",
+            [FromQuery] string orderByColumn = "CreationDate",
             [FromQuery] bool orderDesc = false,
             [FromQuery] int skip = 0,
             [FromQuery] int? take = null)
         {
-            if (!typeof(Ticket).GetProperties(BindingFlags.Public | BindingFlags.Instance).Any(prop => prop.Name.ToLower().Contains(property.ToLower())))
-            {
-                return this.BadRequest($"Property {property} doesn't exist!");
-            }
-
-            PropertyInfo? propertyInfo = typeof(Ticket).GetProperty(property);
             var ticketQuery = ticketRepo.GetAll();
 
-            if (searchTerm is not null && propertyInfo is not null)
+            if (searchTerm is not null)
             {
                 searchTerm = searchTerm.ToLower();
-                ticketQuery = ticketQuery.Where(ticket =>
-                    Ticket.CheckIfSearchMatches(propertyInfo.GetValue(ticket), searchTerm, propertyValue));
+                ticketQuery = ticketQuery.Where(Ticket.GetSearchPredicate(searchTerm, property, classPropertyName));
             }
 
             Ticket[] tickets = [.. ticketQuery];
             var totalCount = tickets.Length;
-
             ticketQuery =
-            orderDesc
-            ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, property)).Skip(skip)
-            : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, property)).Skip(skip);
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
             if (take is not null)
             {
@@ -150,7 +144,6 @@ namespace Application.WebApi.Controllers
             }
 
             tickets = [.. ticketQuery];
-
             return this.Ok(new TicketSearchDTO
             {
                 Total = totalCount, Results = tickets,

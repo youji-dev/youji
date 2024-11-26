@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -73,49 +74,78 @@ namespace PersistenceLayer.DataAccess.Entities
         public string? Object { get; set; }
 
         /// <summary>
-        /// To be used when comparing an unknown property of Ticket to a search term
+        /// To be used when trying to filter tickets by a given property. Supports strings, integers, datetimes as well as custom class properties
         /// </summary>
-        /// <param name="value" type="any">The value to compare</param>
-        /// <param name="searchTerm" type="string">The search term</param>
-        /// <param name="valueProperty" type="string" default="Id">The property name to be used if value is an object</param>
-        /// <returns>Boolean</returns>
-        public static bool CheckIfSearchMatches(object? value, string? searchTerm, string valueProperty = "Id")
+        /// <param name="searchTerm">The string to be compared</param>
+        /// <param name="valueProperty">The property to be compared</param>
+        /// <param name="classPropertyName" default="Id">The property to be used if the property to be compared is a class</param>
+        /// <returns>Expression</returns>
+        public static Expression<Func<Ticket, bool>> GetSearchPredicate(string searchTerm, string valueProperty, string classPropertyName = "Id")
         {
-            if (string.IsNullOrEmpty(searchTerm))
+            var parameter = Expression.Parameter(typeof(Ticket), "t");
+            var property = Expression.Property(parameter, valueProperty);
+            var propertyType = property.Type;
+            var searchTermExpression = Expression.Constant(searchTerm.ToLower());
+            var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+            var equalsMethod = typeof(string).GetMethod("Equals", new[] { typeof(string), typeof(string) });
+            var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
+            var toStringMethod = typeof(int).GetMethod("ToString", Type.EmptyTypes);
+            var dateTimeToStringMethod = typeof(int).GetMethod("ToString", Type.EmptyTypes);
+            var guidToString = typeof(Guid).GetMethod("ToString", Type.EmptyTypes);
+            Expression expression = Expression.Empty();
+            if (toLowerMethod != null && containsMethod != null && equalsMethod != null && toStringMethod != null &&
+                guidToString != null && dateTimeToStringMethod != null)
             {
-                return true;
-            }
-
-            if (value == null)
-            {
-                return true;
-            }
-            else
-            {
-                if (value is string)
+                Console.WriteLine("All Methods not null");
+                if (propertyType == typeof(string))
                 {
-                    if (value.ToString() != null)
+                    var toLowerProperty = Expression.Call(property, toLowerMethod);
+                    expression = Expression.Call(toLowerProperty, containsMethod, searchTermExpression);
+                }
+
+                if (propertyType == typeof(int))
+                {
+                    var stringRepresentation = Expression.Call(property, toStringMethod);
+                    var toLowerStringRepresentation = Expression.Call(stringRepresentation, toLowerMethod);
+                    expression = Expression.Call(toLowerStringRepresentation, equalsMethod, searchTermExpression);
+                }
+
+                if (propertyType == typeof(DateTime))
+                {
+                    var stringRepresentation = Expression.Call(property, dateTimeToStringMethod);
+                    var toLowerStringRepresentation = Expression.Call(stringRepresentation, toLowerMethod);
+                    expression = Expression.Call(toLowerStringRepresentation, containsMethod, searchTermExpression);
+                }
+
+                if (propertyType.IsClass && propertyType != typeof(string) && propertyType != typeof(int) &&
+                    propertyType != typeof(bool) && propertyType != typeof(DateTime))
+                {
+                    Console.WriteLine("Is Class");
+                    var stringPropertyExpression = Expression.Property(property, classPropertyName);
+                    if (stringPropertyExpression.Type == typeof(Guid))
                     {
-                        if (searchTerm.ToLower().Contains(((string)value).ToLower()))
-                        {
-                            return true;
-                        }
+                        Console.WriteLine("Is Guid");
+                        expression = Expression.Call(null, equalsMethod,
+                            Expression.Call(stringPropertyExpression, guidToString), searchTermExpression);
+                    }
+
+                    if (stringPropertyExpression.Type == typeof(string))
+                    {
+                        Console.WriteLine("Is string");
+                        expression = Expression.Call(null, equalsMethod, stringPropertyExpression,
+                            searchTermExpression);
+                    }
+
+                    if (stringPropertyExpression.Type == typeof(int))
+                    {
+                        Console.WriteLine("Is int");
+                        expression = Expression.Call(null, equalsMethod,
+                            Expression.Call(stringPropertyExpression, toStringMethod), searchTermExpression);
                     }
                 }
-                else if (value.GetType().GetProperty(valueProperty) != null)
-                {
-                    if (value.GetType().GetProperty(valueProperty)?.ToString() != null)
-                    {
-                        return value.GetType().GetProperty(valueProperty)?.ToString() == searchTerm;
-                    }
-                }
-                else
-                {
-                    return true;
-                }
             }
 
-            return false;
+            return Expression.Lambda<Func<Ticket, bool>>(expression, parameter);
         }
     }
 }

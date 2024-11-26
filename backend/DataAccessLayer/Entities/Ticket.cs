@@ -71,5 +71,51 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The affected object.
         /// </summary>
         public string? Object { get; set; }
+
+        /// <summary>
+        /// To be used when comparing an unknown property of Ticket to a search term
+        /// </summary>
+        /// <param name="value" type="any">The value to compare</param>
+        /// <param name="searchTerm" type="string">The search term</param>
+        /// <param name="valueProperty" type="string" default="Id">The property name to be used if value is an object</param>
+        /// <returns>Boolean</returns>
+        public static bool CheckIfSearchMatches(object? value, string? searchTerm, string valueProperty = "Id")
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return true;
+            }
+
+            if (value == null)
+            {
+                return true;
+            }
+            else
+            {
+                if (value is string)
+                {
+                    if (value.ToString() != null)
+                    {
+                        if (searchTerm.ToLower().Contains(((string)value).ToLower()))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else if (value.GetType().GetProperty(valueProperty) != null)
+                {
+                    if (value.GetType().GetProperty(valueProperty)?.ToString() != null)
+                    {
+                        return value.GetType().GetProperty(valueProperty)?.ToString() == searchTerm;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

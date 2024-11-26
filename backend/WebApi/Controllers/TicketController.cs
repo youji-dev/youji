@@ -81,9 +81,9 @@ namespace Application.WebApi.Controllers
             Ticket[] tickets = [.. ticketQuery];
             var totalCount = tickets.Length;
             ticketQuery =
-            orderDesc
-            ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-            : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
             if (take is not null)
             {
@@ -91,13 +91,10 @@ namespace Application.WebApi.Controllers
             }
 
             tickets = [.. ticketQuery];
-
-            return this.Ok(
-                new TicketSearchDTO()
-                {
-                    Total = totalCount,
-                    Results = tickets,
-                });
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
         }
 
         /// <summary>

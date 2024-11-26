@@ -136,6 +136,9 @@ namespace Application.WebApi.Controllers
                     Ticket.CheckIfSearchMatches(propertyInfo.GetValue(ticket), searchTerm, propertyValue));
             }
 
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
+
             ticketQuery =
             orderDesc
             ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, property)).Skip(skip)
@@ -146,9 +149,12 @@ namespace Application.WebApi.Controllers
                 ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
             }
 
-            Ticket[] tickets = [.. ticketQuery];
+            tickets = [.. ticketQuery];
 
-            return this.Ok(tickets);
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
         }
 
         /// <summary>

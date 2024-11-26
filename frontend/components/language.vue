@@ -9,7 +9,7 @@
       </div>
     </div>
     <template #reference>
-      <el-button type="primary" circle>
+      <el-button type="primary" :size="'small'" plain circle>
         <Icon name="material-symbols:language" :style="{ backgroundColor: colorMode.value === 'light' ? TEXT_LIGHT : TEXT_DARK }" />
       </el-button>
     </template>

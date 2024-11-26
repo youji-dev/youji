@@ -1,32 +1,35 @@
 <template>
-  <div class="page-bg-light dark:page-bg-dark">
+  <div class="page-bg-light dark:page-bg-dark min-h-lvh">
     <!-- This file will be used as default layout on every page. It is typically used for backgrounds, navbars, ... -->
     <div class="fixed right-5 bottom-5 z-50">
-      <Theme/>
-      <Language/>
+      <Theme />
+      <Language />
     </div>
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
-import Language from '~/components/language.vue';
-import Theme from '~/components/theme.vue';
+import Language from "~/components/language.vue";
+import Theme from "~/components/theme.vue";
 </script>
 
 <style>
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 @layer components {
   .page-bg-dark {
-    background-color: #0A0A0A;
+    background-color: #0a0a0a;
   }
 
   .page-bg-light {
-    background-color: #F2F3F5;
+    background-color: #f2f3f5;
   }
 
   .base-bg-dark {
@@ -34,11 +37,11 @@ import Theme from '~/components/theme.vue';
   }
 
   .base-bg-light {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
   }
 
   .text-dark {
-    color: #E5EAF3
+    color: #e5eaf3;
   }
 
   .text-light {
@@ -46,13 +49,12 @@ import Theme from '~/components/theme.vue';
   }
 
   .logo-dark {
-    background-color: #E5EAF3
+    background-color: #e5eaf3;
   }
 
   .logo-light {
     background-color: #303133;
   }
-
 }
 
 ::-webkit-scrollbar {

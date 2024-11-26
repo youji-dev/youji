@@ -1,57 +1,123 @@
 <template>
-  <div class="mt-20 md:mt-5 max-h-[92vh] overflow-y-clip" :style="{ width: width }">
+  <div
+    class="mt-20 md:mt-5 max-h-[92vh] overflow-y-clip"
+    :style="{ width: width }"
+  >
     <div v-loading="loading" v-if="!is404 && ticketModel" class="px-5 pb-3">
-      <TicketHeader :ticket="ticketModel" class="lg:col-span-full"></TicketHeader>
+      <TicketHeader
+        :ticket="ticketModel"
+        class="lg:col-span-full"
+      ></TicketHeader>
     </div>
-  <div class="overflow-y-auto px-5 max-h-[75vh] md:max-h-[82vh]" :style="{ width: width }">
-    <div v-loading="loading" v-if="!is404 && ticketModel" class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]" :element-loading-text="loadingText">
+    <div
+      class="overflow-y-auto px-5 max-h-[75vh] md:max-h-[82vh]"
+      :style="{ width: width }"
+    >
+      <div
+        v-loading="loading"
+        v-if="!is404 && ticketModel"
+        class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
+        :element-loading-text="loadingText"
+      >
+        <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
+          <el-text>{{ $t("title") }}</el-text>
+          <el-input
+            v-model="ticketModel.title"
+            :placeholder="$t('enter')"
+            class="drop-shadow-md dark:base-bg-dark"
+          />
+        </div>
 
-      <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
-        <el-text>{{ $t("title") }}</el-text>
-        <el-input v-model="ticketModel.title" :placeholder="$t('enter')" class="drop-shadow-md dark:base-bg-dark" />
+        <DropdownGroup
+          :ticket="ticketModel"
+          class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start"
+        />
+
+        <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
+          <el-text>{{ $t("description") }}</el-text>
+          <el-input
+            v-model="ticketModel.description"
+            type="textarea"
+            class="drop-shadow-md max-h-full dark:base-bg-dark"
+            :rows="15"
+            resize="vertical"
+            :placeholder="$t('enter')"
+          />
+        </div>
+
+        <div
+          v-if="!isNew"
+          class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6"
+        >
+          <el-text class="w-1/2 truncate text-center"
+            >{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text
+          >
+          <br />
+          <el-text class="w-1/2 text-center"
+            >{{ $t("createdOn") }}:
+            {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text
+          >
+        </div>
+
+        <TicketFiles
+          v-if="!isNew"
+          class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5"
+          :ticket="ticketModel"
+        />
+
+        <TicketCommentCollection
+          v-if="!isNew"
+          class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3"
+          v-model:ticket="ticketModel"
+        />
       </div>
-
-      <DropdownGroup :ticket="ticketModel" class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start" />
-
-      <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
-        <el-text>{{ $t("description") }}</el-text>
-        <el-input v-model="ticketModel.description" type="textarea" class="drop-shadow-md max-h-full dark:base-bg-dark" :rows="15" resize="vertical" :placeholder="$t('enter')" />
+      <div v-if="is404" class="h-screen flex justify-center items-center">
+        <el-result class="" icon="error" :title="$t('resourceNotFound')">
+          <template #extra>
+            <el-button @click="router.back()" type="primary">{{
+              $t("back")
+            }}</el-button>
+          </template>
+        </el-result>
       </div>
-
-      <div v-if="!isNew" class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
-        <el-text class="w-1/2 truncate text-center">{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text>
-        <br />
-        <el-text class="w-1/2 text-center">{{ $t("createdOn") }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text>
+      <div v-else-if="ticketModel == null">
+        <TicketDetailTicketLoadingSkeleton />
       </div>
-      
-      <TicketFiles v-if="!isNew" class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5" :ticket="ticketModel" />
-
-      <TicketCommentCollection v-if="!isNew" class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3" v-model:ticket="ticketModel" />
-
-
     </div>
-    <div v-if="is404" class="h-screen flex justify-center items-center">
-      <el-result class="" icon="error" :title="$t('resourceNotFound')">
-        <template #extra>
-          <el-button @click="router.back()" type="primary">{{ $t("back") }}</el-button>
-        </template>
-      </el-result>
-    </div>
-    <div v-else-if="ticketModel == null">
-      <TicketDetailTicketLoadingSkeleton />
-    </div>
-  </div>
-  <div class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7">
-    <el-tooltip :disabled="!isNew" :content="$t('pdfExportNotOnUnsaved')" placement="top-start">
-      <el-button :disabled="isNew" class="text-sm drop-shadow-md" type="default" :icon="Printer" @click="exportToPDF()">{{ $t("pdfExport") }}</el-button>
-    </el-tooltip>
+    <div
+      class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7"
+    >
+      <el-tooltip
+        :disabled="!isNew"
+        :content="$t('pdfExportNotOnUnsaved')"
+        placement="top-start"
+      >
+        <el-button
+          :disabled="isNew"
+          class="text-sm drop-shadow-md"
+          type="default"
+          :icon="Printer"
+          @click="exportToPDF()"
+          >{{ $t("pdfExport") }}</el-button
+        >
+      </el-tooltip>
 
-    <div class="flex">
-      <el-button class="text-sm justify-self-end drop-shadow-md" type="primary" @click="isNew ? createTicket() : saveTicketChanges()">{{ $t("save") }}</el-button>
+      <div class="flex">
+        <el-button
+          class="text-sm justify-self-end drop-shadow-md"
+          type="primary"
+          @click="isNew ? createTicket() : saveTicketChanges()"
+          >{{ $t("save") }}</el-button
+        >
 
-      <el-button class="text-sm justify-self-end drop-shadow-md" type="default" @click="router.back()">{{ $t("close") }}</el-button>
+        <el-button
+          class="text-sm justify-self-end drop-shadow-md"
+          type="default"
+          @click="router.back()"
+          >{{ $t("close") }}</el-button
+        >
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
@@ -89,7 +155,12 @@ let availableBuildings: Ref<building[]> = ref([] as building[]);
 let ticketModel: Ref<ticket | null> = ref(null);
 
 onNuxtReady(async () => {
-  await Promise.all([$api.state.getAll(), $api.priority.getAll(), $api.building.getAll(), fetchOrInitializeTicket(route.params.id as string)])
+  await Promise.all([
+    $api.state.getAll(),
+    $api.priority.getAll(),
+    $api.building.getAll(),
+    fetchOrInitializeTicket(route.params.id as string),
+  ])
     .then(([states, priorities, buildings, ticketData]) => {
       availableStates.value = states.data.value ?? [];
       availablePriorities.value = priorities.data.value ?? [];
@@ -97,7 +168,7 @@ onNuxtReady(async () => {
       ticketModel.value = ticketData;
       is404.value = false;
     })
-    .catch(error => {
+    .catch((error) => {
       if (error instanceof TicketNotFoundError) {
         is404.value = true;
       } else {
@@ -159,7 +230,9 @@ async function saveTicketChanges() {
   try {
     loadingText.value = i18n.t("savingTicket");
     loading.value = true;
-    const ticketResult = await $api.ticket.edit(fromTicketResponse(ticketModel.value!));
+    const ticketResult = await $api.ticket.edit(
+      fromTicketResponse(ticketModel.value!)
+    );
 
     if (ticketResult.error.value) {
       if (ticketResult.error.value.statusCode === 404) {
@@ -182,6 +255,11 @@ async function saveTicketChanges() {
     }
 
     if (ticketResult.data.value) {
+      ElMessage({
+        message: i18n.t("saved"),
+        type: "success",
+        duration: 5000,
+      });
       ticketModel.value = ticketResult.data.value;
     }
   } catch (error) {
@@ -205,7 +283,7 @@ async function createTicket() {
       description: ticketModel.value!.description ?? null,
       author: ticketModel.value!.author,
       stateId: ticketModel.value!.state.id,
-      priorityValue: ticketModel.value!.priority.value,
+      priorityId: ticketModel.value!.priority.id,
       buildingId: ticketModel.value!.building?.id ?? null,
       object: ticketModel.value!.object ?? null,
       room: ticketModel.value!.room ?? null,
@@ -229,7 +307,14 @@ async function createTicket() {
     }
 
     if (ticketResult.data.value) {
-      router.push(localePath("/tickets/" + ticketResult.data.value.id)?.fullPath as string);
+      ElMessage({
+        message: i18n.t("saved"),
+        type: "success",
+        duration: 5000,
+      });
+      router.push(
+        localePath("/tickets/" + ticketResult.data.value.id)?.fullPath as string
+      );
     }
   } catch (error) {
     ElNotification({

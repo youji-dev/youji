@@ -90,31 +90,31 @@ namespace PersistenceLayer.DataAccess.Entities
             var equalsMethod = typeof(string).GetMethod("Equals", new[] { typeof(string), typeof(string) });
             var toLowerMethod = typeof(string).GetMethod("ToLower", Type.EmptyTypes);
             var toStringMethod = typeof(int).GetMethod("ToString", Type.EmptyTypes);
-            var dateTimeToStringMethod = typeof(int).GetMethod("ToString", Type.EmptyTypes);
+            var boolToStringMethod = typeof(bool).GetMethod("ToString", Type.EmptyTypes);
+            var dateTimeToStringMethod = typeof(DateTime).GetMethod("ToString", Type.EmptyTypes);
             var guidToString = typeof(Guid).GetMethod("ToString", Type.EmptyTypes);
             Expression expression = Expression.Empty();
             if (toLowerMethod != null && containsMethod != null && equalsMethod != null && toStringMethod != null &&
-                guidToString != null && dateTimeToStringMethod != null)
+                guidToString != null && dateTimeToStringMethod != null && boolToStringMethod != null)
             {
-                Console.WriteLine("All Methods not null");
                 if (propertyType == typeof(string))
                 {
-                    var toLowerProperty = Expression.Call(property, toLowerMethod);
-                    expression = Expression.Call(toLowerProperty, containsMethod, searchTermExpression);
+                    expression = Expression.Call(Expression.Call(property, toLowerMethod), containsMethod, searchTermExpression);
                 }
 
                 if (propertyType == typeof(int))
                 {
-                    var stringRepresentation = Expression.Call(property, toStringMethod);
-                    var toLowerStringRepresentation = Expression.Call(stringRepresentation, toLowerMethod);
-                    expression = Expression.Call(toLowerStringRepresentation, equalsMethod, searchTermExpression);
+                    expression = Expression.Call(null, equalsMethod, Expression.Call(Expression.Call(property, toStringMethod), toLowerMethod), searchTermExpression);
                 }
 
                 if (propertyType == typeof(DateTime))
                 {
-                    var stringRepresentation = Expression.Call(property, dateTimeToStringMethod);
-                    var toLowerStringRepresentation = Expression.Call(stringRepresentation, toLowerMethod);
-                    expression = Expression.Call(toLowerStringRepresentation, containsMethod, searchTermExpression);
+                    expression = Expression.Call(Expression.Call(Expression.Call(property, dateTimeToStringMethod), toLowerMethod), containsMethod, searchTermExpression);
+                }
+
+                if (propertyType == typeof(Guid))
+                {
+                    expression = Expression.Call(null, equalsMethod, Expression.Call(Expression.Call(property, guidToString), toLowerMethod), searchTermExpression);
                 }
 
                 if (propertyType.IsClass && propertyType != typeof(string) && propertyType != typeof(int) &&
@@ -125,22 +125,31 @@ namespace PersistenceLayer.DataAccess.Entities
                     if (stringPropertyExpression.Type == typeof(Guid))
                     {
                         Console.WriteLine("Is Guid");
-                        expression = Expression.Call(null, equalsMethod,
-                            Expression.Call(stringPropertyExpression, guidToString), searchTermExpression);
+                        expression = Expression.Call(null, equalsMethod, Expression.Call(stringPropertyExpression, guidToString), searchTermExpression);
                     }
 
                     if (stringPropertyExpression.Type == typeof(string))
                     {
                         Console.WriteLine("Is string");
-                        expression = Expression.Call(null, equalsMethod, stringPropertyExpression,
-                            searchTermExpression);
+                        expression = Expression.Call(Expression.Call(stringPropertyExpression, toLowerMethod), containsMethod, searchTermExpression);
                     }
 
                     if (stringPropertyExpression.Type == typeof(int))
                     {
                         Console.WriteLine("Is int");
-                        expression = Expression.Call(null, equalsMethod,
-                            Expression.Call(stringPropertyExpression, toStringMethod), searchTermExpression);
+                        expression = Expression.Call(Expression.Call(stringPropertyExpression, toStringMethod), containsMethod, searchTermExpression);
+                    }
+
+                    if (stringPropertyExpression.Type == typeof(bool))
+                    {
+                        Console.WriteLine("Is bool");
+                        expression = Expression.Call(null, equalsMethod, Expression.Call(Expression.Call(stringPropertyExpression, boolToStringMethod), toLowerMethod), searchTermExpression);
+                    }
+
+                    if (stringPropertyExpression.Type == typeof(DateTime))
+                    {
+                        Console.WriteLine("Is DateTime");
+                        expression = Expression.Call(Expression.Call(Expression.Call(stringPropertyExpression, dateTimeToStringMethod), toLowerMethod), containsMethod, searchTermExpression);
                     }
                 }
             }

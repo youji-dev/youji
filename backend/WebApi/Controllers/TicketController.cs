@@ -99,7 +99,8 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term.
+        /// Fetches tickets by a given property. Property can be a subclass, classPropertyName has to be specified as the property to be compared in the subclass.
+        /// Supports String|Int|Boolean|DateTime|Guid fields.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>

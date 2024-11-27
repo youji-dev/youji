@@ -74,10 +74,12 @@ namespace PersistenceLayer.DataAccess.Entities
         public string? Object { get; set; }
 
         /// <summary>
-        /// To be used when trying to filter tickets by a given property. Supports strings, integers, datetimes as well as custom class properties
+        /// Filters tickets by a given property. Supports strings, integers, DateTime, and custom class properties.
+        /// String|DateTime|Int: Contains
+        /// Guid|Boolean: Equals
         /// </summary>
         /// <param name="searchTerm">The string to be compared</param>
-        /// <param name="valueProperty">The property to be compared</param>
+        /// <param name="valueProperty">The property to be compared to the string</param>
         /// <param name="classPropertyName" default="Id">The property to be used if the property to be compared is a class</param>
         /// <returns>Expression</returns>
         public static Expression<Func<Ticket, bool>> GetSearchPredicate(string searchTerm, string valueProperty, string classPropertyName = "Id")
@@ -104,7 +106,7 @@ namespace PersistenceLayer.DataAccess.Entities
 
                 if (propertyType == typeof(int))
                 {
-                    expression = Expression.Call(null, equalsMethod, Expression.Call(Expression.Call(property, toStringMethod), toLowerMethod), searchTermExpression);
+                    expression = Expression.Call(Expression.Call(Expression.Call(property, toStringMethod), toLowerMethod), containsMethod, searchTermExpression);
                 }
 
                 if (propertyType == typeof(DateTime))
@@ -115,6 +117,11 @@ namespace PersistenceLayer.DataAccess.Entities
                 if (propertyType == typeof(Guid))
                 {
                     expression = Expression.Call(null, equalsMethod, Expression.Call(Expression.Call(property, guidToString), toLowerMethod), searchTermExpression);
+                }
+
+                if (propertyType == typeof(bool))
+                {
+                    expression = Expression.Call(null, equalsMethod, Expression.Call(Expression.Call(property, boolToStringMethod), toLowerMethod), searchTermExpression);
                 }
 
                 if (propertyType.IsClass && propertyType != typeof(string) && propertyType != typeof(int) &&

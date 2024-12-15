@@ -98,13 +98,12 @@ namespace DomainLayer.BusinessLogic.Authentication
             if (dev)
             {
                 return await this.GetOrCreateUser(username.ToLowerInvariant());
-                user.Type = Roles.Admin;
-                return user;
             }
 
             var host = configuration.GetValueOrThrow("LDAPHost");
             var port = int.Parse(configuration.GetValueOrThrow("LDAPPort"));
             var baseDn = configuration.GetValueOrThrow("LDAPBaseDN");
+            string emailAttributeName = configuration.GetValueOrThrow("EMailAttributeName", ["LDAP"]);
 
             var connection = new LdapConnection();
             try
@@ -120,14 +119,14 @@ namespace DomainLayer.BusinessLogic.Authentication
                         baseDn,
                         $"(&(cn={username}))",
                         Native.LdapSearchScope.LDAP_SCOPE_SUBTREE,
-                        ["userPrincipalName"]));
+                        [emailAttributeName]));
 
                 string? email = null;
                 try
                 {
                     email = emailSearchResponse.Entries
                         .SingleOrDefault()?
-                        .Attributes["userPrincipalName"]
+                        .Attributes[emailAttributeName]
                         .GetValues<string?>()
                         .SingleOrDefault();
                 }

@@ -122,7 +122,7 @@ namespace DomainLayer.BusinessLogic.Mailing
             => string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectText);
 
         /// <summary>
-        /// Generate an mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
+        /// Generate a mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
         /// </summary>
         /// <param name="mailModel">The model to use as a data provider</param>
         /// <returns>The generated mail body</returns>

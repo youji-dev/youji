@@ -30,9 +30,9 @@ namespace Common.Helpers
         /// Breaks all lines longer than the given line length
         /// </summary>
         /// <param name="input">The input string</param>
-        /// <param name="lineLenght">The maximum line length</param>
+        /// <param name="lineLength">The maximum line length</param>
         /// <returns>The string limited to the max line length</returns>
-        public static string LimitLineLength(string input, int lineLenght)
+        public static string LimitLineLength(string input, int lineLength)
         {
             string[] lines = input.Split(Environment.NewLine);
 
@@ -44,7 +44,7 @@ namespace Common.Helpers
                 string indentation = IndentationRegex().Match(lineCopy).ToString();
                 do
                 {
-                    int charactersInLine = Math.Min(lineCopy.Length, lineLenght);
+                    int charactersInLine = Math.Min(lineCopy.Length, lineLength);
                     string shortenedLine = string.Join(string.Empty, lineCopy.Take(charactersInLine)).Trim();
 
                     limitedString.AppendLine($"{indentation}{shortenedLine}");

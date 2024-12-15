@@ -97,7 +97,7 @@ namespace DomainLayer.BusinessLogic.Authentication
 
             if (dev)
             {
-                var user = await this.GetOrCreateUser(username.ToLowerInvariant());
+                return await this.GetOrCreateUser(username.ToLowerInvariant());
                 user.Type = Roles.Admin;
                 return user;
             }

@@ -16,7 +16,7 @@ namespace Common.Helpers
         /// <returns>The plain text result</returns>
         public static string HtmlToPlainText(string html)
         {
-            string result = (string)html.Clone();
+            string result;
             result = StyleTagRegex().Replace(html, string.Empty);
             result = IndentTagsRegex().Replace(result, "\t");
 

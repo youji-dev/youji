@@ -41,7 +41,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore "backend/Backend.sln"
       - name: Build
-        run: dotnet build --no-restore -warnaserror
+        run: dotnet build "backend/Backend.sln" --no-restore -warnaserror
 
   build-frontend:
     name: Frontend build

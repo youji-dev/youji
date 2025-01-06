@@ -8,11 +8,11 @@ namespace Common.Extensions
     public static class ConfigurationExtensions
     {
         /// <summary>
-        /// Returns the requsted key or throws if it wasn't found
+        /// Returns the requested key or throws if it wasn't found
         /// </summary>
         /// <param name="configuration">The configuration object to use</param>
         /// <param name="key">The key to search for</param>
-        /// <param name="sections">The sections the could should be found under</param>
+        /// <param name="sections">The sections the value should be found under</param>
         /// <returns>The configuration value if it was found</returns>
         /// <exception cref="InvalidOperationException">Thrown when no value was found for the key under the given sections</exception>
         public static string GetValueOrThrow(this IConfiguration configuration, string key, string[]? sections = null)

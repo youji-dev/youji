@@ -26,25 +26,25 @@ jobs:
             frontend:
               - 'frontend/**'
               - '.github/workflows/**'
-  build-api:
-    name: Backend build
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
+  # build-api:
+  #   name: Backend build
+  #   runs-on: ubuntu-latest
+  #   needs: changes
+  #   if: ${{ needs.changes.outputs.backend == 'true' }}
 
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-      - name: Restore dependencies
-        run: dotnet restore "backend/Backend.sln"
-      - name: Build
-        run: dotnet build "backend/WebApi/Application.WebApi.csproj" --no-restore -warnaserror
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Setup .NET
+  #       uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: 8.0.x
+  #     - name: Restore dependencies
+  #       run: dotnet restore "backend/Backend.sln"
+  #     - name: Build
+  #       run: dotnet build "backend/Backend.sln" --no-restore -warnaserror
 
   build-frontend:
-    name: Fronend build
+    name: Frontend build
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}

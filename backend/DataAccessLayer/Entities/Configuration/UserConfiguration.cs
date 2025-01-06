@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 namespace PersistenceLayer.DataAccess.Entities.Configuration
 {
     /// <summary>
-    /// Entity configuration for <see cref="RoleAssignment"/>
+    /// Entity configuration for <see cref="User"/>
     /// </summary>
-    internal class RoleAssignmentConfiguration : IEntityTypeConfiguration<RoleAssignment>
+    internal class UserConfiguration : IEntityTypeConfiguration<User>
     {
         /// <inheritdoc />
-        public void Configure(EntityTypeBuilder<RoleAssignment> builder)
+        public void Configure(EntityTypeBuilder<User> builder)
         {
         }
     }

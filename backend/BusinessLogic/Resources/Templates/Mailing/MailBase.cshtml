@@ -1,0 +1,87 @@
+﻿@page
+@using DomainLayer.BusinessLogic.Mailing.Models
+@model MailModel
+
+<!-- Begin document -->
+
+<div class="container">
+    <header>
+        <h1>@Model.MailTitle</h1>
+        <img class='logo' src="@Model.LogoSrc" />
+    </header>
+
+    <div class="content">
+        @RenderBody()
+    </div>
+</div>
+
+<style>
+    html, body {
+        padding: 0;
+        margin: 0;
+        font-family: sans-serif;
+    }
+
+    .container {
+        width: 100%;
+        height: 100%;
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        background-color: #409EFF;
+    }
+
+    header > h1 {
+        padding-inline: 5ch;
+    }
+
+    header > .logo {
+        padding-inline: 5ch;
+    }
+
+    .logo {
+        width: 100px;
+        height: 100px;
+    }
+
+    .content {
+        margin-top: 0.5rem;
+        margin-inline: 10ch;
+        max-width: 80ch;
+    }
+
+    .card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .card {
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        background-color: #e2e2e2;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card > * {
+        padding-inline: 20px;
+    }
+
+    .card > .card-header {
+        border-bottom: 1px solid black;
+    }
+
+    .card > .card-separator {
+        align-self: center;
+    }
+
+    .icon {
+        width: 2ch;
+    }
+</style>

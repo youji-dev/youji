@@ -49,12 +49,6 @@ class TicketRepository {
     return useFetchAuthenticated<ticketComment>(`${this.path}/${id}/comment`, { method: "POST", body: comment });
   }
 
-  async uploadAttachment(id: string, file: File): Promise<ReturnType<typeof useFetchAuthenticated<ticketAttachment>>> {
-    const formData = new FormData();
-    formData.append("attachmentFile", file);
-    return useFetchAuthenticated<ticketAttachment>(`${this.path}/${id}/attachment`, { method: "POST", headers: { "Content-Type": "multipart/form-data" }, body: formData });
-  }
-
   async exportToPDF(id: string, language: string) {
     await useFetchAuthenticated<Blob>(`${this.path}/${id}/export`, {
       method: "GET",

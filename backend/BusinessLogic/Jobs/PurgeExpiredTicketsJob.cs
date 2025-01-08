@@ -12,16 +12,12 @@ namespace DomainLayer.BusinessLogic.Jobs
         /// <inheritdoc/>
         public async Task Execute(IJobExecutionContext context)
         {
-            var relevantTickets = ticketRepo.GetAll().Where(ticket => ticket.State.HasAutoPurge);
-            var expiredRelevantTickets = relevantTickets.Where(ticket => ticket.State.AutoPurgeDays != null
-                    && DateTime.UtcNow.AddDays(-(int)ticket.State.AutoPurgeDays) > ticket.LastStateUpdate).ToArray();
+            var deletableTickets = ticketRepo.GetAll()
+            .Where(ticket => ticket.State.HasAutoPurge && ticket.State.AutoPurgeDays != null
+                && DateTime.UtcNow.AddDays(-(int)ticket.State.AutoPurgeDays) > ticket.LastStateUpdate).ToArray();
 
-            foreach (var ticket in expiredRelevantTickets)
-            {
+            foreach (var ticket in deletableTickets)
                 await ticketRepo.DeleteAsync(ticket);
-            }
-
-            return;
         }
     }
 }

@@ -7,12 +7,11 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
-using Common.Contracts.Get;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
-using System.Net.Mail;
+using Application.WebApi.Contracts.Response;
 
 namespace Application.WebApi.Controllers
 {
@@ -58,7 +57,7 @@ namespace Application.WebApi.Controllers
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
-        public ActionResult<Ticket[]> Get(
+        public ActionResult<TicketSearchDTO> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string orderByColumn = "CreationDate",
@@ -116,7 +115,7 @@ namespace Application.WebApi.Controllers
         [HttpGet("searchByProperty")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
-        public ActionResult<Ticket[]> GetByProperty(
+        public ActionResult<TicketSearchDTO> GetByProperty(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string property = "Title",

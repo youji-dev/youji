@@ -27,7 +27,7 @@ namespace Application.WebApi.Controllers
         {
             try
             {
-                RoleAssignment roleAssignment = await authenticationService.LdapLogin(
+                User roleAssignment = await authenticationService.LdapLogin(
                     loginRequestDto.Username,
                     loginRequestDto.Password);
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
@@ -58,7 +58,7 @@ namespace Application.WebApi.Controllers
         {
             try
             {
-                RoleAssignment roleAssignment = await authenticationService.VerifyRefreshToken(refreshRequestDto.RefreshToken);
+                User roleAssignment = await authenticationService.VerifyRefreshToken(refreshRequestDto.RefreshToken);
 
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);

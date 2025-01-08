@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Models;
 using DomainLayer.BusinessLogic.Authentication;
 using Quartz;
 using DomainLayer.BusinessLogic.Jobs;
+using DomainLayer.BusinessLogic.Mailing;
 
 namespace Application.WebApi
 {
@@ -59,6 +60,7 @@ namespace Application.WebApi
         {
             services.AddScoped<ExportService>();
             services.AddScoped<AuthenticationService>();
+            services.AddScoped<MailingService>();
         }
 
         /// <summary>

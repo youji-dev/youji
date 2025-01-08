@@ -14,5 +14,10 @@
         /// The name of the priority.
         /// </summary>
         public required string Name { get; set; }
+
+        /// <summary>
+        /// The color of the priority.
+        /// </summary>
+        public required string Color { get; set; }
     }
 }

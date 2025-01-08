@@ -119,19 +119,15 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string property = "Title",
-            [FromQuery] string classPropertyName = "Id",
+            [FromQuery] string? classPropertyName = null,
             [FromQuery] string orderByColumn = "CreationDate",
             [FromQuery] bool orderDesc = false,
             [FromQuery] int skip = 0,
             [FromQuery] int? take = null)
         {
-            var ticketQuery = ticketRepo.GetAll();
-
-            if (searchTerm is not null)
-            {
-                searchTerm = searchTerm.ToLower();
-                ticketQuery = ticketQuery.Where(Ticket.GetSearchPredicate(searchTerm, property, classPropertyName));
-            }
+            var ticketQuery = searchTerm is null
+                ? ticketRepo.GetAll()
+                : ticketRepo.GetByPropertyValue(searchTerm, property, classPropertyName);
 
             Ticket[] tickets = [.. ticketQuery];
             var totalCount = tickets.Length;

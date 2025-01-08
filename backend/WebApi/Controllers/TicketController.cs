@@ -246,7 +246,7 @@ namespace Application.WebApi.Controllers
 
             await commentRepo.AddAsync(comment);
 
-            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [commentData.Author]);
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [author]);
             var mailAddresses = userRepository.GetMany(mailRecipientIds)
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
                 .Select(u => new MailboxAddress(u.UserId, u.Email));

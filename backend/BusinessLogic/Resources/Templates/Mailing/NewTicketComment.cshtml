@@ -1,0 +1,15 @@
+﻿@page
+@using DomainLayer.BusinessLogic.Mailing.Models
+@model NewTicketCommentModel
+
+<!-- Begin document -->
+
+@{
+    Layout = "mailLayout";
+}
+
+<div class="card">
+    <h3 class="card-header">von '@Model.Author'</h3>
+    <p>@Model.Content</p>
+</div>
+

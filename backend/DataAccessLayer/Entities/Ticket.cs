@@ -8,7 +8,7 @@ namespace PersistenceLayer.DataAccess.Entities
     /// <summary>
     /// Represents the entity of a ticket.
     /// </summary>
-    public class Ticket
+    public record class Ticket
     {
         /// <summary>
         /// The id of the ticket.

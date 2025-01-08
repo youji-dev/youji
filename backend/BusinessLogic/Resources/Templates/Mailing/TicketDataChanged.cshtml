@@ -1,0 +1,55 @@
+﻿@page
+@using DomainLayer.BusinessLogic.Mailing.Models
+@model TicketDataChangedModel
+
+<!-- Begin document -->
+
+@{
+    Layout = "mailLayout";
+}
+
+@if (Model.TitleChange is not null)
+{
+    <h2>Titel geändert</h2>
+    <p>@Model.TitleChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon" /> @Model.TitleChange?.NewValue</p>
+}
+
+@if (Model.DescriptionChange is not null)
+{
+    <h2>Beschreibung geändert</h2>
+    <div class="card">
+        <p>@Model.DescriptionChange?.OldValue</p>
+        <img src="@Model.ArrowDownIconSrc" alt="v" class="icon card-separator" />
+        <p>@Model.DescriptionChange?.NewValue</p>
+    </div>
+}
+
+@if (Model.PriorityChange is not null)
+{
+    <h2>Priorität geändert</h2>
+    <p>@Model.PriorityChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.PriorityChange?.NewValue</p>
+}
+
+@if (Model.StateChange is not null)
+{
+    <h2>Status geändert</h2>
+    <p>@Model.StateChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.StateChange?.NewValue</p>
+}
+
+@if (Model.BuildingChange is not null)
+{
+    <h2>Gebäude geändert</h2>
+    <p>@Model.BuildingChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.BuildingChange?.NewValue</p>
+}
+
+@if (Model.RoomChange is not null)
+{
+    <h2>Raum geändert</h2>
+    <p>@Model.RoomChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.RoomChange?.NewValue</p>
+}
+
+@if (Model.ObjectChange is not null)
+{
+    <h2>Betroffenes Objekt geändert</h2>
+    <p>@Model.ObjectChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.ObjectChange?.NewValue</p>
+}

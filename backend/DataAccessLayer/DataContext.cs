@@ -30,9 +30,9 @@ namespace PersistenceLayer.DataAccess
         public DbSet<Priority> Priorities { get; set; }
 
         /// <summary>
-        /// Database set of the role assignment table.
+        /// Database set of the users table.
         /// </summary>
-        public DbSet<RoleAssignment> RoleAssignments { get; set; }
+        public DbSet<User> Users { get; set; }
 
         /// <summary>
         /// Database set of the attachment table.
@@ -69,7 +69,7 @@ namespace PersistenceLayer.DataAccess
 
             modelBuilder.ApplyConfiguration(new BuildingConfiguration());
             modelBuilder.ApplyConfiguration(new PriorityConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleAssignmentConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
             modelBuilder.ApplyConfiguration(new StateConfiguration());
             modelBuilder.ApplyConfiguration(new TicketAttachmentConfiguration());
             modelBuilder.ApplyConfiguration(new TicketCommentConfiguration());

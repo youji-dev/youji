@@ -6,6 +6,7 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Globalization;
 using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
+using Common.Extensions;
 
 namespace Application.WebApi.Controllers
 {
@@ -38,10 +39,11 @@ namespace Application.WebApi.Controllers
                 return null;
 
             Localizer? localizer = null;
-            if (!string.IsNullOrWhiteSpace(lang))
+            using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Resources.I18N.xml");
+            if (!string.IsNullOrWhiteSpace(lang) && localizerResourceStream is not null)
             {
                 localizer = new();
-                localizer.LoadXML(Assembly.GetExecutingAssembly(), "Resources.I18N.xml", CultureInfo.GetCultureInfo(lang));
+                localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(lang));
             }
 
             TicketExportModel model = TicketExportModel.FromTicket(ticket);

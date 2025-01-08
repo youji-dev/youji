@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using DomainLayer.BusinessLogic.Authentication;
+using DomainLayer.BusinessLogic.Mailing;
 
 namespace Application.WebApi
 {
@@ -57,6 +58,7 @@ namespace Application.WebApi
         {
             services.AddScoped<ExportService>();
             services.AddScoped<AuthenticationService>();
+            services.AddScoped<MailingService>();
         }
 
         /// <summary>

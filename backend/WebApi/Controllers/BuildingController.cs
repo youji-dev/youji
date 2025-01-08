@@ -35,6 +35,7 @@ namespace Application.WebApi.Controllers
         /// <param name="buildingName">A <see langword="string"/> with the new name of building</param>
         /// <returns>An <see cref="ObjectResult"/> with the added building entity.</returns>
         [HttpPost]
+        [Consumes("text/plain")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<Building>> Post(

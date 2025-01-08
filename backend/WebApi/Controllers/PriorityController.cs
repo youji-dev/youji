@@ -88,7 +88,7 @@ namespace Application.WebApi.Controllers
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/></param>
         /// <param name="priorityId">The specific id of the priority that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
-        [HttpDelete("{priorityValue}")]
+        [HttpDelete("{priorityId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]

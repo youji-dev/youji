@@ -10,6 +10,8 @@ using Application.WebApi.Decorators;
 using Blurhash.ImageSharp;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
+using DomainLayer.BusinessLogic.Mailing;
+using MimeKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -175,11 +177,16 @@ namespace Application.WebApi.Controllers
                     return this.BadRequest("The given building id doesn´t exist.");
             }
 
+            var author = this.User.FindFirst("username")?.Value;
+
+            if (author is null)
+                return this.Unauthorized();
+
             Ticket ticket = new()
             {
                 Id = default,
                 Title = ticketData.Title,
-                Author = ticketData.Author,
+                Author = author,
                 CreationDate = DateTime.UtcNow,
                 State = state,
                 Description = ticketData.Description,
@@ -197,36 +204,57 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Adds a new comment entity of a specific ticket.
         /// </summary>
+        /// <remarks>
+        /// Also sends mails to involved and available users
+        /// </remarks>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="commentRepo">Instance of <see cref="TicketCommentRepository"/>.</param>
+        /// <param name="mailingService">Instance of <see cref="MailingService"/></param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <param name="ticketId">The specific ticket id</param>
-        /// <param name="commentData">The comment data that will be added.</param>
+        /// <param name="commentContent">The comment content that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added comment entity.</returns>
         [HttpPost("{ticketId}/comment")]
+        [Consumes("text/plain")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<TicketComment>> PostComment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketCommentRepository commentRepo,
+            [FromServices] MailingService mailingService,
+            [FromServices] UserRepository userRepository,
             [FromRoute] Guid ticketId,
-            [FromBody] CommentPostDTO commentData)
+            [FromBody] string commentContent)
         {
             Ticket? ticket = await ticketRepo.GetAsync(ticketId);
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
 
+            var author = this.User.FindFirst("username")?.Value;
+
+            if (author is null)
+                return this.Unauthorized();
+
             TicketComment comment = new()
             {
                 Id = default,
-                Author = commentData.Author,
-                Content = commentData.Content,
+                Author = author,
+                Content = commentContent,
                 CreationDate = DateTime.UtcNow,
                 TicketId = ticketId,
             };
 
             await commentRepo.AddAsync(comment);
+
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [author]);
+            var mailAddresses = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailboxAddress(u.UserId, u.Email));
+
+            var mail = mailingService.GenerateNewTicketCommentMail(comment);
+            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Kommentar an Ticket '{ticket.Title}'"), mail);
 
             return this.Ok(comment);
         }
@@ -236,6 +264,8 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
+        /// <param name="mailingService">Instance of <see cref="MailingService"/></param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="attachmentFile">The file that will be uploaded.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
@@ -246,6 +276,8 @@ namespace Application.WebApi.Controllers
         public async Task<ActionResult<TicketAttachment>> PostAttachment(
             [FromServices] TicketRepository ticketRepo,
             [FromServices] TicketAttachmentRepository attachmentRepo,
+            [FromServices] MailingService mailingService,
+            [FromServices] UserRepository userRepository,
             [FromRoute] Guid ticketId,
             IFormFile attachmentFile)
         {
@@ -276,6 +308,15 @@ namespace Application.WebApi.Controllers
 
             await attachmentRepo.AddAsync(attachment);
 
+            string performingUser = this.User.FindFirstValue("username") ?? string.Empty;
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [performingUser]);
+            var mailAddresses = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailboxAddress(u.UserId, u.Email));
+
+            var mail = mailingService.GenerateNewTicketAttachmentMail(attachment);
+            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Anhang an Ticket '{ticket.Title}'"), mail);
+
             return this.Ok(attachment);
         }
 
@@ -286,6 +327,8 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
+        /// <param name="mailingService">Instance of <see cref="MailingService"/></param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <param name="ticketData">The ticket data that will update the ticket.</param>
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
@@ -297,6 +340,8 @@ namespace Application.WebApi.Controllers
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
             [FromServices] BuildingRepository buildingRepo,
+            [FromServices] MailingService mailingService,
+            [FromServices] UserRepository userRepository,
             [FromBody] TicketPutDTO ticketData)
         {
             var ticket = await ticketRepo.GetAsync(ticketData.Id);
@@ -324,6 +369,8 @@ namespace Application.WebApi.Controllers
 
             Priority? priority = await priorityRepo.GetAsync(ticketData.PriorityId);
 
+            var oldTicket = ticket with { };
+
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
             ticket.State = state ?? ticket.State;
@@ -333,6 +380,14 @@ namespace Application.WebApi.Controllers
             ticket.Room = ticketData.Room ?? ticket.Room;
 
             await ticketRepo.UpdateAsync(ticket);
+
+            var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);
+            var mailAddresses = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailboxAddress(u.UserId, u.Email));
+
+            var mail = mailingService.GenerateTicketChangedMail(ticket, oldTicket);
+            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Ticket '{ticket.Title}' wurde geändert"), mail);
 
             return this.Ok(ticket);
         }

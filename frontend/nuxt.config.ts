@@ -29,7 +29,14 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "@nuxtjs/color-mode", "@nuxt/icon", "@nuxtjs/i18n", "@element-plus/nuxt"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@pinia/nuxt",
+    "@nuxtjs/color-mode",
+    "@nuxt/icon",
+    "@nuxtjs/i18n",
+    "@element-plus/nuxt",
+  ],
   i18n: {
     strategy: "prefix",
     // Icons from https://www.npmjs.com/package/@iconify-json/flag

@@ -23,5 +23,10 @@ namespace PersistenceLayer.DataAccess.Entities
         /// E-Mail address of the user.
         /// </summary>
         public string? Email { get; set; }
+
+        /// <summary>
+        /// Preferred language code of the user
+        /// </summary>
+        public string? PreferredLcid { get; set; }
     }
 }

@@ -187,6 +187,7 @@ namespace Application.WebApi.Controllers
                 Author = author,
                 CreationDate = DateTime.UtcNow,
                 State = state,
+                LastStateUpdate = DateTime.UtcNow,
                 Description = ticketData.Description,
                 Priority = priority,
                 Building = building,
@@ -364,6 +365,9 @@ namespace Application.WebApi.Controllers
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
             ticket.State = state ?? ticket.State;
+            ticket.LastStateUpdate = state is not null && !state.Id.Equals(ticket.State.Id)
+                ? DateTime.UtcNow
+                : ticket.LastStateUpdate;
             ticket.Building = building ?? ticket.Building;
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;

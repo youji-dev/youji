@@ -47,6 +47,8 @@ namespace Application.WebApi.Controllers
                 Id = default,
                 Name = stateData.Name,
                 Color = stateData.Color,
+                HasAutoPurge = stateData.HasAutoPurge,
+                AutoPurgeDays = stateData.AutoPurgeDays,
             };
 
             await stateRepo.AddAsync(state);
@@ -75,6 +77,8 @@ namespace Application.WebApi.Controllers
 
             state.Name = stateData.Name;
             state.Color = stateData.Color;
+            state.HasAutoPurge = stateData.HasAutoPurge;
+            state.AutoPurgeDays = stateData.AutoPurgeDays;
 
             await stateRepo.UpdateAsync(state);
             return this.Ok(state);

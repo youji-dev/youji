@@ -82,7 +82,7 @@
             <div class="flex justify-start items-center">
               <ColoredSelect
                 :change-callback="updateTicketStatus"
-                :change-call-back-params="[scope.row.id]"
+                :change-callback-params="[scope.row.id]"
                 :add-current-value-to-callback="true"
                 :current="
                   new ColoredSelectOption(

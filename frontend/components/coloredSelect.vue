@@ -6,7 +6,7 @@
       class="colored-select bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]"
       @change="
         changeCallback(
-          ...(changeCallBackParams ?? []),
+          ...(changeCallbackParams ?? []),
           addCurrentValueToCallback
             ? !!valueKeyForCallback
               ? selectedOption.option[valueKeyForCallback]
@@ -83,7 +83,7 @@ const props = defineProps({
     type: Function,
     required: false,
   },
-  changeCallBackParams: {
+  changeCallbackParams: {
     type: Array<any>,
     required: false,
   },

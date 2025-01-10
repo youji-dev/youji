@@ -16,4 +16,14 @@ export default interface state {
    * The color of the state
    */
   color: string;
+
+  /**
+   * Indicates if tickets will be purged automatically
+   */
+  hasAutoPurge: boolean;
+
+  /**
+   * Days from when tickets will be purged
+   */
+  autoPurgeDays: number;
 }

@@ -1,4 +1,5 @@
-﻿using PersistenceLayer.DataAccess.Entities;
+﻿using I18N.DotNet;
+using PersistenceLayer.DataAccess.Entities;
 
 namespace DomainLayer.BusinessLogic.Mailing.Models
 {
@@ -24,14 +25,16 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         /// Creates a new instance of <see cref="NewTicketCommentModel"/> from a <see cref="TicketComment"/>
         /// </summary>
         /// <param name="comment">The comment</param>
+        /// <param name="localizer">Localizer to use for mail generation</param>
         /// <returns>The generated model</returns>
-        public static NewTicketCommentModel FromComment(TicketComment comment)
+        public static NewTicketCommentModel FromComment(TicketComment comment, Localizer localizer)
         {
             return new NewTicketCommentModel()
             {
-                MailTitle = $"Neuer Kommentar an '{comment.Ticket?.Title ?? "unbekannt"}'",
+                MailTitle = localizer.Localize($"New comment on ticket '{comment.Ticket?.Title ?? "unbekannt"}'"),
                 Author = comment.Author,
                 Content = comment.Content,
+                Localizer = localizer,
             };
         }
     }

@@ -305,6 +305,16 @@ namespace Application.WebApi.Controllers
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
                 .Select(u => new MailboxAddress(u.UserId, u.Email));
 
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredLcid,
+                });
+
+            await mailingService.SendManyLocalized()
+
             var mail = mailingService.GenerateNewTicketAttachmentMail(attachment);
             await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Anhang an Ticket '{ticket.Title}'"), mail);
 

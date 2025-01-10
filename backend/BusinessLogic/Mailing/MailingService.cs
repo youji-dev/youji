@@ -1,8 +1,10 @@
 ﻿using System.Globalization;
+using System.Reflection;
 using System.Text;
 using Common.Extensions;
 using Common.Helpers;
 using DomainLayer.BusinessLogic.Mailing.Models;
+using I18N.DotNet;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
@@ -30,10 +32,11 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// </summary>
         /// <param name="newTicket">New version of the ticket</param>
         /// <param name="oldTicket">Old version of the ticket</param>
+        /// <param name="localizer">Localizer for mail generation</param>
         /// <returns>The generated mail body</returns>
-        public MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket)
+        public MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket, Localizer localizer)
         {
-            TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket);
+            TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket, localizer);
 
             return this.GenerateMail(mailModel);
         }
@@ -42,10 +45,11 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// Generate a mail body for a new attachement
         /// </summary>
         /// <param name="newAttachment">The new attachment</param>
+        /// <param name="localizer">Localizer for mail generation</param>
         /// <returns>The generated mail body</returns>
-        public MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment)
+        public MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment, Localizer localizer)
         {
-            NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment);
+            NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment, localizer);
 
             return this.GenerateMail(mailModel);
         }
@@ -54,10 +58,11 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// Generate a mail body for a new comment
         /// </summary>
         /// <param name="newComment">The new comment</param>
+        /// <param name="localizer">Localizer for mail generation</param>
         /// <returns>The generated mail body</returns>
-        public MimeEntity GenerateNewTicketCommentMail(TicketComment newComment)
+        public MimeEntity GenerateNewTicketCommentMail(TicketComment newComment, Localizer localizer)
         {
-            NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment);
+            NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment, localizer);
 
             return this.GenerateMail(mailModel);
         }
@@ -105,6 +110,36 @@ namespace DomainLayer.BusinessLogic.Mailing
                 message.To.Add(recipient);
                 message.Subject = subject;
 
+                message.Body = body;
+
+                await client.SendAsync(message);
+            }
+
+            await client.DisconnectAsync(true);
+        }
+
+        public async Task SendManyLocalized(IEnumerable<MailRecipient> recipients, Func<Localizer, MimeEntity> mailGenerator, string subjectLocalization, string subjectParameter)
+        {
+            using SmtpClient client = new();
+            await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
+
+            Localizer localizer = new();
+            using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Resources/Localization/Mailing.I18N.xml");
+
+            var senderMail = new MailboxAddress(this.mailSenderName, this.mailSenderAddress);
+            foreach (var recipient in recipients)
+            {
+                string language = recipient.PreferredLcid ?? "en-EN";
+
+                if (localizerResourceStream is not null)
+                    localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(language));
+
+                MimeMessage message = new();
+                message.From.Add(senderMail);
+                message.To.Add(recipient.Address);
+                message.Subject = localizer.LocalizeFormat(subjectLocalization, subjectParameter);
+
+                var body = mailGenerator(localizer);
                 message.Body = body;
 
                 await client.SendAsync(message);

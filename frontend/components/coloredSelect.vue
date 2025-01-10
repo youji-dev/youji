@@ -35,12 +35,7 @@
     <select
       v-model="selectedOption"
       :id="id"
-      :style="{
-        border: 'solid 1px ' + selectedOption.color,
-        'background-color': convertHexToRGBA(selectedOption.color, 0.35),
-        color: contrastColor({ bgColor: selectedOption.color }),
-      }"
-      class="colored-select"
+      class="colored-select bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]"
     >
       <option
         v-for="option in options"

@@ -74,6 +74,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 .PaddingBottom(this.verticalPadding)
                 .Text(this.model.Title)
                 .FontSize(this.largeFont)
+                .ClampLines(3)
                 .Bold();
         }
 
@@ -103,8 +104,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     row.Spacing(this.itemSpacing);
 
-                    row.RelativeItem().Text($"{this.localizationTable["Affected object"]}: ");
-                    row.AutoItem().Text(this.model.Object ?? "-")
+                    row.RelativeItem(1).Text($"{this.localizationTable["Affected object"]}: ");
+                    row.RelativeItem(3).Text(this.model.Object ?? "-")
                         .AlignRight();
                 });
 
@@ -112,8 +113,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text($"{this.localizationTable["Building"]}: ");
-                    innerRow.AutoItem().Text(this.model.Building ?? "-")
+                    innerRow.RelativeItem(1).Text($"{this.localizationTable["Building"]}: ");
+                    innerRow.RelativeItem(3).Text(this.model.Building ?? "-")
                         .AlignRight();
                 });
 
@@ -121,8 +122,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text($"{this.localizationTable["Room"]}: ");
-                    innerRow.AutoItem().Text(this.model.Room ?? "-")
+                    innerRow.RelativeItem(1).Text($"{this.localizationTable["Room"]}: ");
+                    innerRow.RelativeItem(3).Text(this.model.Room ?? "-")
                         .AlignRight();
                 });
 
@@ -130,8 +131,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text($"{this.localizationTable["Reported by"]}: ");
-                    innerRow.AutoItem().Text(this.model.Author)
+                    innerRow.RelativeItem(1).Text($"{this.localizationTable["Reported by"]}: ");
+                    innerRow.RelativeItem(3).Text(this.model.Author)
                         .AlignRight();
                 });
 
@@ -139,8 +140,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem(10).Text($"{this.localizationTable["Reported on"]}: ");
-                    innerRow.AutoItem().Text(this.model.CreationDate.ToShortDateString())
+                    innerRow.RelativeItem(1).Text($"{this.localizationTable["Reported on"]}: ");
+                    innerRow.RelativeItem(3).Text(this.model.CreationDate.ToShortDateString())
                         .AlignRight();
                 });
             });

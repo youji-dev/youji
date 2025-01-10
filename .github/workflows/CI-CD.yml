@@ -41,10 +41,10 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore "backend/Backend.sln"
       - name: Build
-        run: dotnet build "backend/WebApi/Application.WebApi.csproj" --no-restore -warnaserror
+        run: dotnet build "backend/Backend.sln" --no-restore -warnaserror
 
   build-frontend:
-    name: Fronend build
+    name: Frontend build
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}

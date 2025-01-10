@@ -22,5 +22,15 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The color of the state.
         /// </summary>
         public required string Color { get; set; }
+
+        /// <summary>
+        /// Indicates if tickets will be purged automatically.
+        /// </summary>
+        public required bool HasAutoPurge { get; set; }
+
+        /// <summary>
+        /// Days from when tickets will be purged.
+        /// </summary>
+        public int? AutoPurgeDays { get; set; }
     }
 }

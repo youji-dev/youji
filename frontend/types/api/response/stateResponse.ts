@@ -18,12 +18,12 @@ export default interface state {
   color: string;
 
   /**
-   * Marks the status so that tickets with it can be purged automatically
+   * Indicates if tickets will be purged automatically
    */
   hasAutoPurge: boolean;
 
   /**
-   * Days from when tickets will purged
+   * Days from when tickets will be purged
    */
   autoPurgeDays: number;
 }

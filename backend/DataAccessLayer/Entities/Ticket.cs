@@ -49,7 +49,7 @@ namespace PersistenceLayer.DataAccess.Entities
         public required State State { get; set; }
 
         /// <summary>
-        /// Date of last state update.
+        /// Date of the last state update. Used to determine tickets that should be purged.
         /// </summary>
         [JsonIgnore]
         public DateTime LastStateUpdate { get; set; }

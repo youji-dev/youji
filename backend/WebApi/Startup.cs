@@ -127,7 +127,7 @@ namespace Application.WebApi
                 quartz.AddTrigger(options =>
                     options.ForJob(jobKey)
                     .WithIdentity("PurgeExpiredTicketsJobTrigger")
-                    .WithCronSchedule("0 0 0 * * ?"));
+                    .WithCronSchedule("0 0 0 * * ?")); // Cron job expression for execution every day at 12:00 pm.
             });
 
             services.AddQuartzHostedService(quartz => quartz.WaitForJobsToComplete = true);

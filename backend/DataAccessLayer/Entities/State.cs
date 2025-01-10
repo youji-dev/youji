@@ -24,12 +24,12 @@ namespace PersistenceLayer.DataAccess.Entities
         public required string Color { get; set; }
 
         /// <summary>
-        /// Marks the status so that tickets with it can be purged automatically.
+        /// Indicates if tickets will be purged automatically.
         /// </summary>
         public required bool HasAutoPurge { get; set; }
 
         /// <summary>
-        /// Days from when tickets will purged.
+        /// Days from when tickets will be purged.
         /// </summary>
         public int? AutoPurgeDays { get; set; }
     }

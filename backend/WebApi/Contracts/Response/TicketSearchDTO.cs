@@ -13,7 +13,7 @@ namespace Application.WebApi.Contracts.Response
         public required int Total { get; set; }
 
         /// <summary>
-        /// The results.
+        /// The results (for the current page).
         /// </summary>
         public required Ticket[] Results { get; set; }
     }

@@ -19,9 +19,9 @@ export const useTicketsStore = defineStore("tickets", {
             }
         },
 
-        async fetchTickets(search: string, skip: number, take: number) {
+        async fetchTickets(search: string, skip: number, take: number, orderByCol: string, orderDesc: boolean) {
             const { $api } = useNuxtApp();
-            const resp = await $api.ticket.search(search, "CreationDate", true, skip, take);
+            const resp = await $api.ticket.search(search, orderByCol, orderDesc, skip, take);
             console.log("ticket response", resp.data.value);
             if (resp.error.value) {
                 console.log(resp.error)

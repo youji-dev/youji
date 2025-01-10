@@ -101,7 +101,7 @@ const {
   options,
   current,
   changeCallback,
-  changeCallBackParams,
+  changeCallbackParams,
   addCurrentValueToCallback = false,
   keyText,
   labelText,

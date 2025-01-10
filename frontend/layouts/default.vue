@@ -1,9 +1,7 @@
 <template>
-  <div class="page-bg-light dark:page-bg-dark w-full min-h-[100vh] max-h-full flex overflow-x-hidden overflow-y-scroll">
-    <div class="fixed right-5 bottom-5 z-50">
-      <Theme />
-      <Language />
-    </div>
+  <div
+    class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll"
+  >
     <Sidebar class="flex-none" />
     <SidebarMobile class="flex-none" />
     <slot />
@@ -11,13 +9,16 @@
 </template>
 
 <script lang="ts" setup>
-import Language from "~/components/language.vue";
 import SidebarMobile from "~/components/sidebar-mobile.vue";
 import Sidebar from "~/components/sidebar.vue";
-import Theme from "~/components/theme.vue";
 </script>
 
 <style>
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

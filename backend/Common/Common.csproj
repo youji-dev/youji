@@ -20,5 +20,7 @@
 		</AdditionalFiles>
 	</ItemGroup>
 
-
+	<ItemGroup>
+	  <Folder Include="Contracts\Get\" />
+	</ItemGroup>
 </Project>

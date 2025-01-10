@@ -52,7 +52,7 @@ namespace Application.WebApi.Controllers
         /// <param name="userUpdate">An update </param>
         /// <returns>The updated user</returns>
         [HttpPatch("{userId}")]
-        public async Task<ActionResult<User>> UpdateRole(
+        public async Task<ActionResult<User>> Patch(
             [FromServices] UserRepository userRepository,
             [FromRoute] string userId,
             [FromBody] UserPatch userUpdate)
@@ -63,6 +63,9 @@ namespace Application.WebApi.Controllers
 
             if (userUpdate.NewRole is not null)
                 user.Type = (Roles)userUpdate.NewRole;
+
+            if (userUpdate.NewPreferredLcid is not null)
+                user.PreferredLcid = userUpdate.NewPreferredLcid;
 
             await userRepository.UpdateAsync(user);
 

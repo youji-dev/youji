@@ -46,6 +46,9 @@
         :default-sort="{ prop: sortColProp, order: sortDesc ? 'descending' : 'ascending' }"
         @sort-change="changeSort"
         :sort-by="sortCol"
+        @row-dblclick="(row: any, column: any, event: Event) => {
+          router.push(localeRoute(`/tickets/${row.id}`)?.fullPath as string)
+        } "
       >
         <el-table-column
           class="hidden lg:block"

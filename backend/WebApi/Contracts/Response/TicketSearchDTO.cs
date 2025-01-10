@@ -1,6 +1,6 @@
 using PersistenceLayer.DataAccess.Entities;
 
-namespace Common.Contracts.Get
+namespace Application.WebApi.Contracts.Response
 {
     /// <summary>
     /// Represents a comment data transfer object for post operation.

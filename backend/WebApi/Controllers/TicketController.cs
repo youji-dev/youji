@@ -7,7 +7,7 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
-using Common.Contracts.Get;
+using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;

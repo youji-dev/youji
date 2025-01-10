@@ -21,8 +21,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\DataAccessLayer\PersistenceLayer.DataAccess.csproj" />
+	  <Folder Include="Contracts\Get\" />
 	</ItemGroup>
-
-
 </Project>

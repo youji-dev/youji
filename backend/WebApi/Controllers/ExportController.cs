@@ -51,7 +51,7 @@ namespace Application.WebApi.Controllers
 
             FileContentResult result = new(pdf, "application/octet-stream")
             {
-                FileDownloadName = $"Export_{ticket.Title.Replace(" ", "-")}_{DateTime.Now:yyyy-MM-dd}_{DateTime.Now.Ticks}.pdf",
+                FileDownloadName = $"Export_{ticket.Title[..20].Replace(" ", "-")}_{DateTime.Now:yyyy-MM-dd}_{DateTime.Now.Ticks}.pdf",
             };
 
             return result;

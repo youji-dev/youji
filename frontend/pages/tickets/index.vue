@@ -43,11 +43,17 @@
         :data="parsedTickets"
         :height="tableDimensions['height']"
         class="h-full w-full overflow-x-scroll"
-        :default-sort="{ prop: 'create_date', order: 'descending' }"
+        :default-sort="{ prop: sortColProp, order: sortDesc ? 'descending' : 'ascending' }"
+        @sort-change="changeSort"
+        :sort-by="sortCol"
+        @row-dblclick="(row: any, column: any, event: Event) => {
+          router.push(localeRoute(`/tickets/${row.id}`)?.fullPath as string)
+        } "
       >
         <el-table-column
           class="hidden lg:block"
           prop="author"
+          filter-class-name="Author"
           :label="$t('username')"
           width="150"
           show-overflow-tooltip
@@ -55,6 +61,7 @@
         />
         <el-table-column
           prop="title"
+          filter-class-name="Title"
           :label="$t('title')"
           min-width="250"
           show-overflow-tooltip
@@ -62,6 +69,7 @@
         />
         <el-table-column
           prop="state.name"
+          filter-class-name="State"
           :label="$t('status')"
           :filters="statusOptions.map((opt : state) => {return {text: opt.name, value: opt.id}})"
           :filter-method="filterTag"
@@ -73,7 +81,7 @@
             <div class="flex justify-start items-center">
               <ColoredSelect
                 :change-callback="updateTicketStatus"
-                :change-call-back-params="[scope.row.id]"
+                :change-callback-params="[scope.row.id]"
                 :add-current-value-to-callback="true"
                 :current="
                   new ColoredSelectOption(
@@ -95,6 +103,7 @@
         </el-table-column>
         <el-table-column
           prop="building.name"
+          filter-class-name="Building"
           class="hidden lg:block"
           :label="$t('building')"
           width="150"
@@ -103,6 +112,7 @@
         />
         <el-table-column
           prop="room"
+          filter-class-name="Room"
           class="hidden lg:block"
           :label="$t('room')"
           width="100"
@@ -111,6 +121,7 @@
         />
         <el-table-column
           prop="priority.name"
+          filter-class-name="Priority"
           class="hidden lg:block"
           :label="$t('priority')"
           width="120"
@@ -120,6 +131,7 @@
         <el-table-column
           class="hidden lg:block"
           prop="creationDate"
+          filter-class-name="CreationDate"
           :label="$t('createDate')"
           width="200"
           show-overflow-tooltip
@@ -164,6 +176,9 @@ const { fetchStatusOptions, fetchTickets } = useTicketsStore();
 const loading = ref(true);
 const pageLoading = ref(false);
 const searchLoading = ref(false);
+const sortCol = ref("CreationDate");
+const sortColProp = ref("creationDate");
+const sortDesc = ref(true);
 const localeRoute = useLocaleRoute();
 const router = useRouter();
 const i18n = useI18n();
@@ -200,7 +215,7 @@ async function fetchTicketsFromStart(fromSearch: boolean) {
   pageLoading.value = fromSearch;
   searchLoading.value = fromSearch;
   loading.value = !fromSearch;
-  await fetchTickets(search.value, 0, 25);
+  await fetchTickets(search.value, 0, 25, sortCol.value, sortDesc.value);
   pageLoading.value = false;
   loading.value = false;
   searchLoading.value = false;
@@ -319,9 +334,22 @@ function updateTicketStatus(ticket_id: string, new_status: state) {
   return;
 }
 
+function changeSort(sortData: {column: any, prop: string, order: any} ) {
+  sortCol.value = sortData.column.filterClassName;
+  sortColProp.value = sortData.prop;
+  sortDesc.value = sortData.order === "ascending" ? false : true;
+  searchLoading.value = true;
+  fetchNewPage(1).then(() => {
+    searchLoading.value = false;
+  }).catch((e) => {
+    searchLoading.value = false;
+    console.error(e);
+  });
+}
+
 async function fetchNewPage(page: number) {
   pageLoading.value = true;
-  await fetchTickets(search.value, page * 25 - 25, 25);
+  await fetchTickets(search.value, page * 25 - 25, 25, sortCol.value, sortDesc.value);
   pageLoading.value = false;
 }
 </script>

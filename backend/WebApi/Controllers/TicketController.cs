@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
 using Blurhash.ImageSharp;
+using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
@@ -47,7 +48,7 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term.
+        /// Gets a ticket filtert by a specific search term and the max amount of results used for pagination.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
@@ -82,19 +83,23 @@ namespace Application.WebApi.Controllers
                     || ticket.Author.ToLower().Contains(searchTerm));
             }
 
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
             ticketQuery =
-            orderDesc
-            ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-            : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
             if (take is not null)
             {
                 ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
             }
 
-            Ticket[] tickets = [.. ticketQuery];
-
-            return this.Ok(tickets);
+            tickets = [.. ticketQuery];
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
         }
 
         /// <summary>

@@ -263,6 +263,11 @@ async function saveTicketChanges() {
     }
 
     if (ticketResult.data.value) {
+      ElMessage({
+        message: i18n.t("saved"),
+        type: "success",
+        duration: 5000,
+      });
       ticketModel.value = ticketResult.data.value;
     }
   } catch (error) {
@@ -281,9 +286,16 @@ async function createTicket() {
   try {
     loadingText.value = i18n.t("creatingTicket");
     loading.value = true;
-    const ticketResult = await $api.ticket.create(
-      createTicketFromResponse(ticketModel.value!)
-    );
+    const ticketResult = await $api.ticket.create({
+      title: ticketModel.value!.title,
+      description: ticketModel.value!.description ?? null,
+      author: ticketModel.value!.author,
+      stateId: ticketModel.value!.state.id,
+      priorityId: ticketModel.value!.priority.id,
+      buildingId: ticketModel.value!.building?.id ?? null,
+      object: ticketModel.value!.object ?? null,
+      room: ticketModel.value!.room ?? null,
+    });
 
     if (ticketResult.error.value) {
       if (ticketResult.error.value.statusCode === 403) {
@@ -303,6 +315,11 @@ async function createTicket() {
     }
 
     if (ticketResult.data.value) {
+      ElMessage({
+        message: i18n.t("saved"),
+        type: "success",
+        duration: 5000,
+      });
       router.push(
         localePath("/tickets/" + ticketResult.data.value.id)?.fullPath as string
       );

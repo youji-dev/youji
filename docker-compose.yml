@@ -12,7 +12,7 @@ services:
     healthcheck:
       interval: 5s
       retries: 5
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       timeout: 5s
 
   youji-backend:
@@ -38,7 +38,7 @@ services:
       - youji-backend
     restart: always
     environment:
-      - BACKEND_BASE_URL=https://YOUR-PUBLIC-API-HOST
+      - NUXT_PUBLIC_BACKEND_URL=https://YOUR-PUBLIC-API-HOST
     ports:
       - "80:80"
 
@@ -48,5 +48,3 @@ networks:
 
 volumes:
   database:
-
-

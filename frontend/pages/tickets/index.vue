@@ -58,7 +58,6 @@
           width="150"
           show-overflow-tooltip
           sortable
-          
         />
         <el-table-column
           prop="title"

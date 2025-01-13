@@ -2,7 +2,8 @@
   <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1">
     <div>
       <el-text>{{ $t("state") }}</el-text>
-      <el-select v-model="ticket.state" value-key="id" class="drop-shadow-xl dark:base-bg-dark" :placeholder="$t('select')">
+      <el-select v-model="ticket.state" value-key="id" class="drop-shadow-xl dark:base-bg-dark"
+        :placeholder="$t('select')">
         <el-option v-for="state in availableStates" :key="state.id" :label="state.name" :value="state">
           <el-tag :color="state.color">
             <el-text :style="{ color: contrastColor({ bgColor: state.color }) }"> {{ state.name }}</el-text>
@@ -18,13 +19,16 @@
     </div>
     <div>
       <el-text>{{ $t("priority") }}</el-text>
-      <el-select v-model="ticket.priority" value-key="value" class="drop-shadow-xl dark:base-bg-dark" :placeholder="$t('select')">
-        <el-option v-for="priority in availablePriorities" :key="priority.value" :label="priority.name" :value="priority" />
+      <el-select v-model="ticket.priority" value-key="value" class="drop-shadow-xl dark:base-bg-dark"
+        :placeholder="$t('select')">
+        <el-option v-for="priority in availablePriorities" :key="priority.id" :label="priority.name"
+          :value="priority" />
       </el-select>
     </div>
     <div class="lg:col-span-full">
       <el-text>{{ $t("building") }}</el-text>
-      <el-select v-model="ticket.building" class="drop-shadow-xl dark:base-bg-dark" value-key="id" :clearable="true" :placeholder="$t('select')">
+      <el-select v-model="ticket.building" class="drop-shadow-xl dark:base-bg-dark" value-key="id" :clearable="true"
+        :placeholder="$t('select')">
         <el-option v-for="building in availableBuildings" :key="building.id" :label="building.name" :value="building" />
       </el-select>
     </div>

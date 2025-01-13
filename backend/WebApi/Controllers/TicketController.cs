@@ -7,12 +7,16 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
+using Blurhash.ImageSharp;
 using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Application.WebApi.Contracts.Response;
+
 
 namespace Application.WebApi.Controllers
 {
@@ -342,6 +346,13 @@ namespace Application.WebApi.Controllers
             using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
+            string? blurHash = null;
+            if (attachmentFile.ContentType.StartsWith("image/"))
+            {
+                using var image = Image.Load<Rgba32>(stream.ToArray());
+                blurHash = Blurhasher.Encode(image, 5, 5);
+            }
+
             TicketAttachment attachment = new()
             {
                 Id = default,
@@ -349,6 +360,7 @@ namespace Application.WebApi.Controllers
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
                 TicketId = ticketId,
+                BlurHash = blurHash,
             };
 
             await attachmentRepo.AddAsync(attachment);

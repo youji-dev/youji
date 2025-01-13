@@ -119,6 +119,9 @@
       </div>
     </div>
   </div>
+  <el-dialog v-model="imagePreviewDisplay">
+    <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
+  </el-dialog>
 </template>
 
 <script lang="ts" setup async>
@@ -130,7 +133,8 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 
-import { fromTicketResponse } from "~/types/api/request/editTicket";
+import { fromTicketResponse as createTicketFromResponse } from "~/types/api/request/createTicket";
+import { fromTicketResponse as editTicketFromResponse } from "~/types/api/request/editTicket";
 import TicketNotFoundError from "~/types/error/ticketNotFound";
 
 import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
@@ -140,6 +144,10 @@ import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 const localePath = useLocaleRoute();
+
+const { imagePreviewDisplay, imagePreviewSrc } = storeToRefs(
+  useImagePreviewDisplayStore()
+);
 
 const router = useRouter();
 const route = useRoute();
@@ -231,7 +239,7 @@ async function saveTicketChanges() {
     loadingText.value = i18n.t("savingTicket");
     loading.value = true;
     const ticketResult = await $api.ticket.edit(
-      fromTicketResponse(ticketModel.value!)
+      editTicketFromResponse(ticketModel.value!)
     );
 
     if (ticketResult.error.value) {

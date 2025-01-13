@@ -11,7 +11,6 @@ using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
-using System.Net.Mail;
 
 namespace Application.WebApi.Controllers
 {
@@ -248,12 +247,19 @@ namespace Application.WebApi.Controllers
             await commentRepo.AddAsync(comment);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [author]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateNewTicketCommentMail(comment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Kommentar an Ticket '{ticket.Title}'"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => mailingService.GenerateNewTicketCommentMail(comment, localizer),
+                (localizer) => localizer.Localize($"New comment on ticket '{ticket.Title}'"));
 
             return this.Ok(comment);
         }
@@ -301,9 +307,6 @@ namespace Application.WebApi.Controllers
 
             string performingUser = this.User.FindFirstValue("username") ?? string.Empty;
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [performingUser]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
             var mailRecipients = userRepository.GetMany(mailRecipientIds)
                 .Where(u => !string.IsNullOrWhiteSpace(u.Email))
@@ -313,10 +316,10 @@ namespace Application.WebApi.Controllers
                     PreferredLcid = u.PreferredLcid,
                 });
 
-            await mailingService.SendManyLocalized()
-
-            var mail = mailingService.GenerateNewTicketAttachmentMail(attachment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Anhang an Ticket '{ticket.Title}'"), mail);
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => mailingService.GenerateNewTicketAttachmentMail(attachment, localizer),
+                (localizer) => localizer.Localize($"New attachment on ticket '{ticket.Title}'"));
 
             return this.Ok(attachment);
         }
@@ -386,12 +389,19 @@ namespace Application.WebApi.Controllers
             await ticketRepo.UpdateAsync(ticket);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateTicketChangedMail(ticket, oldTicket);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Ticket '{ticket.Title}' wurde geändert"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => mailingService.GenerateTicketChangedMail(ticket, oldTicket, localizer),
+                (localizer) => localizer.Localize($"Ticket '{ticket.Title}' was changed"));
 
             return this.Ok(ticket);
         }

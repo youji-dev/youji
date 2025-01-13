@@ -68,63 +68,22 @@ namespace DomainLayer.BusinessLogic.Mailing
         }
 
         /// <summary>
-        /// Send a mail
+        /// Send same mail to many recipients with recipient-specific localization
         /// </summary>
-        /// <param name="recipient">The mail recipient</param>
-        /// <param name="subject">The mail subject</param>
-        /// <param name="body">The mail body</param>
-        /// <returns>A task representing the asynchronous operation</returns>
-        public async Task Send(MailboxAddress recipient, string subject, MimeEntity body)
-        {
-            MimeMessage message = new();
-            message.From.Add(new MailboxAddress(this.mailSenderName, this.mailSenderAddress));
-            message.To.Add(recipient);
-            message.Subject = subject;
-
-            message.Body = body;
-
-            using SmtpClient client = new();
-
-            await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
-
-            await client.SendAsync(message);
-            await client.DisconnectAsync(true);
-        }
-
-        /// <summary>
-        /// Send same mail to many recipients
-        /// </summary>
-        /// <param name="recipients">List of all recipients</param>
-        /// <param name="subject">The mail subject</param>
-        /// <param name="body">The mail body</param>
+        /// <param name="recipients">The recpients of the mail</param>
+        /// <param name="mailGenerator">A generator function that produces the mail body</param>
+        /// <param name="subjectGenerator">A generator function that produces the mail subject</param>
         /// <returns>A Task representing the asynchronous operation</returns>
-        public async Task SendMany(IEnumerable<MailboxAddress> recipients, string subject, MimeEntity body)
-        {
-            using SmtpClient client = new();
-            await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
-
-            foreach (var recipient in recipients)
-            {
-                MimeMessage message = new();
-                message.From.Add(new MailboxAddress(this.mailSenderName, this.mailSenderAddress));
-                message.To.Add(recipient);
-                message.Subject = subject;
-
-                message.Body = body;
-
-                await client.SendAsync(message);
-            }
-
-            await client.DisconnectAsync(true);
-        }
-
-        public async Task SendManyLocalized(IEnumerable<MailRecipient> recipients, Func<Localizer, MimeEntity> mailGenerator, string subjectLocalization, string subjectParameter)
+        public async Task SendManyLocalized(
+            IEnumerable<MailRecipient> recipients,
+            Func<Localizer, MimeEntity> mailGenerator,
+            Func<Localizer, string> subjectGenerator)
         {
             using SmtpClient client = new();
             await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
 
             Localizer localizer = new();
-            using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Resources/Localization/Mailing.I18N.xml");
+            using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Mailing.I18N.xml");
 
             var senderMail = new MailboxAddress(this.mailSenderName, this.mailSenderAddress);
             foreach (var recipient in recipients)
@@ -137,7 +96,7 @@ namespace DomainLayer.BusinessLogic.Mailing
                 MimeMessage message = new();
                 message.From.Add(senderMail);
                 message.To.Add(recipient.Address);
-                message.Subject = localizer.LocalizeFormat(subjectLocalization, subjectParameter);
+                message.Subject = string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectGenerator(localizer));
 
                 var body = mailGenerator(localizer);
                 message.Body = body;
@@ -147,14 +106,6 @@ namespace DomainLayer.BusinessLogic.Mailing
 
             await client.DisconnectAsync(true);
         }
-
-        /// <summary>
-        /// Format a string to conform to shared subject format
-        /// </summary>
-        /// <param name="subjectText">The text the subject should include</param>
-        /// <returns>The formatted subject</returns>
-        public string FormatMailSubject(string subjectText)
-            => string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectText);
 
         /// <summary>
         /// Generate a mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>

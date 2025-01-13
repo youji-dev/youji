@@ -4,6 +4,7 @@ import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import type createCommentRequest from "~/types/api/request/createComment";
 import type EditTicketRequest from "~/types/api/request/editTicket";
+import type searchResponse from "~/types/api/response/searchResponse";
 
 class TicketRepository {
   private path = "/api/Ticket";
@@ -12,8 +13,8 @@ class TicketRepository {
     return useFetchAuthenticated<ticket>(`${this.path}/${id}`, { method: "GET" });
   }
 
-  async search(searchTerm: string, orderByColumn: string, orderDesc: boolean, skip: number, take: number): Promise<ReturnType<typeof useFetchAuthenticated<ticket[]>>> {
-    return useFetchAuthenticated<ticket[]>(`${this.path}/search`, {
+  async search(searchTerm: string, orderByColumn: string, orderDesc: boolean, skip: number, take: number): Promise<ReturnType<typeof useFetchAuthenticated<searchResponse>>> {
+    return useFetchAuthenticated<searchResponse>(`${this.path}/search`, {
       method: "GET",
       query: {
         searchTerm,
@@ -49,12 +50,6 @@ class TicketRepository {
     return useFetchAuthenticated<ticketComment>(`${this.path}/${id}/comment`, { method: "POST", body: comment });
   }
 
-  async uploadAttachment(id: string, file: File): Promise<ReturnType<typeof useFetchAuthenticated<ticketAttachment>>> {
-    const formData = new FormData();
-    formData.append("attachmentFile", file);
-    return useFetchAuthenticated<ticketAttachment>(`${this.path}/${id}/attachment`, { method: "POST", headers: { "Content-Type": "multipart/form-data" }, body: formData });
-  }
-
   async exportToPDF(id: string, language: string) {
     await useFetchAuthenticated<Blob>(`${this.path}/${id}/export`, {
       method: "GET",
@@ -69,6 +64,7 @@ class TicketRepository {
         link.setAttribute("download", filename ?? "ticket.pdf");
         document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
       },
     });
   }

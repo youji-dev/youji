@@ -7,11 +7,14 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
+using Blurhash.ImageSharp;
+using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
-using System.Net.Mail;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Application.WebApi.Controllers
 {
@@ -45,7 +48,7 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term.
+        /// Gets a ticket filtert by a specific search term and the max amount of results used for pagination.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
@@ -80,19 +83,23 @@ namespace Application.WebApi.Controllers
                     || ticket.Author.ToLower().Contains(searchTerm));
             }
 
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
             ticketQuery =
-            orderDesc
-            ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-            : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
             if (take is not null)
             {
                 ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
             }
 
-            Ticket[] tickets = [.. ticketQuery];
-
-            return this.Ok(tickets);
+            tickets = [.. ticketQuery];
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
         }
 
         /// <summary>
@@ -187,6 +194,7 @@ namespace Application.WebApi.Controllers
                 Author = author,
                 CreationDate = DateTime.UtcNow,
                 State = state,
+                LastStateUpdate = DateTime.UtcNow,
                 Description = ticketData.Description,
                 Priority = priority,
                 Building = building,
@@ -287,6 +295,13 @@ namespace Application.WebApi.Controllers
             using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
+            string? blurHash = null;
+            if (attachmentFile.ContentType.StartsWith("image/"))
+            {
+                using var image = Image.Load<Rgba32>(stream.ToArray());
+                blurHash = Blurhasher.Encode(image, 5, 5);
+            }
+
             TicketAttachment attachment = new()
             {
                 Id = default,
@@ -294,6 +309,7 @@ namespace Application.WebApi.Controllers
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
                 TicketId = ticketId,
+                BlurHash = blurHash,
             };
 
             await attachmentRepo.AddAsync(attachment);
@@ -364,6 +380,9 @@ namespace Application.WebApi.Controllers
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
             ticket.State = state ?? ticket.State;
+            ticket.LastStateUpdate = state is not null && !state.Id.Equals(ticket.State.Id)
+                ? DateTime.UtcNow
+                : ticket.LastStateUpdate;
             ticket.Building = building ?? ticket.Building;
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;

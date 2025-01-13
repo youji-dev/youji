@@ -1,6 +1,6 @@
 <template>
   <div
-    class="absolute px-6 py-3 left-0 top-0 h-full w-full bg-transparent block md:hidden z-10"
+    class="absolute px-6 py-3 left-0 top-0 h-fit w-full bg-transparent block lg:hidden z-10"
     :class="{ 'max-h-fit': !drawer }"
   >
     <div class="flex items-center justify-between w-full">
@@ -14,24 +14,44 @@
 
     <el-drawer
       v-model="drawer"
-      :title="$t('navigation')"
+      :title="$t('youji')"
+      :with-header="false"
       :direction="'ltr'"
-      style="min-width: 60%; max-height: 100vh"
+      style="min-width: fit-content; max-width: fit-content; height: 100vh"
     >
       <template #header="{}" style="margin-bottom: 0"> </template>
       <template #body style="overflow-y: hidden"></template>
-      <el-menu default-active="2" class="el-menu-vertical-demo pt-5" style="height: calc(100vh - 120px)">
+      <el-menu
+        :default-active="getPageIndex()"
+        class="el-menu-vertical-demo h-full"
+      >
         <div>
-          <el-menu-item index="2">
+          <div class="flex items-center justify-between">
+            <Logo />
+            <div class="flex items-center justify-end">
+              <Theme />
+              <Language />
+            </div>
+          </div>
+          <el-menu-item
+            index="1"
+            @click="router.push(localeRoute('/tickets')?.fullPath as string)"
+          >
             <el-icon>
               <Files />
             </el-icon>
-            <el-badge :value="9" type="primary" :offset="[10, 15]">
+            <el-badge :value="9" type="primary" :offset="[-125, 15]">
               <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
             </el-badge>
           </el-menu-item>
 
-          <el-menu-item index="1" class="menu-item">
+          <el-menu-item
+            index="2"
+            class="menu-item"
+            @click="
+              router.push(localeRoute('/tickets/new')?.fullPath as string)
+            "
+          >
             <el-icon>
               <Plus />
             </el-icon>
@@ -40,13 +60,20 @@
         </div>
         <div>
           <el-divider></el-divider>
-          <el-menu-item class="menu-item">
+          <el-menu-item
+            class="menu-item"
+            @click="router.push(localeRoute('/logout')?.fullPath as string)"
+          >
             <el-icon class="-rotate-90" color="#EF4444">
               <Upload />
             </el-icon>
             <span>{{ $t("logout") }}</span>
           </el-menu-item>
-          <el-menu-item class="menu-item" index="3">
+          <el-menu-item
+            class="menu-item"
+            index="3"
+            @click="router.push(localeRoute('/settings')?.fullPath as string)"
+          >
             <el-icon class="-rotate-90">
               <Setting />
             </el-icon>
@@ -62,6 +89,32 @@
 import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
 import Logo from "./logo.vue";
 const drawer = ref(false);
+const router = useRouter();
+const localeRoute = useLocaleRoute();
+const route = useRoute();
+const routeObject = reactive({ route });
+const { locale } = useI18n();
+
+function getPageIndex() {
+  if (
+    routeObject.route.fullPath ==
+    localeRoute("/tickets", locale.value)?.fullPath
+  ) {
+    return "1";
+  } else if (
+    routeObject.route.fullPath ==
+    localeRoute("/tickets/new", locale.value)?.fullPath
+  ) {
+    return "2";
+  } else if (
+    routeObject.route.fullPath ==
+    localeRoute("/settings", locale.value)?.fullPath
+  ) {
+    return "3";
+  } else {
+    return "0";
+  }
+}
 </script>
 
 <style>
@@ -75,7 +128,7 @@ const drawer = ref(false);
   flex-direction: column;
   flex-flow: column;
   min-height: 0;
-  height: 95%;
+  height: 100%;
 }
 
 .menu-item {

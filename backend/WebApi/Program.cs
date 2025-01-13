@@ -16,6 +16,7 @@ builder.Services.AddRepositories();
 builder.Services.AddLogicServices(builder.Configuration);
 builder.Services.AddAuthenticationConfiguration(builder.Configuration);
 builder.Services.AddCorsConfiguration(builder.Configuration);
+builder.Services.AddQuartzConfiguration();
 
 var app = builder.Build();
 

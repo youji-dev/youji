@@ -1,20 +1,30 @@
 <template>
   <div
+    class="max-h-[100vh] px-6 py-3 max-w-fit min-w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
     id="navbar"
-    class="max-h-[100vh] px-6 py-3 md:w-[40%] lg:w-[30%] xl:w-[20%] 2xl:w-[15%] w-fit base-bg-light dark:base-bg-dark hidden md:block lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height">
-    <Logo />
-    <el-menu default-active="2" class="el-menu-vertical-demo pt-5">
+  >
+  <div class="flex items-center justify-between">
+    <Logo/>
+    <div class="flex items-center justify-end">
+      <Theme />
+      <Language />
+    </div>
+  </div>
+    <el-menu
+      :default-active="getPageIndex()"
+      class="el-menu-vertical-demo pt-5"
+    >
       <div>
-        <el-menu-item index="2">
-          <el-icon>
+        <el-menu-item index="1" @click="router.push(localeRoute('/tickets')?.fullPath as string)">
+        <el-icon>
             <Files />
           </el-icon>
-          <el-badge :value="9" type="primary" :offset="[10, 15]">
+          <el-badge :value="9" type="primary" :offset="[-125, 15]">
             <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
           </el-badge>
         </el-menu-item>
 
-        <el-menu-item index="1" class="menu-item">
+        <el-menu-item index="2" class="menu-item"  @click="router.push(localeRoute('/tickets/new')?.fullPath as string)">
           <el-icon>
             <Plus />
           </el-icon>
@@ -23,13 +33,13 @@
       </div>
       <div>
         <el-divider></el-divider>
-        <el-menu-item class="menu-item">
+        <el-menu-item class="menu-item"  @click="router.push(localeRoute('/logout')?.fullPath as string)">
           <el-icon class="-rotate-90" color="#EF4444">
             <Upload />
           </el-icon>
           <span>{{ $t("logout") }}</span>
         </el-menu-item>
-        <el-menu-item class="menu-item" index="3">
+        <el-menu-item class="menu-item" index="3" @click="router.push(localeRoute('/settings')?.fullPath as string)">
           <el-icon class="-rotate-90">
             <Setting />
           </el-icon>
@@ -42,6 +52,29 @@
 
 <script lang="ts" setup>
 import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
+const localeRoute = useLocaleRoute();
+const route = useRoute();
+const routeObject = reactive({ route });
+const { locale } = useI18n();
+const router = useRouter();
+
+function getPageIndex() {
+  if (routeObject.route.fullPath == localeRoute("/tickets", locale.value)?.fullPath) {
+    return "1";
+  } else if (
+    routeObject.route.fullPath ==
+    localeRoute("/tickets/new", locale.value)?.fullPath
+  ) {
+    return "2";
+  } else if (
+    routeObject.route.fullPath ==
+    localeRoute("/settings", locale.value)?.fullPath
+  ) {
+    return "3";
+  } else {
+    return "0";
+  }
+}
 </script>
 
 <style>

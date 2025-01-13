@@ -15,8 +15,6 @@ using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using Application.WebApi.Contracts.Response;
-
 
 namespace Application.WebApi.Controllers
 {

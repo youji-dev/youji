@@ -1,0 +1,50 @@
+services:
+  database:
+    container_name: Youji_Database
+    image: postgres:latest
+    hostname: database
+    restart: always
+    networks:
+      - database
+    volumes:
+      - database:/var/lib/postgresql/data
+    env_file: .env
+    healthcheck:
+      interval: 5s
+      retries: 5
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      timeout: 5s
+
+  youji-backend:
+    container_name: Youji-Backend
+    image: youji/backend:latest
+    build: ./backend
+    restart: always
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - database
+    volumes:
+      - ./backend/WebApi/appsettings.json:/App/appsettings.json
+    ports:
+      - "8123:5003"
+
+  youji-frontend:
+    container_name: Youji-Frontend
+    image: youji/frontend:latest
+    build: ./frontend
+    depends_on:
+      - youji-backend
+    restart: always
+    environment:
+      - NUXT_PUBLIC_BACKEND_URL=https://YOUR-PUBLIC-API-HOST
+    ports:
+      - "80:80"
+
+networks:
+  database:
+    internal: true
+
+volumes:
+  database:

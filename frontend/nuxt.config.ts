@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      BACKEND_URL: process.env.BACKEND_BASE_URL,
+      BACKEND_URL: "", // create a .env file with NUXT_PUBLIC_BACKEND_URL=<your backend url> to override this
       ACCESS_TOKEN_NAME: "youji-access-token",
       REFRESH_TOKEN_NAME: "youji-refresh-token",
       COLORS: {
@@ -29,7 +29,14 @@ export default defineNuxtConfig({
       },
     },
   },
-  modules: ["@nuxtjs/tailwindcss", "@pinia/nuxt", "@nuxtjs/color-mode", "@nuxt/icon", "@nuxtjs/i18n", "@element-plus/nuxt", "@unlazy/nuxt"],
+  modules: [
+    "@nuxtjs/tailwindcss",
+    "@pinia/nuxt",
+    "@nuxtjs/color-mode",
+    "@nuxt/icon",
+    "@nuxtjs/i18n",
+    "@element-plus/nuxt",
+  ],
   i18n: {
     strategy: "prefix",
     // Icons from https://www.npmjs.com/package/@iconify-json/flag

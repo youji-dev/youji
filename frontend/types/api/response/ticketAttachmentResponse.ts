@@ -8,11 +8,6 @@ export default interface ticketAttachment {
   id: string;
 
   /**
-   * The attachment itself as binary
-   */
-  binary: string;
-
-  /**
    * The file name of the attachment
    */
   name: string;
@@ -26,4 +21,11 @@ export default interface ticketAttachment {
    * The id of the ticket that this attachment belongs to
    */
   ticketId: string;
+
+  /**
+   * Blurhash of the attachment. Null if attachment is not an image.
+   * This is used to generate the image preview before the image is downloadet
+   * @see https://blurha.sh
+  */
+  blurHash?: string;
 }

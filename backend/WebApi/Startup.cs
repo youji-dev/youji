@@ -138,11 +138,14 @@ namespace Application.WebApi
         /// </summary>
         /// <typeparam name="T">Instance of <see cref="IJob"/></typeparam>
         /// <param name="quartzConfig">Instance of <see cref="IServiceCollectionQuartzConfigurator"/></param>
-        /// <param name="jobKey">A job key as a string which signs the job.</param>
+        /// <param name="jobKey">Unique key of the job as a string.</param>
         /// <param name="cronExpression">The cron expression in which schedule the job will executed.</param>
         /// <returns>A quartz job configurator.</returns>
-        private static IServiceCollectionQuartzConfigurator AddQuartzJob<T>(this IServiceCollectionQuartzConfigurator quartzConfig, string jobKey, string cronExpression)
-            where T : IJob
+        private static IServiceCollectionQuartzConfigurator AddQuartzJob<T>(
+            this IServiceCollectionQuartzConfigurator quartzConfig,
+            string jobKey,
+            string cronExpression)
+                where T : IJob
         {
             var key = new JobKey(jobKey);
 

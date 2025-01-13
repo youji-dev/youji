@@ -18,9 +18,6 @@ namespace DomainLayer.BusinessLogic.Jobs
                     && DateTime.UtcNow.AddDays(-(int)ticket.State.AutoPurgeDays) > ticket.LastStateUpdate)
                 .ToArray();
 
-            if (deletableTickets.Length < 1)
-                return;
-
             foreach (var ticket in deletableTickets)
                 await ticketRepo.DeleteAsync(ticket);
         }

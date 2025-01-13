@@ -30,12 +30,11 @@ export const useAuthStore = defineStore("auth", {
         const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
           body: {
             username: name,
-            password,
+            password: password,
           },
           method: "post",
           headers: { "Content-Type": "application/json" },
         });
-
         this.loading = pending;
 
         if (error?.value?.statusCode === 401) {
@@ -46,10 +45,12 @@ export const useAuthStore = defineStore("auth", {
         }
 
         if (!data.value) return;
-
-        useCookie(ACCESS_TOKEN_NAME, { secure: true, sameSite: "strict" }).value = data.value.accessToken;
-        useCookie(REFRESH_TOKEN_NAME, { secure: true, sameSite: "strict" }).value = data.value.refreshToken;
-
+        const accessToken = useCookie(ACCESS_TOKEN_NAME);
+        const refreshToken = useCookie(REFRESH_TOKEN_NAME);
+        accessToken.value = data.value.accessToken;
+        refreshToken.value = data.value.refreshToken;
+        console.log(accessToken);
+        console.log(accessToken.value)
         this.authenticated = true;
       } catch (error) {
         console.error(error);
@@ -62,8 +63,6 @@ export const useAuthStore = defineStore("auth", {
     },
 
     async checkIfTokenIsValid(): Promise<boolean> {
-      const { $api } = useNuxtApp();
-
       try {
         await useFetchAuthenticated("/Auth/verify-token");
         return true;

@@ -7,11 +7,14 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
+using Blurhash.ImageSharp;
+using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
-using System.Net.Mail;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Application.WebApi.Controllers
 {
@@ -45,19 +48,19 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term.
+        /// Gets a ticket filtert by a specific search term and the max amount of results used for pagination.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
         /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
-        /// <param name="orderDesc">The direction teh results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
+        /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
         /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
         /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
-        public ActionResult<Ticket[]> Get(
+        public ActionResult<TicketSearchDTO> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string orderByColumn = "CreationDate",
@@ -74,25 +77,78 @@ namespace Application.WebApi.Controllers
                     ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
                     || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
                     || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
-                    || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
+                    || ticket.Priority.Name.ToLower().Contains(searchTerm)
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
                     || ticket.Author.ToLower().Contains(searchTerm));
             }
 
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
             ticketQuery =
-            orderDesc
-            ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-            : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
             if (take is not null)
             {
                 ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
             }
 
-            Ticket[] tickets = [.. ticketQuery];
+            tickets = [.. ticketQuery];
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
+        }
 
-            return this.Ok(tickets);
+        /// <summary>
+        /// Fetches tickets by a given property. Property can be a subclass, classPropertyName has to be specified as the property to be compared in the subclass.
+        /// Supports String|Int|Boolean|DateTime|Guid fields.
+        /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
+        /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
+        /// <param name="property">The property to be searched</param>
+        /// <param name="classPropertyName">The name of the property to be compared in case the ticket property is a class</param>
+        /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
+        /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
+        /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
+        /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
+        /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
+        [HttpGet("searchByProperty")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
+        public ActionResult<TicketSearchDTO> GetByProperty(
+            [FromServices] TicketRepository ticketRepo,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] string property = "Title",
+            [FromQuery] string? classPropertyName = null,
+            [FromQuery] string orderByColumn = "CreationDate",
+            [FromQuery] bool orderDesc = false,
+            [FromQuery] int skip = 0,
+            [FromQuery] int? take = null)
+        {
+            var ticketQuery = searchTerm is null
+                ? ticketRepo.GetAll()
+                : ticketRepo.GetByPropertyValue(searchTerm, property, classPropertyName);
+
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
+            ticketQuery =
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
+
+            if (take is not null)
+            {
+                ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
+            }
+
+            tickets = [.. ticketQuery];
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
         }
 
         /// <summary>
@@ -187,6 +243,7 @@ namespace Application.WebApi.Controllers
                 Author = author,
                 CreationDate = DateTime.UtcNow,
                 State = state,
+                LastStateUpdate = DateTime.UtcNow,
                 Description = ticketData.Description,
                 Priority = priority,
                 Building = building,
@@ -287,6 +344,13 @@ namespace Application.WebApi.Controllers
             using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
+            string? blurHash = null;
+            if (attachmentFile.ContentType.StartsWith("image/"))
+            {
+                using var image = Image.Load<Rgba32>(stream.ToArray());
+                blurHash = Blurhasher.Encode(image, 5, 5);
+            }
+
             TicketAttachment attachment = new()
             {
                 Id = default,
@@ -294,6 +358,7 @@ namespace Application.WebApi.Controllers
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
                 TicketId = ticketId,
+                BlurHash = blurHash,
             };
 
             await attachmentRepo.AddAsync(attachment);
@@ -364,6 +429,9 @@ namespace Application.WebApi.Controllers
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
             ticket.State = state ?? ticket.State;
+            ticket.LastStateUpdate = state is not null && !state.Id.Equals(ticket.State.Id)
+                ? DateTime.UtcNow
+                : ticket.LastStateUpdate;
             ticket.Building = building ?? ticket.Building;
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;

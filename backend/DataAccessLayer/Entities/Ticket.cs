@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using System.Text.Json.Serialization;
 
 namespace PersistenceLayer.DataAccess.Entities
 {
@@ -46,6 +48,12 @@ namespace PersistenceLayer.DataAccess.Entities
         /// </summary>
         [DeleteBehavior(DeleteBehavior.Restrict)]
         public required State State { get; set; }
+
+        /// <summary>
+        /// Date of the last state update. Used to determine tickets that should be purged.
+        /// </summary>
+        [JsonIgnore]
+        public DateTime LastStateUpdate { get; set; }
 
         /// <summary>
         /// An array of all comments on the ticket.

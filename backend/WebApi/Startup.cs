@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using DomainLayer.BusinessLogic.Authentication;
+using Quartz;
+using DomainLayer.BusinessLogic.Jobs;
 using DomainLayer.BusinessLogic.Mailing;
 
 namespace Application.WebApi
@@ -109,6 +111,26 @@ namespace Application.WebApi
                         RoleClaimType = ClaimTypes.Role,
                     };
                 });
+        }
+
+        /// <summary>
+        /// Adds configuration for job logic.
+        /// </summary>
+        /// <param name="services">Instance of <see cref="IServiceCollection"/>.</param>
+        public static void AddQuartzConfiguration(this IServiceCollection services)
+        {
+            services.AddQuartz(quartz =>
+            {
+                var jobKey = new JobKey("PurgeExpiredTicketsJob");
+                quartz.AddJob<PurgeExpiredTicketsJob>(jobKey);
+
+                quartz.AddTrigger(options =>
+                    options.ForJob(jobKey)
+                    .WithIdentity("PurgeExpiredTicketsJobTrigger")
+                    .WithCronSchedule("0 0 0 * * ?")); // Cron job expression for execution every day at 12:00 pm.
+            });
+
+            services.AddQuartzHostedService(quartz => quartz.WaitForJobsToComplete = true);
         }
     }
 }

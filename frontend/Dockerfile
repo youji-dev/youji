@@ -5,7 +5,8 @@ ENV NODE_ENV=production
 
 COPY package*.json ./
 RUN npm install
-RUN npm install sass-embedded-linux-x64 @unlazy/nuxt
+# Install dependencies for building on linux
+RUN npm install sass-embedded-linux-x64
 
 COPY . .
 RUN npm run build

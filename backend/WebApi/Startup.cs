@@ -121,16 +121,40 @@ namespace Application.WebApi
         {
             services.AddQuartz(quartz =>
             {
-                var jobKey = new JobKey("PurgeExpiredTicketsJob");
-                quartz.AddJob<PurgeExpiredTicketsJob>(jobKey);
-
-                quartz.AddTrigger(options =>
-                    options.ForJob(jobKey)
-                    .WithIdentity("PurgeExpiredTicketsJobTrigger")
-                    .WithCronSchedule("0 0 0 * * ?")); // Cron job expression for execution every day at 12:00 pm.
+                quartz
+                    .AddQuartzJob<PurgeExpiredTicketsJob>(
+                        "PurgeExpiredTicketsJob",
+                        "0 0 0 * * ?") // Cron job expression for execution every day at 12:00 pm.
+                    .AddQuartzJob<PurgeExpiredRefreshTokenJob>(
+                        "PurgeExpiredRefreshTokenJob",
+                        "0 0 * * * ?"); // Cron job expression for execution every hour at minute 00.
             });
 
             services.AddQuartzHostedService(quartz => quartz.WaitForJobsToComplete = true);
+        }
+
+        /// <summary>
+        /// Adds a quartz job.
+        /// </summary>
+        /// <typeparam name="T">Instance of <see cref="IJob"/></typeparam>
+        /// <param name="quartzConfig">Instance of <see cref="IServiceCollectionQuartzConfigurator"/></param>
+        /// <param name="jobKey">Unique key of the job as a string.</param>
+        /// <param name="cronExpression">The cron expression in which schedule the job will executed.</param>
+        /// <returns>A quartz job configurator.</returns>
+        private static IServiceCollectionQuartzConfigurator AddQuartzJob<T>(
+            this IServiceCollectionQuartzConfigurator quartzConfig,
+            string jobKey,
+            string cronExpression)
+                where T : IJob
+        {
+            var key = new JobKey(jobKey);
+
+            return quartzConfig
+                .AddJob<T>(key)
+                .AddTrigger(options => options
+                    .ForJob(key)
+                    .WithIdentity($"{jobKey}Trigger")
+                    .WithCronSchedule(cronExpression));
         }
     }
 }

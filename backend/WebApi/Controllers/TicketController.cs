@@ -211,9 +211,10 @@ namespace Application.WebApi.Controllers
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketPostDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var ticketState = await stateRepo.GetAsync(ticketData.StateId);
+            var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
 
-            if (state is null)
+            if (ticketState is null)
                 return this.BadRequest("The ticket to be created must have a valid state.");
 
             var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
@@ -242,7 +243,7 @@ namespace Application.WebApi.Controllers
                 Title = ticketData.Title,
                 Author = author,
                 CreationDate = DateTime.UtcNow,
-                State = state,
+                State = ticketState,
                 LastStateUpdate = DateTime.UtcNow,
                 Description = ticketData.Description,
                 Priority = priority,

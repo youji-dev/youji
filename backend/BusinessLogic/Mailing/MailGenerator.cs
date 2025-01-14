@@ -13,9 +13,9 @@ using RazorEngine.Templating;
 namespace DomainLayer.BusinessLogic.Mailing
 {
     /// <summary>
-    /// Helper class for mail generation
+    /// Helper class for mail body generation
     /// </summary>
-    public static partial class MailingHelper
+    public static partial class MailGenerator
     {
         /// <summary>
         /// Generate a mail body for a changed ticket
@@ -140,7 +140,7 @@ namespace DomainLayer.BusinessLogic.Mailing
     /// <summary>
     /// Partial class for Regex
     /// </summary>
-    public static partial class MailingHelper
+    public static partial class MailGenerator
     {
         [GeneratedRegex(@"^.*<!-- Begin document -->\s*", RegexOptions.Singleline)]
         private static partial Regex RazorDeclaresRegex();

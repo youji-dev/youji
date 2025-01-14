@@ -2,15 +2,10 @@
 using System.Reflection;
 using System.Text;
 using Common.Extensions;
-using Common.Helpers;
-using DomainLayer.BusinessLogic.Mailing.Models;
 using I18N.DotNet;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using PersistenceLayer.DataAccess.Entities;
-using RazorEngine;
-using RazorEngine.Templating;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
@@ -26,46 +21,6 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly bool useSsl = bool.Parse(configuration.GetValueOrThrow("UseSsl", ["Mail"]));
         private readonly CompositeFormat mailSubjectFormat = CompositeFormat.Parse(
             configuration.GetValueOrThrow("SubjectFormat", ["Mail"]));
-
-        /// <summary>
-        /// Generate a mail body for a changed ticket
-        /// </summary>
-        /// <param name="newTicket">New version of the ticket</param>
-        /// <param name="oldTicket">Old version of the ticket</param>
-        /// <param name="localizer">Localizer for mail generation</param>
-        /// <returns>The generated mail body</returns>
-        public MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket, Localizer localizer)
-        {
-            TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket, localizer);
-
-            return this.GenerateMail(mailModel);
-        }
-
-        /// <summary>
-        /// Generate a mail body for a new attachement
-        /// </summary>
-        /// <param name="newAttachment">The new attachment</param>
-        /// <param name="localizer">Localizer for mail generation</param>
-        /// <returns>The generated mail body</returns>
-        public MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment, Localizer localizer)
-        {
-            NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment, localizer);
-
-            return this.GenerateMail(mailModel);
-        }
-
-        /// <summary>
-        /// Generate a mail body for a new comment
-        /// </summary>
-        /// <param name="newComment">The new comment</param>
-        /// <param name="localizer">Localizer for mail generation</param>
-        /// <returns>The generated mail body</returns>
-        public MimeEntity GenerateNewTicketCommentMail(TicketComment newComment, Localizer localizer)
-        {
-            NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment, localizer);
-
-            return this.GenerateMail(mailModel);
-        }
 
         /// <summary>
         /// Send same mail to many recipients with recipient-specific localization
@@ -105,32 +60,6 @@ namespace DomainLayer.BusinessLogic.Mailing
             }
 
             await client.DisconnectAsync(true);
-        }
-
-        /// <summary>
-        /// Generate a mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
-        /// </summary>
-        /// <param name="mailModel">The model to use as a data provider</param>
-        /// <returns>The generated mail body</returns>
-        private MimeEntity GenerateMail(MailModel mailModel)
-        {
-            BodyBuilder bodyBuilder = new();
-
-            MailingHelper.AddResourcesToModel(bodyBuilder, mailModel);
-
-            string layout = MailingHelper.GetTemplate("MailBase")
-                ?? throw new InvalidOperationException("Could not find resource file for mail layout");
-
-            string template = MailingHelper.GetTemplate(mailModel.TemplateName)
-                ?? throw new InvalidOperationException($"Could not find resource file for mail template with name '{mailModel.TemplateName}'");
-
-            Engine.Razor.AddTemplate("mailLayout", layout);
-            var html = Engine.Razor.RunCompile(template, mailModel.TemplateName, mailModel.GetType(), mailModel);
-
-            bodyBuilder.HtmlBody = html;
-            bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);
-
-            return bodyBuilder.ToMessageBody();
         }
     }
 }

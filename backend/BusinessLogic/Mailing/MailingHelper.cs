@@ -4,14 +4,85 @@ using Common.Extensions;
 using DomainLayer.BusinessLogic.Mailing.Models;
 using MimeKit.Utils;
 using MimeKit;
+using I18N.DotNet;
+using PersistenceLayer.DataAccess.Entities;
+using Common.Helpers;
+using RazorEngine;
+using RazorEngine.Templating;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
     /// <summary>
-    /// Helper class for razor templates
+    /// Helper class for mail generation
     /// </summary>
-    internal static partial class MailingHelper
+    public static partial class MailingHelper
     {
+        /// <summary>
+        /// Generate a mail body for a changed ticket
+        /// </summary>
+        /// <param name="newTicket">New version of the ticket</param>
+        /// <param name="oldTicket">Old version of the ticket</param>
+        /// <param name="localizer">Localizer for mail generation</param>
+        /// <returns>The generated mail body</returns>
+        public static MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket, Localizer localizer)
+        {
+            TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket, localizer);
+
+            return GenerateMail(mailModel);
+        }
+
+        /// <summary>
+        /// Generate a mail body for a new attachement
+        /// </summary>
+        /// <param name="newAttachment">The new attachment</param>
+        /// <param name="localizer">Localizer for mail generation</param>
+        /// <returns>The generated mail body</returns>
+        public static MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment, Localizer localizer)
+        {
+            NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment, localizer);
+
+            return GenerateMail(mailModel);
+        }
+
+        /// <summary>
+        /// Generate a mail body for a new comment
+        /// </summary>
+        /// <param name="newComment">The new comment</param>
+        /// <param name="localizer">Localizer for mail generation</param>
+        /// <returns>The generated mail body</returns>
+        public static MimeEntity GenerateNewTicketCommentMail(TicketComment newComment, Localizer localizer)
+        {
+            NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment, localizer);
+
+            return GenerateMail(mailModel);
+        }
+
+        /// <summary>
+        /// Generate a mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
+        /// </summary>
+        /// <param name="mailModel">The model to use as a data provider</param>
+        /// <returns>The generated mail body</returns>
+        private static MimeEntity GenerateMail(MailModel mailModel)
+        {
+            BodyBuilder bodyBuilder = new();
+
+            AddResourcesToModel(bodyBuilder, mailModel);
+
+            string layout = GetTemplate("MailBase")
+                ?? throw new InvalidOperationException("Could not find resource file for mail layout");
+
+            string template = GetTemplate(mailModel.TemplateName)
+                ?? throw new InvalidOperationException($"Could not find resource file for mail template with name '{mailModel.TemplateName}'");
+
+            Engine.Razor.AddTemplate("mailLayout", layout);
+            var html = Engine.Razor.RunCompile(template, mailModel.TemplateName, mailModel.GetType(), mailModel);
+
+            bodyBuilder.HtmlBody = html;
+            bodyBuilder.TextBody = HtmlHelper.LimitLineLength(HtmlHelper.HtmlToPlainText(html), 80);
+
+            return bodyBuilder.ToMessageBody();
+        }
+
         /// <summary>
         /// Get the template with the given name
         /// </summary>
@@ -69,7 +140,7 @@ namespace DomainLayer.BusinessLogic.Mailing
     /// <summary>
     /// Partial class for Regex
     /// </summary>
-    internal static partial class MailingHelper
+    public static partial class MailingHelper
     {
         [GeneratedRegex(@"^.*<!-- Begin document -->\s*", RegexOptions.Singleline)]
         private static partial Regex RazorDeclaresRegex();

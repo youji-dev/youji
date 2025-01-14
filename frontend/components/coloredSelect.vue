@@ -3,7 +3,7 @@
     <select
       v-model="selectedOption"
       :id="id"
-      class="colored-select"
+      class="colored-select bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]"
       @change="
         changeCallback(
           ...(changeCallbackParams ?? []),
@@ -111,6 +111,7 @@ onMounted(() => {
     selectedOption.value = current;
   });
 });
+
 </script>
 
 <style>

@@ -19,7 +19,6 @@
 			<Link>stylecop.json</Link>
 		</AdditionalFiles>
 	</ItemGroup>
-
 	<ItemGroup>
 	  <Folder Include="Contracts\Get\" />
 	</ItemGroup>

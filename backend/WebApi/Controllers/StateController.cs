@@ -37,11 +37,20 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Post(
             [FromServices] StateRepository stateRepo,
             [FromBody] StatePostDTO stateData)
         {
+            State? defaultState = null;
+
+            if (stateData.IsDefault)
+                defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+
+            if (defaultState is not null)
+                return this.BadRequest($"The state '{defaultState.Name}' is already set as default.");
+
             var state = new State()
             {
                 Id = default,
@@ -49,6 +58,7 @@ namespace Application.WebApi.Controllers
                 Color = stateData.Color,
                 HasAutoPurge = stateData.HasAutoPurge,
                 AutoPurgeDays = stateData.AutoPurgeDays,
+                IsDefault = stateData.IsDefault,
             };
 
             await stateRepo.AddAsync(state);
@@ -64,6 +74,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Put(
@@ -75,10 +86,19 @@ namespace Application.WebApi.Controllers
             if (state is null)
                 return this.NotFound($"A state with the id '{stateData.Id}' doesn´t exist.");
 
+            State? defaultState = null;
+
+            if (stateData.IsDefault)
+                defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+
+            if (defaultState is not null)
+                return this.BadRequest($"The state '{defaultState.Name}' is already set as default.");
+
             state.Name = stateData.Name;
             state.Color = stateData.Color;
             state.HasAutoPurge = stateData.HasAutoPurge;
             state.AutoPurgeDays = stateData.AutoPurgeDays;
+            state.IsDefault = stateData.IsDefault;
 
             await stateRepo.UpdateAsync(state);
             return this.Ok(state);

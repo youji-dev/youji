@@ -36,6 +36,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxtjs/i18n",
     "@element-plus/nuxt",
+    "@unlazy/nuxt"
   ],
   i18n: {
     strategy: "prefix",

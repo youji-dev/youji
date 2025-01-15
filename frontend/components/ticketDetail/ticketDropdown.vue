@@ -14,13 +14,14 @@
           :label="state.name"
           :value="state"
         >
-          <el-tag :color="state.color">
-            <el-text
-              :style="{ color: contrastColor({ bgColor: state.color }) }"
-            >
-              {{ state.name }}</el-text
-            >
-          </el-tag>
+          <div class="flex items-center">
+            <el-tag
+              :color="state.color"
+              size="small"
+              class="mr-2 aspect-square"
+            />
+            <span class="truncate">{{ state.name }}</span>
+          </div>
         </el-option>
         <template #label>
           <div class="flex items-center">
@@ -36,11 +37,6 @@
     </div>
     <div>
       <el-text>{{ $t("priority") }}</el-text>
-      <!-- <el-select v-model="ticket.priority" value-key="value" class="drop-shadow-xl dark:base-bg-dark"
-        :placeholder="$t('select')">
-        <el-option v-for="priority in availablePriorities" :key="priority.id" :label="priority.name"
-          :value="priority" />
-      </el-select> -->
       <el-select
         v-model="ticket.priority"
         value-key="id"
@@ -53,13 +49,14 @@
           :label="priority.name"
           :value="priority"
         >
-          <el-tag :color="priority.color">
-            <el-text
-              :style="{ color: contrastColor({ bgColor: priority.color }) }"
-            >
-              {{ priority.name }}</el-text
-            >
-          </el-tag>
+          <div class="flex items-center">
+            <el-tag
+              :color="priority.color"
+              size="small"
+              class="mr-2 aspect-square"
+            />
+            <span class="truncate">{{ priority.name }}</span>
+          </div>
         </el-option>
         <template #label>
           <div class="flex items-center">
@@ -110,7 +107,6 @@
 </template>
 
 <script lang="ts" setup>
-import { contrastColor } from "contrast-color";
 import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
 import type priority from "~/types/api/response/priorityResponse";

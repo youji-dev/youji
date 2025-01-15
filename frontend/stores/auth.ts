@@ -1,5 +1,7 @@
+import { jwtDecode } from "jwt-decode";
 import { defineStore } from "pinia";
 import useFetchAuthenticated from "~/composables/useFetchAuthenticated";
+import { Roles } from "~/types/roles";
 
 // In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
 // All of these actions and variables can be used and called in our vue files.
@@ -12,12 +14,15 @@ interface UserPayloadInterface {
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
-    name: "" as any,
-    role: 0 as number,
+    username: "" as string,
+    userRole: 0 as Roles,
     loading: false,
     csrfToken: "" as any,
     authErrors: [] as string[],
   }),
+  getters: {
+    userIsAdmin: (state) => (state.userRole & Roles.Admin) > 0
+  },
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {
       const {
@@ -44,7 +49,11 @@ export const useAuthStore = defineStore("auth", {
           this.authErrors.push(error.value);
         }
 
-        if (!data.value) return;
+        if (!data.value.accessToken || !data.value.refreshToken) {
+          this.authErrors.push("Did not recieve expected response with access and refresh token")
+          return;
+        } 
+
         const accessToken = useCookie(ACCESS_TOKEN_NAME);
         const refreshToken = useCookie(REFRESH_TOKEN_NAME);
         accessToken.value = data.value.accessToken;
@@ -52,6 +61,11 @@ export const useAuthStore = defineStore("auth", {
         console.log(accessToken);
         console.log(accessToken.value)
         this.authenticated = true;
+        
+        const decodedJwt = jwtDecode<{username: string, role: number}>(data.value.accessToken)
+        this.username = decodedJwt.username;
+        this.userRole = decodedJwt.role;
+
       } catch (error) {
         console.error(error);
       }

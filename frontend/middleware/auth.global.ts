@@ -1,6 +1,5 @@
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { authenticated, name } = storeToRefs(useAuthStore());
-  const { $locally } = useNuxtApp();
+  const { authenticated } = storeToRefs(useAuthStore());
   const { public: { ACCESS_TOKEN_NAME } } = useRuntimeConfig()
   const token = useCookie(ACCESS_TOKEN_NAME, { httpOnly: true, secure: true, sameSite: 'strict' });
   const localeRoute = useLocaleRoute();
@@ -20,7 +19,6 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (token.value) {
     if (await checkIfTokenIsValid()) {
       authenticated.value = true;
-      name.value = $locally.getItem("username");
     } else {
       authenticated.value = false;
       token.value = null;

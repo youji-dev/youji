@@ -9,7 +9,7 @@ namespace Common.Contracts.Patch
     /// <param name="NewPreferredLcid">A new preffered language code; set to null to leave unchanged</param>
     public record class UserPatch(
         Roles? NewRole,
-        string? NewPreferredLcid)
+        string? NewPreferredEmailLcid)
     {
     }
 }

@@ -64,8 +64,8 @@ namespace Application.WebApi.Controllers
             if (userUpdate.NewRole is not null)
                 user.Type = (Roles)userUpdate.NewRole;
 
-            if (userUpdate.NewPreferredLcid is not null)
-                user.PreferredLcid = userUpdate.NewPreferredLcid;
+            if (userUpdate.NewPreferredEmailLcid is not null)
+                user.PreferredEmailLcid = userUpdate.NewPreferredEmailLcid;
 
             await userRepository.UpdateAsync(user);
 

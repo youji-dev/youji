@@ -25,8 +25,8 @@ namespace PersistenceLayer.DataAccess.Entities
         public string? Email { get; set; }
 
         /// <summary>
-        /// Preferred language code of the user
+        /// Preferred language code for e-mail notifications
         /// </summary>
-        public string? PreferredLcid { get; set; }
+        public string? PreferredEmailLcid { get; set; }
     }
 }

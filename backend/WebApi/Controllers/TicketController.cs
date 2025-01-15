@@ -310,7 +310,7 @@ namespace Application.WebApi.Controllers
                 .Select(u => new MailRecipient()
                 {
                     Address = new MailboxAddress(u.UserId, u.Email),
-                    PreferredLcid = u.PreferredLcid,
+                    PreferredLcid = u.PreferredEmailLcid,
                 });
 
             await mailingService.SendManyLocalized(
@@ -378,7 +378,7 @@ namespace Application.WebApi.Controllers
                 .Select(u => new MailRecipient()
                 {
                     Address = new MailboxAddress(u.UserId, u.Email),
-                    PreferredLcid = u.PreferredLcid,
+                    PreferredLcid = u.PreferredEmailLcid,
                 });
 
             await mailingService.SendManyLocalized(
@@ -460,7 +460,7 @@ namespace Application.WebApi.Controllers
                 .Select(u => new MailRecipient()
                 {
                     Address = new MailboxAddress(u.UserId, u.Email),
-                    PreferredLcid = u.PreferredLcid,
+                    PreferredLcid = u.PreferredEmailLcid,
                 });
 
             await mailingService.SendManyLocalized(

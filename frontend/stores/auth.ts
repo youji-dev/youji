@@ -21,7 +21,7 @@ export const useAuthStore = defineStore("auth", {
     authErrors: [] as string[],
   }),
   getters: {
-    userIsAdmin: (state) => (state.userRole & Roles.Admin) > 0
+    userIsAdmin: (state) => (state.userRole & Roles.Admin) > 0,
   },
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {
@@ -32,14 +32,17 @@ export const useAuthStore = defineStore("auth", {
       this.authErrors = [];
 
       try {
-        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
-          body: {
-            username: name,
-            password: password,
-          },
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-        });
+        const { data, pending, error }: any = await useFetch(
+          `${BACKEND_URL}/Auth/login`,
+          {
+            body: {
+              username: name,
+              password: password,
+            },
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         this.loading = pending;
 
         if (error?.value?.statusCode === 401) {
@@ -50,25 +53,41 @@ export const useAuthStore = defineStore("auth", {
         }
 
         if (!data.value.accessToken || !data.value.refreshToken) {
-          this.authErrors.push("Did not recieve expected response with access and refresh token")
+          this.authErrors.push(
+            "Did not receive expected response with access and refresh token"
+          );
           return;
-        } 
+        }
 
         const accessToken = useCookie(ACCESS_TOKEN_NAME);
         const refreshToken = useCookie(REFRESH_TOKEN_NAME);
         accessToken.value = data.value.accessToken;
         refreshToken.value = data.value.refreshToken;
-        console.log(accessToken);
-        console.log(accessToken.value)
-        this.authenticated = true;
-        
-        const decodedJwt = jwtDecode<{username: string, role: number}>(data.value.accessToken)
-        this.username = decodedJwt.username;
-        this.userRole = decodedJwt.role;
 
+        this.authenticated = true;
+
+        this.getUserData();
       } catch (error) {
         console.error(error);
       }
+    },
+    getUserData() {
+      const {
+        public: { ACCESS_TOKEN_NAME },
+      } = useRuntimeConfig();
+
+      const token = useCookie(ACCESS_TOKEN_NAME, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+
+      if (!token.value) return;
+      const { username, role } = jwtDecode<{ username: string; role: number }>(
+        token.value
+      );
+      this.username = username;
+      this.userRole = role;
     },
     logUserOut() {
       this.authenticated = false;

@@ -1,4 +1,6 @@
-﻿namespace DomainLayer.BusinessLogic.Mailing.Models
+﻿using I18N.DotNet;
+
+namespace DomainLayer.BusinessLogic.Mailing.Models
 {
     /// <summary>
     /// Base mail model
@@ -14,6 +16,11 @@
         /// The main mail title
         /// </summary>
         public required string MailTitle { get; set; }
+
+        /// <summary>
+        /// Localizer for mail generation
+        /// </summary>
+        public required Localizer Localizer { get; set; }
 
         /// <summary>
         /// The youji logo src

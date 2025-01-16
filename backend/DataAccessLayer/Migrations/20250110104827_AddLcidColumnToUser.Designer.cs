@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersistenceLayer.DataAccess;
@@ -11,9 +12,11 @@ using PersistenceLayer.DataAccess;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250110104827_AddLcidColumnToUser")]
+    partial class AddLcidColumnToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,9 +170,6 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
-                    b.Property<string>("BlurHash")
-                        .HasColumnType("text");
-
                     b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("text");
@@ -224,7 +224,7 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<string>("PreferredEmailLcid")
+                    b.Property<string>("PreferredLcid")
                         .HasColumnType("text");
 
                     b.Property<int>("Type")

@@ -25,7 +25,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <summary>
         /// Send same mail to many recipients with recipient-specific localization
         /// </summary>
-        /// <param name="recipients">The recpients of the mail</param>
+        /// <param name="recipients">The recipients of the mail</param>
         /// <param name="mailGenerator">A generator function that produces the mail body</param>
         /// <param name="subjectGenerator">A generator function that produces the mail subject</param>
         /// <returns>A Task representing the asynchronous operation</returns>

@@ -32,7 +32,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         }
 
         /// <summary>
-        /// Generate a mail body for a new attachement
+        /// Generate a mail body for a new attachment
         /// </summary>
         /// <param name="newAttachment">The new attachment</param>
         /// <param name="localizer">Localizer for mail generation</param>
@@ -58,7 +58,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         }
 
         /// <summary>
-        /// Generate a mail body for the given <paramref name="mailTemplate"/> using the <paramref name="mailModel"/>
+        /// Generate the mail body for a model
         /// </summary>
         /// <param name="mailModel">The model to use as a data provider</param>
         /// <returns>The generated mail body</returns>

@@ -38,12 +38,11 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
                 return null;
 
-            Localizer? localizer = null;
+            Localizer localizer = new();
             using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Resources.I18N.xml");
-            if (!string.IsNullOrWhiteSpace(lang) && localizerResourceStream is not null)
+            if (localizerResourceStream is not null)
             {
-                localizer = new();
-                localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(lang));
+                localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(lang ?? CultureInfo.CurrentCulture.Name));
             }
 
             TicketExportModel model = TicketExportModel.FromTicket(ticket);

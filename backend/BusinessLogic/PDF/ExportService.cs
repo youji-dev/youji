@@ -21,9 +21,9 @@ namespace DomainLayer.BusinessLogic.PDF
         /// Export a ticket to pdf
         /// </summary>
         /// <param name="model">The ticket model to use for the document</param>
-        /// <param name="localizer">The localizer to use for the export; if omitted default values are used</param>
+        /// <param name="localizer">The localizer to use for the export</param>
         /// <returns>The generated pdf as binary</returns>
-        public byte[] Export(TicketExportModel model, Localizer? localizer = null)
+        public byte[] Export(TicketExportModel model, Localizer localizer)
         {
             TicketExportDocument document = new(model, localizer);
 

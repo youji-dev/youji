@@ -1,4 +1,5 @@
 ﻿using MimeKit;
+using PersistenceLayer.DataAccess.Entities;
 
 namespace DomainLayer.BusinessLogic.Mailing
 {
@@ -16,5 +17,22 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// The preferred language of the recipient
         /// </summary>
         public string? PreferredLcid { get; init; }
+
+        /// <summary>
+        /// Filter and map a collection of users to a collection of mail recipients
+        /// </summary>
+        /// <param name="users">The collection of users</param>
+        /// <returns>The collection of mail recipients</returns>
+        public static IEnumerable<MailRecipient> GetCollectionFromUsers(IEnumerable<User> users)
+        {
+            return users
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email)
+                    && u.AllowsEmailNotifications)
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+        }
     }
 }

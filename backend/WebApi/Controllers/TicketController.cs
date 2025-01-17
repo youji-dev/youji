@@ -304,14 +304,7 @@ namespace Application.WebApi.Controllers
             await commentRepo.AddAsync(comment);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [author]);
-
-            var mailRecipients = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailRecipient()
-                {
-                    Address = new MailboxAddress(u.UserId, u.Email),
-                    PreferredLcid = u.PreferredEmailLcid,
-                });
+            var mailRecipients = MailRecipient.GetCollectionFromUsers(userRepository.GetMany(mailRecipientIds));
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
@@ -372,14 +365,7 @@ namespace Application.WebApi.Controllers
 
             string performingUser = this.User.FindFirstValue("username") ?? string.Empty;
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [performingUser]);
-
-            var mailRecipients = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailRecipient()
-                {
-                    Address = new MailboxAddress(u.UserId, u.Email),
-                    PreferredLcid = u.PreferredEmailLcid,
-                });
+            var mailRecipients = MailRecipient.GetCollectionFromUsers(userRepository.GetMany(mailRecipientIds));
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
@@ -454,14 +440,7 @@ namespace Application.WebApi.Controllers
             await ticketRepo.UpdateAsync(ticket);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);
-
-            var mailRecipients = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailRecipient()
-                {
-                    Address = new MailboxAddress(u.UserId, u.Email),
-                    PreferredLcid = u.PreferredEmailLcid,
-                });
+            var mailRecipients = MailRecipient.GetCollectionFromUsers(userRepository.GetMany(mailRecipientIds));
 
             await mailingService.SendManyLocalized(
                 mailRecipients,

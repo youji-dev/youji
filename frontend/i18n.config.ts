@@ -83,6 +83,7 @@ export default defineI18nConfig(() => ({
       savingFailed: "Saving failed",
       saved: "Saved",
       nothingFound: "Nothing found",
+      youji: "youji",
     },
     de: {
       welcome: "Willkommen",
@@ -165,6 +166,7 @@ export default defineI18nConfig(() => ({
       savingFailed: "Speichern fehlgeschlagen",
       saved: "Gespeichert",
       nothingFound: "Nichts gefunden",
+      youji: "youji",
     },
   },
 }));

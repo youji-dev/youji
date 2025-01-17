@@ -48,7 +48,7 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term and the max amount of results used for pagination.
+        /// Gets a ticket filtered by a specific search term and the max amount of results used for pagination.
         /// </summary>
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>

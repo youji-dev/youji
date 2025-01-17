@@ -27,7 +27,7 @@
       <el-table v-if="!loading && !pageLoading && tickets.length > 0" :data="parsedTickets"
         :height="tableDimensions['height']" class="h-full w-full overflow-x-scroll"
         :default-sort="{ prop: sortColProp, order: sortDesc ? 'descending' : 'ascending' }" @sort-change="changeSort"
-        :sort-by="sortCol" @row-dblclick="(row: any, column: any, event: Event) => {
+        :sort-by="sortCol" @row-dblclick="(row) => {
           router.push(localeRoute(`/tickets/${row.id}`)?.fullPath as string)
         }">
         <el-table-column class="hidden lg:block" prop="author" filter-class-name="Author" :label="$t('username')"
@@ -345,18 +345,19 @@ function changeSort(sortData: { column: any, prop: string, order: any }) {
   sortCol.value = sortData.column.filterClassName;
   sortColProp.value = sortData.prop;
   sortDesc.value = sortData.order === "ascending" ? false : true;
-  searchLoading.value = true;
-  fetchNewPage(1).then(() => {
-    searchLoading.value = false;
+  pageLoading.value = true;
+  fetchTickets(search.value, page.value * 25 - 25, 25, sortCol.value, sortDesc.value).then(() => {
+    pageLoading.value = false;
   }).catch((e) => {
-    searchLoading.value = false;
+    pageLoading.value = false;
     console.error(e);
   });
 }
 
-async function fetchNewPage(page: number) {
+async function fetchNewPage(_page: number) {
+  page.value = _page;
   pageLoading.value = true;
-  await fetchTickets(search.value, page * 25 - 25, 25, sortCol.value, sortDesc.value);
+  await fetchTickets(search.value, page.value * 25 - 25, 25, sortCol.value, sortDesc.value);
   pageLoading.value = false;
 }
 </script>

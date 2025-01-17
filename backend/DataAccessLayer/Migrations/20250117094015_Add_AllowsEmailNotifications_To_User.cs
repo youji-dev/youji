@@ -5,24 +5,24 @@
 namespace PersistenceLayer.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_AreEmailNotificationsAllowed_To_User : Migration
+    public partial class Add_AllowsEmailNotifications_To_User : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
-                name: "AreEmailNotificationsAllowed",
+                name: "AllowsEmailNotifications",
                 table: "Users",
                 type: "boolean",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "AreEmailNotificationsAllowed",
+                name: "AllowsEmailNotifications",
                 table: "Users");
         }
     }

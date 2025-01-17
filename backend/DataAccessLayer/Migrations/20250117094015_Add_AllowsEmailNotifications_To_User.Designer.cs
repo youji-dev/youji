@@ -12,8 +12,8 @@ using PersistenceLayer.DataAccess;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250117085039_Add_AreEmailNotificationsAllowed_To_User")]
-    partial class Add_AreEmailNotificationsAllowed_To_User
+    [Migration("20250117094015_Add_AllowsEmailNotifications_To_User")]
+    partial class Add_AllowsEmailNotifications_To_User
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -228,8 +228,10 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<bool>("AreEmailNotificationsAllowed")
-                        .HasColumnType("boolean");
+                    b.Property<bool>("AllowsEmailNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Email")
                         .HasColumnType("text");

@@ -32,6 +32,6 @@ namespace PersistenceLayer.DataAccess.Entities
         /// <summary>
         /// Whether the user wants to recieve e-mail notifications
         /// </summary>
-        public bool AreEmailNotificationsAllowed { get; set; }
+        public bool AllowsEmailNotifications { get; set; } = true;
     }
 }

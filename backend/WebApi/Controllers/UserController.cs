@@ -68,7 +68,7 @@ namespace Application.WebApi.Controllers
                 user.PreferredEmailLcid = userUpdate.NewPreferredEmailLcid;
 
             if (userUpdate.NewAreEmailNotificationsAllowed is not null)
-                user.AreEmailNotificationsAllowed = (bool)userUpdate.NewAreEmailNotificationsAllowed;
+                user.AllowsEmailNotifications = (bool)userUpdate.NewAreEmailNotificationsAllowed;
 
             await userRepository.UpdateAsync(user);
 

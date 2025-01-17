@@ -36,7 +36,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Buildings");
+                    b.ToTable("Buildings", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Priority", b =>
@@ -58,7 +58,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Priorities");
+                    b.ToTable("Priorities", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.RefreshToken", b =>
@@ -81,7 +81,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.State", b =>
@@ -107,7 +107,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("States");
+                    b.ToTable("States", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>
@@ -157,7 +157,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("StateId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketAttachment", b =>
@@ -189,7 +189,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.TicketComment", b =>
@@ -217,7 +217,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.User", b =>
@@ -225,8 +225,10 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("text");
 
-                    b.Property<bool>("AreEmailNotificationsAllowed")
-                        .HasColumnType("boolean");
+                    b.Property<bool>("AllowsEmailNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Email")
                         .HasColumnType("text");
@@ -239,7 +241,7 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("PersistenceLayer.DataAccess.Entities.Ticket", b =>

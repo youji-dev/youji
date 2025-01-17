@@ -11,6 +11,8 @@ namespace PersistenceLayer.DataAccess.Entities.Configuration
         /// <inheritdoc />
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.Property(e => e.AllowsEmailNotifications)
+                .HasDefaultValue(true);
         }
     }
 }

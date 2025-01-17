@@ -92,22 +92,22 @@ const drawer = ref(false);
 const router = useRouter();
 const localeRoute = useLocaleRoute();
 const route = useRoute();
-const routeObject = reactive({ route });
+// const routeObject = reactive({ route });
 const { locale } = useI18n();
 
 function getPageIndex() {
   if (
-    routeObject.route.fullPath ==
+    route.fullPath ==
     localeRoute("/tickets", locale.value)?.fullPath
   ) {
     return "1";
   } else if (
-    routeObject.route.fullPath ==
+    route.fullPath ==
     localeRoute("/tickets/new", locale.value)?.fullPath
   ) {
     return "2";
   } else if (
-    routeObject.route.fullPath ==
+    route.fullPath ==
     localeRoute("/settings", locale.value)?.fullPath
   ) {
     return "3";

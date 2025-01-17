@@ -1,6 +1,6 @@
 <template>
   <el-popover placement="top" :width="100" trigger="click">
-    <div v-for="availLocale in availableLocales" @click="switchLocale(availLocale.code)" class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">
+    <div v-if="isClient" v-for="availLocale in locales" @click="switchLocale(availLocale.code)" class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">
       <div class="flex items-center w-1/3">
         <Icon :name="availLocale.icon" />
       </div>
@@ -21,12 +21,15 @@ const { locales } = useI18n();
 const router = useRouter();
 const switchLocalePath = useSwitchLocalePath();
 const colorMode = useColorMode();
+const isClient = ref(false);
 const {
   public: { TEXT_LIGHT, TEXT_DARK },
 } = useRuntimeConfig();
-const availableLocales = computed(() => {
-  return locales.value;
+
+onMounted(() => {
+  isClient.value = true;
 });
+
 
 const switchLocale = (localeKey: string) => {
   console.log(localeKey);

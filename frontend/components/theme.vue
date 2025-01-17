@@ -1,11 +1,15 @@
 <template>
-  <el-button @click="toggleTheme" :size="'small'" circle plain type="primary" :icon="determineIcon()"></el-button>
+  <el-button @click="toggleTheme" :size="'small'" circle plain type="primary" :icon="icon"></el-button>
 </template>
 
 <script lang="ts" setup>
 import { Monitor, Moon, Sunny } from "@element-plus/icons-vue";
-
+const icon = ref();
 const colorMode = useColorMode();
+onMounted(() => {
+  determineIcon();
+})
+
 const toggleTheme = () => {
   document.documentElement.classList.remove(colorMode.value);
   if (colorMode.preference === "light") {
@@ -18,17 +22,18 @@ const toggleTheme = () => {
     colorMode.preference = "light";
     document.documentElement.classList.add("light");
   }
+  determineIcon();
 };
 
 function determineIcon() {
   if (colorMode.preference === "light") {
-    return Sunny;
+    icon.value = Sunny;
   } else if (colorMode.preference === "dark") {
-    return Moon;
+    icon.value = Moon;
   } else if (colorMode.preference === "system") {
-    return Monitor;
+    icon.value = Monitor;
   } else {
-    return Sunny;
+    icon.value =Sunny;
   }
 }
 </script>

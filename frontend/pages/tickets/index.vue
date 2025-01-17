@@ -93,7 +93,6 @@
 <script lang="tsx" setup>
 import { Search } from "@element-plus/icons-vue";
 import { ref } from "vue";
-const search = ref("");
 import ColoredSelect from "~/components/coloredSelect.vue";
 import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
@@ -101,16 +100,18 @@ import type ticket from "~/types/api/response/ticketResponse";
 import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
 const { statusOptions, priorityOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
 const { fetchStatusOptions, fetchPriorityOptions, fetchTickets } = useTicketsStore();
-const loading = ref(true);
-const pageLoading = ref(false);
-const searchLoading = ref(false);
-const sortCol = ref("CreationDate");
-const sortColProp = ref("creationDate");
-const sortDesc = ref(true);
+const loading = ref() as Ref<boolean>;
+  const pageLoading = ref() as Ref<boolean>;
+    const searchLoading = ref() as Ref<boolean>;
+      const sortDesc = ref() as Ref<boolean>;
+      const search = ref() as Ref<string>;
+const sortCol = ref() as Ref<string>;
+const sortColProp = ref() as Ref<string>;
 const localeRoute = useLocaleRoute();
 const router = useRouter();
 const i18n = useI18n();
-const width = ref("100vw");
+const width = ref() as Ref<string>;
+const page = ref() as Ref<number>;
 const { $api } = useNuxtApp();
 interface Ticket {
   id: number;
@@ -130,6 +131,15 @@ const tableDimensions = ref({
 
 onMounted(async () => {
   getTableDimensions();
+  page.value = 1;
+  width.value = "100vw"
+  sortCol.value = "CreationDate";
+  sortColProp.value = "creationDate";
+  search.value = "";
+  sortDesc.value = true;
+  loading.value = true;
+  pageLoading.value = false;
+  searchLoading.value = false;
 });
 
 onNuxtReady(async () => {
@@ -138,6 +148,7 @@ onNuxtReady(async () => {
   await fetchTicketsFromStart(false);
   determineViewWidth();
   window.addEventListener("resize", determineViewWidth);
+
 });
 
 async function fetchTicketsFromStart(fromSearch: boolean) {

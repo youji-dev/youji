@@ -1,12 +1,9 @@
 ﻿using DomainLayer.BusinessLogic.PDF;
-using I18N.DotNet;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
-using System.Globalization;
-using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
-using Common.Extensions;
+using System.Globalization;
 
 namespace Application.WebApi.Controllers
 {
@@ -38,15 +35,8 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
                 return null;
 
-            Localizer localizer = new();
-            using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Resources.I18N.xml");
-            if (localizerResourceStream is not null)
-            {
-                localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(lang ?? CultureInfo.CurrentCulture.Name));
-            }
-
             TicketExportModel model = TicketExportModel.FromTicket(ticket);
-            byte[] pdf = exportService.Export(model, localizer);
+            byte[] pdf = exportService.Export(model, lang ?? CultureInfo.CurrentCulture.Name);
 
             string clampedTicketTitle = ticket.Title[..Math.Min(ticket.Title.Length, 20)];
             FileContentResult result = new(pdf, "application/octet-stream")

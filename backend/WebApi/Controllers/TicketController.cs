@@ -445,7 +445,7 @@ namespace Application.WebApi.Controllers
             ticket.State = state ?? ticket.State;
             ticket.LastStateUpdate = state is not null && !state.Id.Equals(ticket.State.Id)
                 ? DateTime.UtcNow
-                : ticket.LastStateUpdate;
+                : ticket.LastStateUpdate.ToUniversalTime();
             ticket.Building = building ?? ticket.Building;
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;

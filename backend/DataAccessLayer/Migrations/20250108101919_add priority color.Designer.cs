@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersistenceLayer.DataAccess;
@@ -11,9 +12,11 @@ using PersistenceLayer.DataAccess;
 namespace PersistenceLayer.DataAccess.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250108101919_add priority color")]
+    partial class Addprioritycolor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,15 +94,9 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
-                    b.Property<int?>("AutoPurgeDays")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Color")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("HasAutoPurge")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -129,9 +126,6 @@ namespace PersistenceLayer.DataAccess.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("text");
-
-                    b.Property<DateTime>("LastStateUpdate")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Object")
                         .HasColumnType("text");
@@ -170,9 +164,6 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<byte[]>("Binary")
                         .IsRequired()
                         .HasColumnType("bytea");
-
-                    b.Property<string>("BlurHash")
-                        .HasColumnType("text");
 
                     b.Property<string>("FileType")
                         .IsRequired()
@@ -226,9 +217,6 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PreferredEmailLcid")
                         .HasColumnType("text");
 
                     b.Property<int>("Type")

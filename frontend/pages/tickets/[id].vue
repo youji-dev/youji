@@ -133,7 +133,6 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 
-import { fromTicketResponse as createTicketFromResponse } from "~/types/api/request/createTicket";
 import { fromTicketResponse as editTicketFromResponse } from "~/types/api/request/editTicket";
 import TicketNotFoundError from "~/types/error/ticketNotFound";
 

@@ -5,11 +5,13 @@ namespace Common.Contracts.Patch
     /// <summary>
     /// DTO for update operations on users
     /// </summary>
-    /// <param name="NewRole">A new role assignment; set to null to leave unchanged</param>
-    /// <param name="NewPreferredLcid">A new preffered language code; set to null to leave unchanged</param>
+    /// <param name="NewRole">A new role assignment</param>
+    /// <param name="NewPreferredEmailLcid">A new preffered language code</param>
+    /// <param name="NewAreEmailNotificationsAllowed">New setting for whether the user wants to recieve e-mails</param>
     public record class UserPatch(
         Roles? NewRole,
-        string? NewPreferredEmailLcid)
+        string? NewPreferredEmailLcid,
+        bool? NewAreEmailNotificationsAllowed)
     {
     }
 }

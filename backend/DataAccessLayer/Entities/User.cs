@@ -28,5 +28,10 @@ namespace PersistenceLayer.DataAccess.Entities
         /// Preferred language code for e-mail notifications
         /// </summary>
         public string? PreferredEmailLcid { get; set; }
+
+        /// <summary>
+        /// Whether the user wants to recieve e-mail notifications
+        /// </summary>
+        public bool AreEmailNotificationsAllowed { get; set; }
     }
 }

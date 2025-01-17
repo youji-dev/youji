@@ -82,7 +82,11 @@ export default defineI18nConfig(() => ({
       updated: "Updated",
       savingFailed: "Saving failed",
       saved: "Saved",
+      deleted: "Deleted",
       nothingFound: "Nothing found",
+      deleteTicketTitle: "Do you really want to delete this Ticket?",
+      deleteTicketDescription: "Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action."
+
     },
     de: {
       welcome: "Willkommen",
@@ -164,7 +168,10 @@ export default defineI18nConfig(() => ({
       updated: "Aktualisiert",
       savingFailed: "Speichern fehlgeschlagen",
       saved: "Gespeichert",
+      deleted: "Gelöscht",
       nothingFound: "Nichts gefunden",
+      deleteTicketTitle: "Willst du dieses Ticket wirklich löschen?",
+      deleteTicketDescription: "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen."
     },
   },
 }));

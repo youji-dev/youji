@@ -74,13 +74,20 @@
         </el-table-column>
         <el-table-column class="hidden lg:block" prop="creationDate" filter-class-name="CreationDate"
           :label="$t('createDate')" width="200" show-overflow-tooltip sortable />
-        <el-table-column fixed="right" min-width="120">
+        <el-table-column fixed="right" :min-width="userIsAdmin ? 120 : 70">
           <template #default="scope">
-            <el-button link type="primary" size="small"
-              @click="router.push(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)">
-              {{ $t("detail") }}
-              <ElIconEdit class="w-5 mx-2"></ElIconEdit>
-            </el-button>
+            <el-tooltip :content="$t('detail')" placement="top-start" :show-after="500">
+              <el-button link type="primary" size="small"
+                @click="router.push(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)">
+                <ElIconEdit class="w-5 mx-2"></ElIconEdit>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip v-if="userIsAdmin" :content="$t('delete')" placement="top-start" :show-after="500">
+              <el-button link type="danger" size="small"
+                @click="() => { deleteTicket = scope.row; displayDeleteDialog = true; }">
+                <ElIconDelete class="w-5 mx-2"></ElIconDelete>
+              </el-button>
+            </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
@@ -88,6 +95,10 @@
         :total="totalCount" :page-size="25" @current-change="fetchNewPage" />
     </div>
   </div>
+  <TicketDeleteConfirmationDialog :ticket="deleteTicket" :visable="displayDeleteDialog"
+    :before-close="() => { displayDeleteDialog = false; }" @deleted="() => {
+      fetchTicketsFromStart(true)
+    }" />
 </template>
 
 <script lang="tsx" setup>
@@ -100,6 +111,7 @@ import type state from "~/types/api/response/stateResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
 const { statusOptions, priorityOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
+const { userIsAdmin } = storeToRefs(useAuthStore());
 const { fetchStatusOptions, fetchPriorityOptions, fetchTickets } = useTicketsStore();
 const loading = ref(true);
 const pageLoading = ref(false);
@@ -123,6 +135,8 @@ interface Ticket {
   create_date: string;
 }
 
+let displayDeleteDialog = ref(false);
+let deleteTicket: Ref<ticket | null> = ref(null);
 const tableDimensions = ref({
   width: 0,
   height: 0,

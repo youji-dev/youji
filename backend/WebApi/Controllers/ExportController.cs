@@ -49,9 +49,10 @@ namespace Application.WebApi.Controllers
             TicketExportModel model = TicketExportModel.FromTicket(ticket);
             byte[] pdf = exportService.Export(model, localizer);
 
+            string clampedTicketTitle = ticket.Title[..Math.Min(ticket.Title.Length, 20)];
             FileContentResult result = new(pdf, "application/octet-stream")
             {
-                FileDownloadName = $"Export_{ticket.Title[..20].Replace(" ", "-")}_{DateTime.Now:yyyy-MM-dd}_{DateTime.Now.Ticks}.pdf",
+                FileDownloadName = $"Export_{clampedTicketTitle.Replace(" ", "-")}_{DateTime.Now:yyyy-MM-dd}_{DateTime.Now.Ticks}.pdf",
             };
 
             return result;

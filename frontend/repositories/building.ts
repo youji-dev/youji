@@ -8,7 +8,7 @@ class BuildingRepository {
   }
 
   async create(name: string): Promise<ReturnType<typeof useFetchAuthenticated<building>>> {
-    return useFetchAuthenticated<building>(this.path, { method: "POST", body: name });
+    return useFetchAuthenticated<building>(this.path, { method: "POST", headers: { "Content-Type": "text/plain" }, body: name });
   }
 
   async edit(building: building): Promise<ReturnType<typeof useFetchAuthenticated<building>>> {

@@ -2,7 +2,6 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type CreateTicketRequest from "~/types/api/request/createTicket";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
-import type createCommentRequest from "~/types/api/request/createComment";
 import type EditTicketRequest from "~/types/api/request/editTicket";
 import type searchResponse from "~/types/api/response/searchResponse";
 
@@ -46,8 +45,8 @@ class TicketRepository {
     return useFetchAuthenticated<ticketAttachment[]>(`${this.path}/${id}/attachments`, { method: "GET" });
   }
 
-  async addComment(id: string, comment: createCommentRequest): Promise<ReturnType<typeof useFetchAuthenticated<ticketComment>>> {
-    return useFetchAuthenticated<ticketComment>(`${this.path}/${id}/comment`, { method: "POST", body: comment });
+  async addComment(id: string, comment: string): Promise<ReturnType<typeof useFetchAuthenticated<ticketComment>>> {
+    return useFetchAuthenticated<ticketComment>(`${this.path}/${id}/comment`, { method: "POST", headers: { "Content-Type": "text/plain" }, body: comment });
   }
 
   async exportToPDF(id: string, language: string) {

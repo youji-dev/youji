@@ -95,7 +95,7 @@
         :total="totalCount" :page-size="25" @current-change="fetchNewPage" />
     </div>
   </div>
-  <TicketDeleteConfirmationDialog :ticket="deleteTicket" :visable="displayDeleteDialog"
+  <TicketDeleteConfirmationDialog :ticket="deleteTicket" :visible="displayDeleteDialog"
     :before-close="() => { displayDeleteDialog = false; }" @deleted="() => {
       fetchTicketsFromStart(true)
     }" />

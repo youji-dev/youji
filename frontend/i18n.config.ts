@@ -170,7 +170,7 @@ export default defineI18nConfig(() => ({
       saved: "Gespeichert",
       deleted: "Gelöscht",
       nothingFound: "Nichts gefunden",
-      deleteTicketTitle: "Willst du dieses Ticket wirklich löschen?",
+      deleteTicketTitle: "Wollen Sie dieses Ticket wirklich löschen?",
       deleteTicketDescription: "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen."
     },
   },

@@ -57,7 +57,7 @@
       </el-tooltip>
 
       <div class="flex">
-        <el-button class="text-sm justify-self-end drop-shadow-md" type="danger" @click="deleteDilaog = true;"
+        <el-button class="text-sm justify-self-end drop-shadow-md" type="danger" @click="deleteDialog = true;"
           :hidden="isNew || !userIsAdmin">{{
             $t("delete") }}</el-button>
 
@@ -72,8 +72,8 @@
   <el-dialog v-model="imagePreviewDisplay">
     <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
   </el-dialog>
-  <TicketDeleteConfirmationDialog :ticket="ticketModel" :visable="deleteDilaog"
-    :before-close="() => { deleteDilaog = false }"
+  <TicketDeleteConfirmationDialog :ticket="ticketModel" :visible="deleteDialog"
+    :before-close="() => { deleteDialog = false }"
     @deleted="() => { router.push(localePath('/tickets')?.fullPath as string) }" />
 </template>
 
@@ -111,7 +111,7 @@ let isNew = ref((route.params.id as string).toLocaleLowerCase() == "new");
 let is404 = ref(false);
 let loading = ref(true);
 let loadingText = ref(i18n.t("loadingData"));
-let deleteDilaog = ref(false);
+let deleteDialog = ref(false);
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);

@@ -17,8 +17,8 @@ export default interface priority {
      */
     name: string;
     /**
-     * The ID of the priority.
+     * The color to be displayed for the priority.
      */
-    id: string;
+    color: string;
 }
 

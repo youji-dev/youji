@@ -1,7 +1,6 @@
 FROM node:20.16.0-slim AS build
-WORKDIR /build
 
-ENV NODE_ENV=production
+WORKDIR /build
 
 COPY package*.json ./
 RUN npm install

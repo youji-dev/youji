@@ -9,7 +9,7 @@
 }
 
 <div class="card">
-    <h3 class="card-header">von '@Model.Author'</h3>
+    <h3 class="card-header">@Model.Localizer.Localize("Comment by") '@Model.Author'</h3>
     <p>@Model.Content</p>
 </div>
 

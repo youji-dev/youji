@@ -319,12 +319,19 @@ namespace Application.WebApi.Controllers
             await commentRepo.AddAsync(comment);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [author]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateNewTicketCommentMail(comment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Kommentar an Ticket '{ticket.Title}'"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => MailGenerator.GenerateNewTicketCommentMail(comment, localizer),
+                (localizer) => localizer.Localize($"New comment on ticket '{ticket.Title}'"));
 
             return this.Ok(comment);
         }
@@ -380,12 +387,19 @@ namespace Application.WebApi.Controllers
 
             string performingUser = this.User.FindFirstValue("username") ?? string.Empty;
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [performingUser]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateNewTicketAttachmentMail(attachment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Anhang an Ticket '{ticket.Title}'"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => MailGenerator.GenerateNewTicketAttachmentMail(attachment, localizer),
+                (localizer) => localizer.Localize($"New attachment on ticket '{ticket.Title}'"));
 
             return this.Ok(attachment);
         }
@@ -455,7 +469,7 @@ namespace Application.WebApi.Controllers
             ticket.State = ticketState;
             ticket.LastStateUpdate = !ticketState.Id.Equals(ticket.State.Id)
                 ? DateTime.UtcNow
-                : ticket.LastStateUpdate;
+                : ticket.LastStateUpdate.ToUniversalTime();
             ticket.Building = building ?? ticket.Building;
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;
@@ -464,12 +478,19 @@ namespace Application.WebApi.Controllers
             await ticketRepo.UpdateAsync(ticket);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateTicketChangedMail(ticket, oldTicket);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Ticket '{ticket.Title}' wurde geändert"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => MailGenerator.GenerateTicketChangedMail(ticket, oldTicket, localizer),
+                (localizer) => localizer.Localize($"Ticket '{ticket.Title}' was changed"));
 
             return this.Ok(ticket);
         }
@@ -481,6 +502,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific id of the ticket that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{ticketId}")]
+        [AuthorizeRoles(Roles.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
@@ -491,19 +513,6 @@ namespace Application.WebApi.Controllers
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
-
-            var userClaim = this.User.FindFirst("username")?.Value;
-            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
-            if (userClaim is null || rolesClaim is null)
-                return this.Unauthorized();
-
-            if (!Enum.TryParse(rolesClaim, out Roles role))
-                return this.Unauthorized();
-
-            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
-            {
-                return this.Forbid();
-            }
 
             await ticketRepo.DeleteAsync(ticket);
 

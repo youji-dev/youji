@@ -1,6 +1,6 @@
 import type { UseFetchOptions } from "#app";
 
-const useFetchAuthenticated = <T>(url: string | (() => string), options?: UseFetchOptions<T>) => {
+const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?: UseFetchOptions<T>) => {
   const {
     public: { BACKEND_URL, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME },
   } = useRuntimeConfig();
@@ -25,7 +25,7 @@ const useFetchAuthenticated = <T>(url: string | (() => string), options?: UseFet
 
     onRequest({ options }) {
       options.headers = {
-        ...options.headers,
+        ...providedOptions?.headers,
         Authorization: `Bearer ${accessToken.value}`,
       };
     },
@@ -49,7 +49,7 @@ const useFetchAuthenticated = <T>(url: string | (() => string), options?: UseFet
     },
   });
 
-  return useFetch(url, { ...options, $fetch: customFetch });
+  return useFetch(url, { ...providedOptions, $fetch: customFetch });
 };
 
 export default useFetchAuthenticated;

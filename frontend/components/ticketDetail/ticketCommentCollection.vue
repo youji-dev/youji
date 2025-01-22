@@ -44,7 +44,7 @@ async function sendComment() {
     }
 
     loading.value = true;
-    let commentPostResult = await $api.ticket.addComment(route.params.id as string, { content: newComment.value });
+    let commentPostResult = await $api.ticket.addComment(route.params.id as string, newComment.value);
 
     if (commentPostResult.error.value) {
       loading.value = false;

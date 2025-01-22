@@ -1,4 +1,5 @@
-﻿using PersistenceLayer.DataAccess.Entities;
+﻿using I18N.DotNet;
+using PersistenceLayer.DataAccess.Entities;
 
 namespace DomainLayer.BusinessLogic.Mailing.Models
 {
@@ -50,12 +51,14 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         /// </summary>
         /// <param name="newTicket">New version of the ticket</param>
         /// <param name="oldTicket">Old version of the ticket</param>
+        /// <param name="localizer">Localizer to use for mail generation</param>
         /// <returns>The generated model</returns>
-        public static TicketDataChangedModel FromTickets(Ticket newTicket, Ticket oldTicket)
+        public static TicketDataChangedModel FromTickets(Ticket newTicket, Ticket oldTicket, Localizer localizer)
         {
             TicketDataChangedModel result = new()
             {
-                MailTitle = $"Ticket '{newTicket.Title}' wurde geändert",
+                MailTitle = localizer.Localize($"Ticket '{newTicket.Title}' was changed"),
+                Localizer = localizer,
             };
 
             if (newTicket.Title != oldTicket.Title)

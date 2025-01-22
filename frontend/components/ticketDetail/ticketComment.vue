@@ -1,8 +1,16 @@
 <template>
   <el-card class="block">
     <div class="flex justify-between">
-      <el-text size="large" tag="b" type="primary">{{ commentModel.author }}</el-text>
-      <el-button :loading="loading" size="small" :icon="Delete" @click="deleteComment()" :hidden="!(userIsAuthor || userIsAdmin)" />
+      <el-text size="large" tag="b" type="primary">{{
+        commentModel.author
+      }}</el-text>
+      <el-button
+        :loading="loading"
+        size="small"
+        :icon="Delete"
+        @click="deleteComment()"
+        :hidden="!(userIsAuthor || isUserAdmin)"
+      />
     </div>
     <el-text size="default">{{ commentModel.content }}</el-text>
   </el-card>
@@ -20,7 +28,7 @@ const loading = ref(false);
 const commentModel = defineModel<ticketComment>("comment", { required: true });
 const ticketModel = defineModel<ticket>("ticket", { required: true });
 
-const {username, userIsAdmin} = storeToRefs(useAuthStore());
+const { username, isUserAdmin } = storeToRefs(useAuthStore());
 const userIsAuthor = username.value === commentModel.value.author;
 
 async function deleteComment() {
@@ -49,7 +57,9 @@ async function deleteComment() {
       }
     }
 
-    ticketModel.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value ?? [];
+    ticketModel.value.comments =
+      (await $api.ticket.getComments(route.params.id as string)).data.value ??
+      [];
     ElNotification({
       title: i18n.t("success"),
       message: i18n.t("commentDeleteSuccess"),

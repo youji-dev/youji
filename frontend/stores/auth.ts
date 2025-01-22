@@ -3,9 +3,6 @@ import { defineStore } from "pinia";
 import useFetchAuthenticated from "~/composables/useFetchAuthenticated";
 import { Roles } from "~/types/roles";
 
-// In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
-// All of these actions and variables can be used and called in our vue files.
-
 interface UserPayloadInterface {
   name: string;
   password: string;
@@ -21,7 +18,9 @@ export const useAuthStore = defineStore("auth", {
     authErrors: [] as string[],
   }),
   getters: {
-    userIsAdmin: (state) => (state.userRole & Roles.Admin) > 0,
+    isUserAdmin: (state) => (state.userRole & Roles.Admin) > 0,
+    isUserFacilityManager: (state) =>
+      (state.userRole & Roles.FacilityManager) > 0,
   },
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {

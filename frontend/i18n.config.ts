@@ -75,7 +75,8 @@ export default defineI18nConfig(() => ({
       commentEmpty: "Comment cannot be empty",
       commentPostSuccess: "Comment posted successfully",
       commentDeleteSuccess: "Comment deleted successfully",
-      pdfExportNotOnUnsaved: "New Tickets must be saved first before exporting as PDF",
+      pdfExportNotOnUnsaved:
+        "New Tickets must be saved first before exporting as PDF",
       detail: "Detail",
       status: "Status",
       createDate: "Creation Date",
@@ -85,8 +86,10 @@ export default defineI18nConfig(() => ({
       deleted: "Deleted",
       nothingFound: "Nothing found",
       deleteTicketTitle: "Do you really want to delete this Ticket?",
-      deleteTicketDescription: "Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action."
-
+      deleteTicketDescription:
+        "Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action.",
+      stateChangeNotAllowed:
+        "You can't change the state because a default state is set.",
     },
     de: {
       welcome: "Willkommen",
@@ -161,7 +164,8 @@ export default defineI18nConfig(() => ({
       commentEmpty: "Kommentar kann nicht leer sein",
       commentPostSuccess: "Kommentar erfolgreich gesendet",
       commentDeleteSuccess: "Kommentar erfolgreich gelöscht",
-      pdfExportNotOnUnsaved: "Neue Tickets müssen vor dem Export als PDF erstmalig gespeichert sein",
+      pdfExportNotOnUnsaved:
+        "Neue Tickets müssen vor dem Export als PDF erstmalig gespeichert sein",
       detail: "Detail",
       status: "Status",
       createDate: "Erstellt am",
@@ -171,7 +175,10 @@ export default defineI18nConfig(() => ({
       deleted: "Gelöscht",
       nothingFound: "Nichts gefunden",
       deleteTicketTitle: "Wollen Sie dieses Ticket wirklich löschen?",
-      deleteTicketDescription: "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen."
+      deleteTicketDescription:
+        "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.",
+      stateChangeNotAllowed:
+        "Du kannst den Status nicht ändern, weil ein Standardstatus festgelegt ist.",
     },
   },
 }));

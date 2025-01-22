@@ -2,38 +2,45 @@
   <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1">
     <div>
       <el-text>{{ $t("state") }}</el-text>
-      <el-select
-        v-model="ticket.state"
-        value-key="id"
-        class="drop-shadow-xl dark:base-bg-dark"
-        :placeholder="$t('select')"
+      <el-tooltip
+        :content="$t('stateChangeNotAllowed')"
+        placement="top"
+        :disabled="canUserChangeState"
       >
-        <el-option
-          v-for="state in availableStates"
-          :key="state.id"
-          :label="state.name"
-          :value="state"
+        <el-select
+          v-model="ticket.state"
+          value-key="id"
+          class="drop-shadow-xl dark:base-bg-dark"
+          :placeholder="$t('select')"
         >
-          <div class="flex items-center">
-            <el-tag
-              :color="state.color"
-              size="small"
-              class="mr-2 aspect-square"
-            />
-            <span class="truncate">{{ state.name }}</span>
-          </div>
-        </el-option>
-        <template #label>
-          <div class="flex items-center">
-            <el-tag
-              :color="ticket.state.color"
-              size="small"
-              class="mr-2 aspect-square"
-            />
-            <span class="truncate">{{ ticket.state.name }}</span>
-          </div>
-        </template>
-      </el-select>
+          <el-option
+            v-for="state in availableStates"
+            :key="state.id"
+            :label="state.name"
+            :value="state"
+            :disabled="!canUserChangeState"
+          >
+            <div class="flex items-center">
+              <el-tag
+                :color="state.color"
+                size="small"
+                class="mr-2 aspect-square"
+              />
+              <span class="truncate">{{ state.name }}</span>
+            </div>
+          </el-option>
+          <template #label>
+            <div class="flex items-center">
+              <el-tag
+                :color="ticket.state.color"
+                size="small"
+                class="mr-2 aspect-square"
+              />
+              <span class="truncate">{{ ticket.state.name }}</span>
+            </div>
+          </template>
+        </el-select>
+      </el-tooltip>
     </div>
     <div>
       <el-text>{{ $t("priority") }}</el-text>
@@ -111,16 +118,26 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type state from "~/types/api/response/stateResponse";
 import type priority from "~/types/api/response/priorityResponse";
 import type building from "~/types/api/response/buildingResponse";
-defineProps<{
+
+const props = defineProps<{
   ticket: ticket;
 }>();
 
+const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 
 let availableStates: Ref<state[]> = ref([]);
 let availablePriorities: Ref<priority[]> = ref([]);
 let availableBuildings: Ref<building[]> = ref([]);
+let doesDefaultStateExist: Ref<boolean> = ref(false);
+let canUserChangeState: Ref<boolean> = computed(() => {
+  return (
+    isUserAdmin.value ||
+    isUserFacilityManager.value ||
+    !doesDefaultStateExist.value
+  );
+});
 
 onNuxtReady(async () => {
   try {
@@ -141,6 +158,9 @@ onNuxtReady(async () => {
     availableStates.value = states.data.value ?? [];
     availablePriorities.value = sortedPriorities ?? [];
     availableBuildings.value = buildings.data.value ?? [];
+    doesDefaultStateExist.value = availableStates.value.some(
+      (state) => state.isDefault
+    );
   } catch (error) {
     ElNotification({
       title: i18n.t("error"),

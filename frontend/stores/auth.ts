@@ -1,9 +1,6 @@
 import { defineStore } from "pinia";
 import useFetchAuthenticated from "~/composables/useFetchAuthenticated";
 
-// In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
-// All of these actions and variables can be used and called in our vue files.
-
 interface UserPayloadInterface {
   name: string;
   password: string;
@@ -27,14 +24,17 @@ export const useAuthStore = defineStore("auth", {
       this.authErrors = [];
 
       try {
-        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
-          body: {
-            username: name,
-            password: password,
-          },
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-        });
+        const { data, pending, error }: any = await useFetch(
+          `${BACKEND_URL}/Auth/login`,
+          {
+            body: {
+              username: name,
+              password: password,
+            },
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         this.loading = pending;
 
         if (error?.value?.statusCode === 401) {
@@ -50,7 +50,7 @@ export const useAuthStore = defineStore("auth", {
         accessToken.value = data.value.accessToken;
         refreshToken.value = data.value.refreshToken;
         console.log(accessToken);
-        console.log(accessToken.value)
+        console.log(accessToken.value);
         this.authenticated = true;
       } catch (error) {
         console.error(error);
@@ -72,5 +72,3 @@ export const useAuthStore = defineStore("auth", {
     },
   },
 });
-
-// https://dev.to/rafaelmagalhaes/authentication-in-nuxt-3-375o

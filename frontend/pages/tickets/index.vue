@@ -37,7 +37,7 @@
       >
         <ElIconLoading class="animate-spin w-5"></ElIconLoading>
       </div>
-      <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possbile sorting arrows are clicked, the data has to be fetched again completely.
+      <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possible sorting arrows are clicked, the data has to be fetched again completely.
        The page should stay the same. -->
       <div
         class="h-full w-full flex items-center justify-center"
@@ -107,6 +107,7 @@
                 :keyText="'id'"
                 :labelText="'name'"
                 :id="scope.row.id"
+                :read-only="!canEditState(scope.row)"
               ></ColoredSelect>
             </div>
           </template>
@@ -159,6 +160,7 @@
                 :keyText="'id'"
                 :labelText="'name'"
                 :id="scope.row.id"
+                :read-only="!canEditPriority(scope.row)"
               ></ColoredSelect>
             </div>
           </template>
@@ -172,7 +174,7 @@
           show-overflow-tooltip
           sortable
         />
-        <el-table-column fixed="right" :min-width="userIsAdmin ? 120 : 70">
+        <el-table-column fixed="right" :min-width="isUserAdmin ? 120 : 70">
           <template #default="scope">
             <el-tooltip
               :content="$t('detail')"
@@ -189,7 +191,7 @@
               </el-button>
             </el-tooltip>
             <el-tooltip
-              v-if="userIsAdmin"
+              v-if="isUserAdmin"
               :content="$t('delete')"
               placement="top-start"
               :show-after="500"
@@ -249,7 +251,9 @@ import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
 const { statusOptions, priorityOptions, tickets, totalCount } = storeToRefs(
   useTicketsStore()
 );
-const { isUserAdmin: userIsAdmin } = storeToRefs(useAuthStore());
+const { isUserAdmin, isUserFacilityManager, username } = storeToRefs(
+  useAuthStore()
+);
 const { fetchStatusOptions, fetchPriorityOptions, fetchTickets } =
   useTicketsStore();
 const loading = ref(true);
@@ -508,6 +512,23 @@ async function fetchNewPage(page: number) {
     sortDesc.value
   );
   pageLoading.value = false;
+}
+
+function canEditState(ticket: ticket) {
+  return (
+    isUserAdmin.value ||
+    isUserFacilityManager.value ||
+    (ticket.author === username.value &&
+      !statusOptions.value.some((state) => state.isDefault))
+  );
+}
+
+function canEditPriority(ticket: ticket) {
+  return (
+    isUserAdmin.value ||
+    isUserFacilityManager.value ||
+    ticket.author === username.value
+  );
 }
 </script>
 

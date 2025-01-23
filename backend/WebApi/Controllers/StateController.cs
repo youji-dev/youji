@@ -43,13 +43,8 @@ namespace Application.WebApi.Controllers
             [FromServices] StateRepository stateRepo,
             [FromBody] StatePostDTO stateData)
         {
-            State? defaultState = null;
-
-            if (stateData.IsDefault)
-                defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
-
-            if (defaultState is not null)
-                return this.BadRequest($"The state '{defaultState.Name}' is already set as default.");
+            if (stateData.IsDefault && stateRepo.Find(state => state.IsDefault).Any())
+                return this.BadRequest("A default state already exists.");
 
             var state = new State()
             {
@@ -86,13 +81,8 @@ namespace Application.WebApi.Controllers
             if (state is null)
                 return this.NotFound($"A state with the id '{stateData.Id}' doesn´t exist.");
 
-            State? defaultState = null;
-
-            if (stateData.IsDefault)
-                defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
-
-            if (defaultState is not null)
-                return this.BadRequest($"The state '{defaultState.Name}' is already set as default.");
+            if (stateData.IsDefault && stateRepo.Find(state => state.IsDefault).Any())
+                return this.BadRequest("A default state already exists.");
 
             state.Name = stateData.Name;
             state.Color = stateData.Color;

@@ -213,7 +213,7 @@ namespace Application.WebApi.Controllers
             [FromBody] TicketPostDTO ticketData)
         {
             var currentUser = this.User;
-            var userRole = currentUser.FindFirst(ClaimTypes.Role)?.Value;
+            var userRole = this.User.FindFirst(ClaimTypes.Role)?.Value;
 
             if (!Enum.TryParse(userRole, out Roles role))
                 return this.Unauthorized();
@@ -225,6 +225,7 @@ namespace Application.WebApi.Controllers
 
             var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
 
+            // Blocks users from creating tickets with non-default states if there is a default state
             if (!role.HasFlag(Roles.FacilityManager)
                 && !role.HasFlag(Roles.Admin)
                 && !ticketState.IsDefault
@@ -442,18 +443,20 @@ namespace Application.WebApi.Controllers
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
 
+            // Only the author, facility manager and admin can change tickets
             if (!ticket.Author.Equals(userClaim)
                 && !role.HasFlag(Roles.FacilityManager)
                 && !role.HasFlag(Roles.Admin))
-                    return this.Forbid();
+                return this.Forbid();
 
-            var ticketState = await stateRepo.GetAsync(ticketData.StateId) ?? ticket.State;
+            var ticketState = ticket.State;
             var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
 
+            // Restrict users from changing the state if there is a default state and the user is not a facility manager or admin
             if (!role.HasFlag(Roles.FacilityManager)
                 && !role.HasFlag(Roles.Admin)
-                && !ticketState.IsDefault
-                && defaultState is not null)
+                && defaultState is not null
+                && !ticket.State.Id.Equals(ticketData.StateId))
                 return this.Forbid();
 
             Building? building = ticketData.BuildingId is null

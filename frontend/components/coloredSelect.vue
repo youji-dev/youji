@@ -60,7 +60,8 @@ const props = defineProps({
   },
   changeCallback: {
     type: Function,
-    required: true,
+    required: false,
+    default: () => {},
   },
   changeCallbackParams: {
     type: Array<any>,

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <None Remove="Resources\Localization\Mailing.I18N.xml" />
+    <None Remove="Resources\Localization\PDF.I18N.xml" />
     <None Remove="Resources\Logo.svg" />
     <None Remove="Resources\Templates\arrow_down.svg" />
     <None Remove="Resources\Templates\arrow_right.svg" />
@@ -41,6 +42,9 @@
 
 	<ItemGroup>
 	  <EmbeddedResource Include="Resources\Localization\Mailing.I18N.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Localization\PDF.I18N.xml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	  <EmbeddedResource Include="Resources\Logo.svg">

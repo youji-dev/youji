@@ -169,8 +169,13 @@ namespace DomainLayer.BusinessLogic.PDF
                         inlined.Item()
                             .Column(col =>
                             {
-                                col.Item().Height(100).Image(this.model.Images[i].Data);
-                                col.Item().Text(this.model.Images[i].FileName)
+                                col.Item()
+                                    .AlignCenter()
+                                    .Height(100)
+                                    .Image(this.model.Images[i].Data);
+
+                                col.Item()
+                                    .Text(this.model.Images[i].FileName)
                                     .FontSize(this.smallFont)
                                     .AlignCenter();
                             });

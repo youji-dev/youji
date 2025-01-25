@@ -1,4 +1,6 @@
-﻿using PersistenceLayer.DataAccess.Entities;
+﻿using Microsoft.Extensions.Configuration;
+using MimeKit;
+using PersistenceLayer.DataAccess.Entities;
 
 namespace DomainLayer.BusinessLogic.PDF
 {
@@ -41,7 +43,7 @@ namespace DomainLayer.BusinessLogic.PDF
         public static TicketExportModel FromTicket(Ticket ticket)
         {
             var images = ticket.Attachments
-                .Where(attachment => ((string[])["webp", "png", "jpeg", "jfif"]).Contains(attachment.FileType))
+                .Where(attachment => attachment.IsRenderableImage)
                 .Select(attachment => new ImageData()
                 {
                     FileName = attachment.Name,

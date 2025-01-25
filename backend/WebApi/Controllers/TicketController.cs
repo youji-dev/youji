@@ -328,6 +328,7 @@ namespace Application.WebApi.Controllers
         /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
         /// <param name="mailingService">Instance of <see cref="MailingService"/></param>
         /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
+        /// <param name="configuration">Instance of <see cref="IConfiguration"/></param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="attachmentFile">The file that will be uploaded.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
@@ -340,6 +341,7 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromServices] MailingService mailingService,
             [FromServices] UserRepository userRepository,
+            [FromServices] IConfiguration configuration,
             [FromRoute] Guid ticketId,
             IFormFile attachmentFile)
         {
@@ -352,7 +354,10 @@ namespace Application.WebApi.Controllers
             await attachmentFile.CopyToAsync(stream);
 
             string? blurHash = null;
-            if (attachmentFile.ContentType.StartsWith("image/"))
+            string mimeType = attachmentFile.ContentType;
+            string unrenderableMimeTypes = configuration.GetValue<string>("Images:UnrenderableMimeTypes") ?? string.Empty;
+
+            if (mimeType.StartsWith("image/") && !unrenderableMimeTypes.Contains(mimeType))
             {
                 using var image = Image.Load<Rgba32>(stream.ToArray());
                 blurHash = Blurhasher.Encode(image, 5, 5);
@@ -366,6 +371,7 @@ namespace Application.WebApi.Controllers
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
                 TicketId = ticketId,
                 BlurHash = blurHash,
+                IsRenderableImage = blurHash is not null,
             };
 
             await attachmentRepo.AddAsync(attachment);

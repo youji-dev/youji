@@ -36,12 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\Resources.I18N.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BusinessLogic\DomainLayer.BusinessLogic.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\DataAccessLayer\PersistenceLayer.DataAccess.csproj" />

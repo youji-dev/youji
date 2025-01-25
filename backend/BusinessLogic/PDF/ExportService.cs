@@ -1,5 +1,8 @@
 ﻿using I18N.DotNet;
 using QuestPDF.Fluent;
+using System.Globalization;
+using System.Reflection;
+using Common.Extensions;
 
 namespace DomainLayer.BusinessLogic.PDF
 {
@@ -21,10 +24,17 @@ namespace DomainLayer.BusinessLogic.PDF
         /// Export a ticket to pdf
         /// </summary>
         /// <param name="model">The ticket model to use for the document</param>
-        /// <param name="localizer">The localizer to use for the export; if omitted default values are used</param>
+        /// <param name="lang">The target language for the export</param>
         /// <returns>The generated pdf as binary</returns>
-        public byte[] Export(TicketExportModel model, Localizer? localizer = null)
+        public byte[] Export(TicketExportModel model, string lang)
         {
+            Localizer localizer = new();
+            using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("PDF.I18N.xml");
+            if (localizerResourceStream is not null)
+            {
+                localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(lang ?? CultureInfo.CurrentCulture.Name));
+            }
+
             TicketExportDocument document = new(model, localizer);
 
             return Document.Create(document.Compose).GeneratePdf();

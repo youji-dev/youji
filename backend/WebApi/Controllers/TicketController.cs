@@ -484,6 +484,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific id of the ticket that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{ticketId}")]
+        [AuthorizeRoles(Roles.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
@@ -494,19 +495,6 @@ namespace Application.WebApi.Controllers
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
-
-            var userClaim = this.User.FindFirst("username")?.Value;
-            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
-            if (userClaim is null || rolesClaim is null)
-                return this.Unauthorized();
-
-            if (!Enum.TryParse(rolesClaim, out Roles role))
-                return this.Unauthorized();
-
-            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
-            {
-                return this.Forbid();
-            }
 
             await ticketRepo.DeleteAsync(ticket);
 

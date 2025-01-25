@@ -170,8 +170,8 @@ namespace DomainLayer.BusinessLogic.PDF
                             .Column(col =>
                             {
                                 col.Item()
-                                    .Height(100)
                                     .AlignCenter()
+                                    .Height(100)
                                     .Image(this.model.Images[i].Data);
 
                                 col.Item()

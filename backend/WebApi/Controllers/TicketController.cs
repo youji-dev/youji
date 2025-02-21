@@ -203,6 +203,7 @@ namespace Application.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<Ticket>> Post(
             [FromServices] TicketRepository ticketRepo,
@@ -211,10 +212,25 @@ namespace Application.WebApi.Controllers
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketPostDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var currentUser = this.User;
+            var userRole = this.User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (state is null)
+            if (!Enum.TryParse(userRole, out Roles role))
+                return this.Unauthorized();
+
+            var ticketState = await stateRepo.GetAsync(ticketData.StateId);
+
+            if (ticketState is null)
                 return this.BadRequest("The ticket to be created must have a valid state.");
+
+            var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+
+            // Blocks users from creating tickets with non-default states if there is a default state
+            if (!role.HasFlag(Roles.FacilityManager)
+                && !role.HasFlag(Roles.Admin)
+                && !ticketState.IsDefault
+                && defaultState is not null)
+                return this.Forbid();
 
             var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
 
@@ -231,7 +247,7 @@ namespace Application.WebApi.Controllers
                     return this.BadRequest("The given building id doesn´t exist.");
             }
 
-            var author = this.User.FindFirst("username")?.Value;
+            var author = currentUser.FindFirst("username")?.Value;
 
             if (author is null)
                 return this.Unauthorized();
@@ -242,7 +258,7 @@ namespace Application.WebApi.Controllers
                 Title = ticketData.Title,
                 Author = author,
                 CreationDate = DateTime.UtcNow,
-                State = state,
+                State = ticketState,
                 LastStateUpdate = DateTime.UtcNow,
                 Description = ticketData.Description,
                 Priority = priority,
@@ -408,6 +424,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<Ticket>> Put(
@@ -419,11 +436,6 @@ namespace Application.WebApi.Controllers
             [FromServices] UserRepository userRepository,
             [FromBody] TicketPutDTO ticketData)
         {
-            var ticket = await ticketRepo.GetAsync(ticketData.Id);
-
-            if (ticket is null)
-                return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
-
             var userClaim = this.User.FindFirst("username")?.Value;
             var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
             if (userClaim is null || rolesClaim is null)
@@ -432,12 +444,27 @@ namespace Application.WebApi.Controllers
             if (!Enum.TryParse(rolesClaim, out Roles role))
                 return this.Unauthorized();
 
-            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
-            {
-                return this.Forbid();
-            }
+            var ticket = await ticketRepo.GetAsync(ticketData.Id);
 
-            State? state = await stateRepo.GetAsync(ticketData.StateId);
+            if (ticket is null)
+                return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
+
+            // Only the author, facility manager and admin can change tickets
+            if (!ticket.Author.Equals(userClaim)
+                && !role.HasFlag(Roles.FacilityManager)
+                && !role.HasFlag(Roles.Admin))
+                return this.Forbid();
+
+            var ticketState = ticket.State;
+            var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+
+            // Restrict users from changing the state if there is a default state and the user is not a facility manager or admin
+            if (!role.HasFlag(Roles.FacilityManager)
+                && !role.HasFlag(Roles.Admin)
+                && defaultState is not null
+                && !ticket.State.Id.Equals(ticketData.StateId))
+                return this.Forbid();
+
             Building? building = ticketData.BuildingId is null
                 ? null
                 : await buildingRepo.GetAsync(ticketData.BuildingId.Value);
@@ -448,8 +475,8 @@ namespace Application.WebApi.Controllers
 
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
-            ticket.State = state ?? ticket.State;
-            ticket.LastStateUpdate = state is not null && !state.Id.Equals(ticket.State.Id)
+            ticket.State = ticketState;
+            ticket.LastStateUpdate = !ticketState.Id.Equals(ticket.State.Id)
                 ? DateTime.UtcNow
                 : ticket.LastStateUpdate.ToUniversalTime();
             ticket.Building = building ?? ticket.Building;

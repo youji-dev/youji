@@ -32,5 +32,10 @@ namespace PersistenceLayer.DataAccess.Entities
         /// Days from when tickets will be purged.
         /// </summary>
         public int? AutoPurgeDays { get; set; }
+
+        /// <summary>
+        /// Indicates if state is default.
+        /// </summary>
+        public bool IsDefault { get; set; }
     }
 }

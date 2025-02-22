@@ -41,7 +41,7 @@ const useFetchAuthenticated = <T>(
           navigateTo(localePath("/login")?.fullPath);
           reject(error);
         } finally {
-          refreshPromise = null; // Reset promise after completion
+          refreshPromise = null;
         }
       });
     }

@@ -6,7 +6,46 @@
     :onresize="determineViewWidth()"
   >
     <div class="flex flex-row items-center justify-end w-full py-2">
-      <div class="w-1/2 flex justify-center items-center md:w-1/3 lg:w-1/5">
+      <div class="w-3/4 flex justify-center items-center md:w-1/3 lg:w-1/3 xl:w-1/4">
+        <el-select class="w-1/2 mr-1" v-model="searchProperty" value-key="value">
+          <el-option
+            v-for="property in [
+              {
+                value: 'Title',
+                label: $t('title')
+              },
+              {
+                value: 'Author',
+                label: $t('username')
+              },
+              {
+                value: 'Building',
+                label: $t('building')
+              },
+              {
+                value: 'Room',
+                label: $t('room')
+              },
+              {
+                value: 'Priority',
+                label: $t('priority')
+              },
+              {
+                value: 'State',
+                label: $t('status')
+              },
+              {
+                value: 'CreationDate',
+                label: $t('createDate')
+              }
+            ]"
+            :key="property.value"
+            :label="$t(property.label)"
+            
+            :value="property"
+            :placeholder="$t('property')"
+          />
+        </el-select>
         <el-input
           v-model="search"
           class="w-full mr-1"
@@ -14,7 +53,14 @@
           :prefix-icon="Search"
           @change="fetchTicketsFromStart(true)"
         />
-        <el-button class="ml-1" type="primary" :icon="ElIconSearch" @click="fetchTicketsFromStart(true)" :loading="searchLoading" round></el-button>
+        <el-button
+          class="ml-1"
+          type="primary"
+          :icon="ElIconSearch"
+          @click="fetchTicketsFromStart(true)"
+          :loading="searchLoading"
+          round
+        ></el-button>
       </div>
     </div>
     <div
@@ -36,14 +82,17 @@
         class="h-full w-full flex items-center justify-center"
         v-if="tickets.length === 0 && !loading && !pageLoading"
       >
-        <el-empty :description="$t('nothingFound')"/>
+        <el-empty :description="$t('nothingFound')" />
       </div>
       <el-table
         v-if="!loading && !pageLoading && tickets.length > 0"
         :data="parsedTickets"
         :height="tableDimensions['height']"
         class="h-full w-full overflow-x-scroll"
-        :default-sort="{ prop: sortColProp, order: sortDesc ? 'descending' : 'ascending' }"
+        :default-sort="{
+          prop: sortColProp,
+          order: sortDesc ? 'descending' : 'ascending',
+        }"
         @sort-change="changeSort"
         :sort-by="sortCol"
         @row-dblclick="(row: any, column: any, event: Event) => {
@@ -172,7 +221,8 @@ import type state from "~/types/api/response/stateResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
 const { statusOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
-const { fetchStatusOptions, fetchTickets } = useTicketsStore();
+const { fetchStatusOptions, fetchTickets, fetchTicketsAdvanced } =
+  useTicketsStore();
 const loading = ref(true);
 const pageLoading = ref(false);
 const searchLoading = ref(false);
@@ -183,7 +233,10 @@ const localeRoute = useLocaleRoute();
 const router = useRouter();
 const i18n = useI18n();
 const width = ref("100vw");
-const { $api } = useNuxtApp();
+const { $api } = useNuxtApp() as any;
+const page = ref(1);
+const searchProperty = ref({value: "", label: ""}) as Ref<{value: string; label: string}>;
+
 interface Ticket {
   id: number;
   name: string;
@@ -215,7 +268,25 @@ async function fetchTicketsFromStart(fromSearch: boolean) {
   pageLoading.value = fromSearch;
   searchLoading.value = fromSearch;
   loading.value = !fromSearch;
-  await fetchTickets(search.value, 0, 25, sortCol.value, sortDesc.value);
+  if (searchProperty.value.value === "") {
+    await fetchTickets(
+      search.value,
+      page.value * 25 - 25,
+      25,
+      sortCol.value,
+      sortDesc.value
+    );
+  } else {
+    await fetchTicketsAdvanced({
+      searchTerm: search.value,
+      skip: page.value * 25 - 25,
+      take: 25,
+      orderByColumn: sortCol.value,
+      orderDesc: sortDesc.value,
+      classPropertyName: ["priority", "building", "status"].includes(searchProperty.value.value) ? "name" : "",
+      property: searchProperty.value.value,
+    });
+  }
   pageLoading.value = false;
   loading.value = false;
   searchLoading.value = false;
@@ -237,7 +308,7 @@ const filterTag = (value: string, row: Ticket) => {
 };
 
 const parsedTickets = computed(() => {
-  return tickets.value.map((ticket) => {
+  return tickets.value.map((ticket: any) => {
     return {
       id: ticket.id,
       title: ticket.title,
@@ -269,7 +340,7 @@ function getTableDimensions() {
 
 function updateTicketStatus(ticket_id: string, new_status: state) {
   let ticket: ticket[] = tickets.value.filter(
-    (ticket) => ticket.id === ticket_id
+    (ticket: any) => ticket.id === ticket_id
   );
   if (!!ticket[0]) {
     let foundTicket: ticket = ticket[0];
@@ -284,7 +355,7 @@ function updateTicketStatus(ticket_id: string, new_status: state) {
         room: foundTicket.room,
         object: foundTicket.object,
       })
-      .then((resp) => {
+      .then((resp: any) => {
         if (resp.error.value) {
           console.error(resp.error.value);
           let selectEl: HTMLSelectElement | null = document.getElementById(
@@ -315,7 +386,7 @@ function updateTicketStatus(ticket_id: string, new_status: state) {
           type: "success",
         });
       })
-      .catch((e) => {
+      .catch((e: any) => {
         let selectEl: HTMLSelectElement | null = document.getElementById(
           ticket_id
         ) as HTMLSelectElement;
@@ -334,22 +405,30 @@ function updateTicketStatus(ticket_id: string, new_status: state) {
   return;
 }
 
-function changeSort(sortData: {column: any, prop: string, order: any} ) {
+function changeSort(sortData: { column: any; prop: string; order: any }) {
   sortCol.value = sortData.column.filterClassName;
   sortColProp.value = sortData.prop;
   sortDesc.value = sortData.order === "ascending" ? false : true;
   searchLoading.value = true;
-  fetchNewPage(1).then(() => {
-    searchLoading.value = false;
-  }).catch((e) => {
-    searchLoading.value = false;
-    console.error(e);
-  });
+  fetchNewPage(1)
+    .then(() => {
+      searchLoading.value = false;
+    })
+    .catch((e) => {
+      searchLoading.value = false;
+      console.error(e);
+    });
 }
 
 async function fetchNewPage(page: number) {
   pageLoading.value = true;
-  await fetchTickets(search.value, page * 25 - 25, 25, sortCol.value, sortDesc.value);
+  await fetchTickets(
+    search.value,
+    page * 25 - 25,
+    25,
+    sortCol.value,
+    sortDesc.value
+  );
   pageLoading.value = false;
 }
 </script>

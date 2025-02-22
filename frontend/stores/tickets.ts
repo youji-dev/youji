@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import type CreateAdvancedTicketSearchRequest from "~/types/api/request/advancedTicketSearch";
+import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 export const useTicketsStore = defineStore("tickets", {
@@ -31,7 +33,21 @@ export const useTicketsStore = defineStore("tickets", {
                 this.totalCount = resp.data.value.total;
                 this.tickets = resp.data.value.results;
             }
+        },
 
+        async fetchTicketsAdvanced(options: CreateAdvancedTicketSearchRequest) {
+            console.log(options);
+            const { $api } = useNuxtApp();
+            const resp = await $api.ticket.advancedSearch(options);
+            console.log("ticket response", resp.data.value);
+            if (resp.error.value) {
+                console.log(resp.error)
+                return;
+            }
+            if (!!resp.data.value) {
+                this.totalCount = resp.data.value.total;
+                this.tickets = resp.data.value.results;
+            }
         },
         async fetchNewTickets() {
             const { $api } = useNuxtApp();

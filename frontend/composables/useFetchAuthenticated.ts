@@ -1,6 +1,9 @@
 import type { UseFetchOptions } from "#app";
 
-const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?: UseFetchOptions<T>) => {
+const useFetchAuthenticated = <T>(
+  url: string | (() => string),
+  providedOptions?: UseFetchOptions<T>
+) => {
   const {
     public: { BACKEND_URL, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME },
   } = useRuntimeConfig();
@@ -17,6 +20,34 @@ const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?
     sameSite: "strict",
   });
 
+  let refreshPromise: Promise<void> | null = null;
+
+  const refreshAccessToken = async () => {
+    if (!refreshPromise) {
+      refreshPromise = new Promise(async (resolve, reject) => {
+        try {
+          const { data }: any = await useFetch(`${BACKEND_URL}/Auth/refresh`, {
+            body: { refreshToken: refreshToken.value },
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          accessToken.value = data.value.accessToken;
+          refreshToken.value = data.value.refreshToken;
+
+          resolve();
+        } catch (error) {
+          authStore.logUserOut();
+          navigateTo(localePath("/login")?.fullPath);
+          reject(error);
+        } finally {
+          refreshPromise = null; // Reset promise after completion
+        }
+      });
+    }
+    return refreshPromise;
+  };
+
   const customFetch = $fetch.create({
     baseURL: BACKEND_URL,
     retry: 1,
@@ -32,15 +63,7 @@ const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?
     async onResponseError({ response }) {
       if (response?.status === 401) {
         try {
-          const { data }: any = await useFetch(`${BACKEND_URL}/Auth/refresh`, {
-            body: {
-              refreshToken: refreshToken.value,
-            },
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-          });
-          accessToken.value = data.value.accessToken;
-          refreshToken.value = data.value.refreshToken;
+          await refreshAccessToken();
         } catch (error) {
           authStore.logUserOut();
           navigateTo(localePath("/login")?.fullPath);

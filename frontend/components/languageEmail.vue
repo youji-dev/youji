@@ -18,8 +18,6 @@
 
 <script lang="ts" setup>
 const { locales } = useI18n();
-const router = useRouter();
-const switchLocalePath = useSwitchLocalePath();
 const colorMode = useColorMode();
 const {
   public: { TEXT_LIGHT, TEXT_DARK },
@@ -29,7 +27,6 @@ const availableLocales = computed(() => {
 });
 
 const switchLocale = (localeKey: string) => {
-  console.log(localeKey);
-  router.push(switchLocalePath(localeKey));
+  // Switch email locale with backend request
 };
 </script>

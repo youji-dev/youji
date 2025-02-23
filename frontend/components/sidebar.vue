@@ -5,10 +5,6 @@
   >
   <div class="flex items-center justify-between">
     <Logo/>
-    <div class="flex items-center justify-end">
-      <Theme />
-      <Language />
-    </div>
   </div>
     <el-menu
       :default-active="getPageIndex()"

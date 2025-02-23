@@ -45,6 +45,10 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -97,6 +101,9 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<bool>("HasAutoPurge")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -126,8 +133,8 @@ namespace PersistenceLayer.DataAccess.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<DateOnly>("LastStateUpdate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("LastStateUpdate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Object")
                         .HasColumnType("text");
@@ -167,9 +174,15 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("bytea");
 
+                    b.Property<string>("BlurHash")
+                        .HasColumnType("text");
+
                     b.Property<string>("FileType")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsRenderableImage")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -219,6 +232,9 @@ namespace PersistenceLayer.DataAccess.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PreferredEmailLcid")
                         .HasColumnType("text");
 
                     b.Property<int>("Type")

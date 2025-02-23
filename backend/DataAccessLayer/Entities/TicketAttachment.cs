@@ -16,8 +16,16 @@ namespace PersistenceLayer.DataAccess.Entities
 
         /// <summary>
         /// The binaries of the attachment.
+        /// null! is required because json serializer can't serialize properties
+        /// that are required and null at the same time
         /// </summary>
-        public required byte[] Binary { get; set; }
+        [JsonIgnore]
+        public byte[] Binary { get; set; } = null!;
+
+        /// <summary>
+        /// Hash that is used to generate the preview of the attachment
+        /// </summary>
+        public string? BlurHash { get; set; }
 
         /// <summary>
         /// The name of the attachment.
@@ -33,6 +41,11 @@ namespace PersistenceLayer.DataAccess.Entities
         /// The id of the related ticket.
         /// </summary>
         public required Guid TicketId { get; set; }
+
+        /// <summary>
+        /// Whether the attachment is a renderable image
+        /// </summary>
+        public bool IsRenderableImage { get; set; }
 
         /// <summary>
         /// The refernce type of the relatet tickets.

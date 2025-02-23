@@ -1,6 +1,5 @@
 ﻿using Application.WebApi.Decorators;
 using Common.Contracts.Post;
-using Common.Contracts.Put;
 using Common.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +47,7 @@ namespace Application.WebApi.Controllers
                 Id = default,
                 Name = priorityData.Name,
                 Value = priorityData.Value,
+                Color = priorityData.Color,
             };
 
             await priorityRepo.AddAsync(priority);
@@ -76,6 +76,7 @@ namespace Application.WebApi.Controllers
 
             priority.Name = priorityData.Name;
             priority.Value = priorityData.Value;
+            priority.Color = priorityData.Color;
 
             await priorityRepo.UpdateAsync(priority);
 

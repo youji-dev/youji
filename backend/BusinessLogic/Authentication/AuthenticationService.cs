@@ -36,7 +36,7 @@ namespace DomainLayer.BusinessLogic.Authentication
                 claims:
                 [
                     new Claim("username", user.UserId),
-                    new Claim(ClaimTypes.Role, user.Type.ToString()),
+                    new Claim("role", ((int)user.Type).ToString()),
                 ],
                 expires: DateTime.UtcNow.AddMinutes(15),
                 issuer: "youji",
@@ -100,9 +100,9 @@ namespace DomainLayer.BusinessLogic.Authentication
                 return await this.GetOrCreateUser(username.ToLowerInvariant());
             }
 
-            var host = configuration.GetValueOrThrow("LDAPHost");
-            var port = int.Parse(configuration.GetValueOrThrow("LDAPPort"));
-            var baseDn = configuration.GetValueOrThrow("LDAPBaseDN");
+            var host = configuration.GetValueOrThrow("Host", ["LDAP"]);
+            var port = int.Parse(configuration.GetValueOrThrow("Port", ["LDAP"]));
+            var baseDn = configuration.GetValueOrThrow("BaseDN", ["LDAP"]);
             string emailAttributeName = configuration.GetValueOrThrow("EMailAttributeName", ["LDAP"]);
 
             var connection = new LdapConnection();

@@ -1,9 +1,10 @@
 <template>
-  <div v-if="changeCallback" class="flex flex-row justify-center items-center">
+  <div class="flex flex-row justify-center items-center">
     <select
       v-model="selectedOption"
+      v-if="!readOnly"
       :id="id"
-      class="colored-select"
+      class="colored-select bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]"
       @change="
         changeCallback(
           ...(changeCallbackParams ?? []),
@@ -24,26 +25,7 @@
         {{ labelText ? option.option[labelText] : option.option }}
       </option>
     </select>
-    <span
-      class="rounded-full mx-2 h-2 w-2"
-      :style="{ 'background-color': selectedOption.color }"
-      >&nbsp;</span
-    >
-  </div>
-  <div v-else class="flex flex-row justify-center items-center">
-    <select
-      v-model="selectedOption"
-      :id="id"
-      class="colored-select"
-    >
-      <option
-        v-for="option in options"
-        :value="option"
-        :key="keyText ? option.option[keyText] : option.option"
-      >
-        {{ labelText ? option.option[labelText] : option.option }}
-      </option>
-    </select>
+    <p v-else>{{ selectedOption.option[labelText] }}</p>
     <span
       class="rounded-full mx-2 h-2 w-2"
       :style="{ 'background-color': selectedOption.color }"
@@ -74,11 +56,12 @@ const props = defineProps({
   },
   labelText: {
     type: String,
-    required: false,
+    required: true,
   },
   changeCallback: {
     type: Function,
     required: false,
+    default: () => {},
   },
   changeCallbackParams: {
     type: Array<any>,
@@ -87,10 +70,17 @@ const props = defineProps({
   addCurrentValueToCallback: {
     type: Boolean,
     required: false,
+    default: false,
   },
   valueKeyForCallback: {
     type: String,
     required: false,
+    default: null,
+  },
+  readOnly: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 const {
@@ -99,10 +89,11 @@ const {
   current,
   changeCallback,
   changeCallbackParams,
-  addCurrentValueToCallback = false,
+  addCurrentValueToCallback,
   keyText,
   labelText,
   valueKeyForCallback = null,
+  readOnly,
 } = props;
 
 const selectedOption = ref(current);

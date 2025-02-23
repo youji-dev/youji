@@ -10,7 +10,7 @@ namespace DomainLayer.BusinessLogic.PDF
     public class TicketExportDocument : IDocument
     {
         private readonly TicketExportModel model;
-        private readonly Dictionary<string, string> localizationTable;
+        private readonly Localizer localizer;
 
         private readonly int pagePadding = 10;
         private readonly int horizontalPadding = 20;
@@ -26,18 +26,11 @@ namespace DomainLayer.BusinessLogic.PDF
         /// Initializes new instance of <see cref="TicketExportDocument"/>
         /// </summary>
         /// <param name="ticketExportModel">The model to use</param>
-        /// <param name="localizer">The localizer to use; if omitted default values are used</param>
-        public TicketExportDocument(TicketExportModel ticketExportModel, Localizer? localizer = null)
+        /// <param name="localizer">The localizer to use</param>
+        public TicketExportDocument(TicketExportModel ticketExportModel, Localizer localizer)
         {
             this.model = ticketExportModel;
-            this.localizationTable = new()
-            {
-                { "Affected object", localizer?.Localize("Affected object") ?? "Affected object" },
-                { "Building", localizer?.Localize("Building") ?? "Building" },
-                { "Room", localizer?.Localize("Room") ?? "Room" },
-                { "Reported by", localizer?.Localize("Reported by") ?? "Reported by" },
-                { "Reported on", localizer?.Localize("Reported on") ?? "Reported on" },
-            };
+            this.localizer = localizer;
         }
 
         /// <inheritdoc/>
@@ -74,6 +67,7 @@ namespace DomainLayer.BusinessLogic.PDF
                 .PaddingBottom(this.verticalPadding)
                 .Text(this.model.Title)
                 .FontSize(this.largeFont)
+                .ClampLines(3)
                 .Bold();
         }
 
@@ -103,8 +97,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     row.Spacing(this.itemSpacing);
 
-                    row.RelativeItem().Text($"{this.localizationTable["Affected object"]}: ");
-                    row.AutoItem().Text(this.model.Object ?? "-")
+                    row.RelativeItem(1).Text($"{this.localizer.Localize("Affected object")}: ");
+                    row.RelativeItem(3).Text(this.model.Object ?? "-")
                         .AlignRight();
                 });
 
@@ -112,8 +106,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text($"{this.localizationTable["Building"]}: ");
-                    innerRow.AutoItem().Text(this.model.Building ?? "-")
+                    innerRow.RelativeItem(1).Text($"{this.localizer.Localize("Building")}: ");
+                    innerRow.RelativeItem(3).Text(this.model.Building ?? "-")
                         .AlignRight();
                 });
 
@@ -121,8 +115,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text($"{this.localizationTable["Room"]}: ");
-                    innerRow.AutoItem().Text(this.model.Room ?? "-")
+                    innerRow.RelativeItem(1).Text($"{this.localizer.Localize("Room")}: ");
+                    innerRow.RelativeItem(3).Text(this.model.Room ?? "-")
                         .AlignRight();
                 });
 
@@ -130,8 +124,8 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem().Text($"{this.localizationTable["Reported by"]}: ");
-                    innerRow.AutoItem().Text(this.model.Author)
+                    innerRow.RelativeItem(1).Text($"{this.localizer.Localize("Reported by")}: ");
+                    innerRow.RelativeItem(3).Text(this.model.Author)
                         .AlignRight();
                 });
 
@@ -139,8 +133,11 @@ namespace DomainLayer.BusinessLogic.PDF
                 {
                     innerRow.Spacing(this.itemSpacing);
 
-                    innerRow.RelativeItem(10).Text($"{this.localizationTable["Reported on"]}: ");
-                    innerRow.AutoItem().Text(this.model.CreationDate.ToShortDateString())
+                    innerRow.RelativeItem(1).Text($"{this.localizer.Localize("Reported on")}: ");
+                    innerRow.RelativeItem(3)
+                        .Text(this.model.CreationDate.ToString(
+                            this.localizer.TargetCulture.DateTimeFormat.ShortDatePattern,
+                            this.localizer.TargetCulture))
                         .AlignRight();
                 });
             });
@@ -172,8 +169,13 @@ namespace DomainLayer.BusinessLogic.PDF
                         inlined.Item()
                             .Column(col =>
                             {
-                                col.Item().Height(100).Image(this.model.Images[i].Data);
-                                col.Item().Text(this.model.Images[i].FileName)
+                                col.Item()
+                                    .AlignCenter()
+                                    .Height(100)
+                                    .Image(this.model.Images[i].Data);
+
+                                col.Item()
+                                    .Text(this.model.Images[i].FileName)
                                     .FontSize(this.smallFont)
                                     .AlignCenter();
                             });
@@ -186,7 +188,9 @@ namespace DomainLayer.BusinessLogic.PDF
             container
                 .PaddingHorizontal(this.horizontalPadding)
                 .PaddingTop(this.verticalPadding)
-                .Text(DateTime.Now.ToLongDateString())
+                .Text(DateTime.Now.ToString(
+                    this.localizer.TargetCulture.DateTimeFormat.LongDatePattern,
+                    this.localizer.TargetCulture))
                 .FontSize(this.smallFont)
                 .AlignRight();
         }

@@ -26,4 +26,9 @@ export default interface state {
    * Days from when tickets will be purged
    */
   autoPurgeDays: number;
+
+  /**
+   * Indicates if this is the default state for new tickets
+   */
+  isDefault: boolean;
 }

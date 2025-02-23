@@ -1,8 +1,7 @@
+import { jwtDecode } from "jwt-decode";
 import { defineStore } from "pinia";
 import useFetchAuthenticated from "~/composables/useFetchAuthenticated";
-
-// In this store we can define actions for authenticating the user at the backend and store variables like the state of the authentication request, errors, user information ...
-// All of these actions and variables can be used and called in our vue files.
+import { Roles } from "~/types/roles";
 
 interface UserPayloadInterface {
   name: string;
@@ -12,12 +11,17 @@ interface UserPayloadInterface {
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     authenticated: false,
-    name: "" as any,
-    role: 0 as number,
+    username: "" as string,
+    userRole: 0 as Roles,
     loading: false,
     csrfToken: "" as any,
     authErrors: [] as string[],
   }),
+  getters: {
+    isUserAdmin: (state) => (state.userRole & Roles.Admin) > 0,
+    isUserFacilityManager: (state) =>
+      (state.userRole & Roles.FacilityManager) > 0,
+  },
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {
       const {
@@ -27,14 +31,17 @@ export const useAuthStore = defineStore("auth", {
       this.authErrors = [];
 
       try {
-        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
-          body: {
-            username: name,
-            password: password,
-          },
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-        });
+        const { data, pending, error }: any = await useFetch(
+          `${BACKEND_URL}/Auth/login`,
+          {
+            body: {
+              username: name,
+              password: password,
+            },
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
         this.loading = pending;
 
         if (error?.value?.statusCode === 401) {
@@ -44,17 +51,42 @@ export const useAuthStore = defineStore("auth", {
           this.authErrors.push(error.value);
         }
 
-        if (!data.value) return;
+        if (!data.value.accessToken || !data.value.refreshToken) {
+          this.authErrors.push(
+            "Did not receive expected response with access and refresh token"
+          );
+          return;
+        }
+
         const accessToken = useCookie(ACCESS_TOKEN_NAME);
         const refreshToken = useCookie(REFRESH_TOKEN_NAME);
         accessToken.value = data.value.accessToken;
         refreshToken.value = data.value.refreshToken;
-        console.log(accessToken);
-        console.log(accessToken.value)
+
         this.authenticated = true;
+
+        this.getUserData();
       } catch (error) {
         console.error(error);
       }
+    },
+    getUserData() {
+      const {
+        public: { ACCESS_TOKEN_NAME },
+      } = useRuntimeConfig();
+
+      const token = useCookie(ACCESS_TOKEN_NAME, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+
+      if (!token.value) return;
+      const { username, role } = jwtDecode<{ username: string; role: number }>(
+        token.value
+      );
+      this.username = username;
+      this.userRole = role;
     },
     logUserOut() {
       this.authenticated = false;
@@ -72,5 +104,3 @@ export const useAuthStore = defineStore("auth", {
     },
   },
 });
-
-// https://dev.to/rafaelmagalhaes/authentication-in-nuxt-3-375o

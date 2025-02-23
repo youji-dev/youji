@@ -1,9 +1,11 @@
 import { defineStore } from "pinia";
+import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 export const useTicketsStore = defineStore("tickets", {
     state: () => ({
         statusOptions: [] as Array<state>,
+        priorityOptions: [] as Array<priority>,
         tickets: [] as Array<ticket>,
         totalCount: 0 as number,
     }),
@@ -15,7 +17,18 @@ export const useTicketsStore = defineStore("tickets", {
                 console.log(resp.error);
             }
             if (!!resp.data.value) {
-                this.statusOptions = resp.data.value ;
+                this.statusOptions = resp.data.value;
+            }
+        },
+
+        async fetchPriorityOptions() {
+            const { $api } = useNuxtApp();
+            const resp = await $api.priority.getAll();
+            if (resp.error) {
+                console.log(resp.error);
+            }
+            if (!!resp.data.value) {
+                this.priorityOptions = resp.data.value;
             }
         },
 
@@ -26,8 +39,8 @@ export const useTicketsStore = defineStore("tickets", {
             if (resp.error.value) {
                 console.log(resp.error)
                 return;
-            } 
-            if (!!resp.data.value){
+            }
+            if (!!resp.data.value) {
                 this.totalCount = resp.data.value.total;
                 this.tickets = resp.data.value.results;
             }

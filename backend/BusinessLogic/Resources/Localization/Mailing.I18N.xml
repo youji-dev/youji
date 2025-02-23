@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<I18N>
+	<Entry>
+		<Key>Ticket '{0}' was changed</Key>
+		<Value lang="en">Ticket '{0}' was changed</Value>
+		<Value lang="de">Ticket '{0}' wurde geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>New comment on ticket '{0}'</Key>
+		<Value lang="en">New comment on ticket '{0}'</Value>
+		<Value lang="de">Neuer Kommentar an Ticket '{0}'</Value>
+	</Entry>
+	<Entry>
+		<Key>New attachment on ticket '{0}'</Key>
+		<Value lang="en">New attachment on ticket '{0}'</Value>
+		<Value lang="de">Neuer Anhang an Ticket '{0}'</Value>
+	</Entry>
+	<Entry>
+		<Key>Comment by</Key>
+		<Value lang="en">Comment by</Value>
+		<Value lang="de">Kommentar von</Value>
+	</Entry>
+	<Entry>
+		<Key>Title changed</Key>
+		<Value lang="en">Title changed</Value>
+		<Value lang="de">Titel geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>Description changed</Key>
+		<Value lang="en">Description changed</Value>
+		<Value lang="de">Beschreibung geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>Priority changed</Key>
+		<Value lang="en">Priority changed</Value>
+		<Value lang="de">Priorität geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>State changed</Key>
+		<Value lang="en">State changed</Value>
+		<Value lang="de">Status geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>Building changed</Key>
+		<Value lang="en">Building changed</Value>
+		<Value lang="de">Gebäude geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>Room changed</Key>
+		<Value lang="en">Room changed</Value>
+		<Value lang="de">Raum geändert</Value>
+	</Entry>
+	<Entry>
+		<Key>Affected object changed</Key>
+		<Value lang="en">Affected object changed</Value>
+		<Value lang="de">Betroffenes Objekt geändert</Value>
+	</Entry>
+</I18N>

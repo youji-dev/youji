@@ -7,12 +7,14 @@ using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Security.Claims;
 using Application.WebApi.Decorators;
+using Blurhash.ImageSharp;
 using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
-using System.Net.Mail;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace Application.WebApi.Controllers
 {
@@ -51,14 +53,14 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
         /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
         /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
-        /// <param name="orderDesc">The direction teh results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
+        /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
         /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
         /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
         /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
-        public ActionResult<Ticket[]> Get(
+        public ActionResult<TicketSearchDTO> Get(
             [FromServices] TicketRepository ticketRepo,
             [FromQuery] string? searchTerm = null,
             [FromQuery] string orderByColumn = "CreationDate",
@@ -75,11 +77,60 @@ namespace Application.WebApi.Controllers
                     ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
                     || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
                     || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
-                    || ((ticket.Priority != null) && ticket.Priority.Name.ToLower().Contains(searchTerm))
+                    || ticket.Priority.Name.ToLower().Contains(searchTerm)
                     || ticket.State.Name.ToLower().Contains(searchTerm)
                     || ticket.Title.ToLower().Contains(searchTerm)
                     || ticket.Author.ToLower().Contains(searchTerm));
             }
+
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
+            ticketQuery =
+                orderDesc
+                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
+                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
+
+            if (take is not null)
+            {
+                ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
+            }
+
+            tickets = [.. ticketQuery];
+            return this.Ok(new TicketSearchDTO
+            {
+                Total = totalCount, Results = tickets,
+            });
+        }
+
+        /// <summary>
+        /// Fetches tickets by a given property. Property can be a subclass, classPropertyName has to be specified as the property to be compared in the subclass.
+        /// Supports String|Int|Boolean|DateTime|Guid fields.
+        /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
+        /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
+        /// <param name="property">The property to be searched</param>
+        /// <param name="classPropertyName">The name of the property to be compared in case the ticket property is a class</param>
+        /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
+        /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
+        /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
+        /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
+        /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
+        [HttpGet("searchByProperty")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize]
+        public ActionResult<TicketSearchDTO> GetByProperty(
+            [FromServices] TicketRepository ticketRepo,
+            [FromQuery] string? searchTerm = null,
+            [FromQuery] string property = "Title",
+            [FromQuery] string? classPropertyName = null,
+            [FromQuery] string orderByColumn = "CreationDate",
+            [FromQuery] bool orderDesc = false,
+            [FromQuery] int skip = 0,
+            [FromQuery] int? take = null)
+        {
+            var ticketQuery = searchTerm is null
+                ? ticketRepo.GetAll()
+                : ticketRepo.GetByPropertyValue(searchTerm, property, classPropertyName);
 
             Ticket[] tickets = [.. ticketQuery];
             var totalCount = tickets.Length;
@@ -152,6 +203,7 @@ namespace Application.WebApi.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<Ticket>> Post(
             [FromServices] TicketRepository ticketRepo,
@@ -160,10 +212,25 @@ namespace Application.WebApi.Controllers
             [FromServices] BuildingRepository buildingRepo,
             [FromBody] TicketPostDTO ticketData)
         {
-            var state = await stateRepo.GetAsync(ticketData.StateId);
+            var currentUser = this.User;
+            var userRole = this.User.FindFirst(ClaimTypes.Role)?.Value;
 
-            if (state is null)
+            if (!Enum.TryParse(userRole, out Roles role))
+                return this.Unauthorized();
+
+            var ticketState = await stateRepo.GetAsync(ticketData.StateId);
+
+            if (ticketState is null)
                 return this.BadRequest("The ticket to be created must have a valid state.");
+
+            var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+
+            // Blocks users from creating tickets with non-default states if there is a default state
+            if (!role.HasFlag(Roles.FacilityManager)
+                && !role.HasFlag(Roles.Admin)
+                && !ticketState.IsDefault
+                && defaultState is not null)
+                return this.Forbid();
 
             var priority = await priorityRepo.GetAsync(ticketData.PriorityId);
 
@@ -180,7 +247,7 @@ namespace Application.WebApi.Controllers
                     return this.BadRequest("The given building id doesn´t exist.");
             }
 
-            var author = this.User.FindFirst("username")?.Value;
+            var author = currentUser.FindFirst("username")?.Value;
 
             if (author is null)
                 return this.Unauthorized();
@@ -191,7 +258,7 @@ namespace Application.WebApi.Controllers
                 Title = ticketData.Title,
                 Author = author,
                 CreationDate = DateTime.UtcNow,
-                State = state,
+                State = ticketState,
                 LastStateUpdate = DateTime.UtcNow,
                 Description = ticketData.Description,
                 Priority = priority,
@@ -253,12 +320,19 @@ namespace Application.WebApi.Controllers
             await commentRepo.AddAsync(comment);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [author]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateNewTicketCommentMail(comment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Kommentar an Ticket '{ticket.Title}'"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => MailGenerator.GenerateNewTicketCommentMail(comment, localizer),
+                (localizer) => localizer.Localize($"New comment on ticket '{ticket.Title}'"));
 
             return this.Ok(comment);
         }
@@ -270,6 +344,7 @@ namespace Application.WebApi.Controllers
         /// <param name="attachmentRepo">Instance of <see cref="TicketAttachmentRepository"/>.</param>
         /// <param name="mailingService">Instance of <see cref="MailingService"/></param>
         /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
+        /// <param name="configuration">Instance of <see cref="IConfiguration"/></param>
         /// <param name="ticketId">The specific ticket id</param>
         /// <param name="attachmentFile">The file that will be uploaded.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added attachment entity.</returns>
@@ -282,6 +357,7 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketAttachmentRepository attachmentRepo,
             [FromServices] MailingService mailingService,
             [FromServices] UserRepository userRepository,
+            [FromServices] IConfiguration configuration,
             [FromRoute] Guid ticketId,
             IFormFile attachmentFile)
         {
@@ -293,6 +369,16 @@ namespace Application.WebApi.Controllers
             using MemoryStream stream = new();
             await attachmentFile.CopyToAsync(stream);
 
+            string? blurHash = null;
+            string mimeType = attachmentFile.ContentType;
+            string unrenderableMimeTypes = configuration.GetValue<string>("Images:UnrenderableMimeTypes") ?? string.Empty;
+
+            if (mimeType.StartsWith("image/") && !unrenderableMimeTypes.Contains(mimeType))
+            {
+                using var image = Image.Load<Rgba32>(stream.ToArray());
+                blurHash = Blurhasher.Encode(image, 5, 5);
+            }
+
             TicketAttachment attachment = new()
             {
                 Id = default,
@@ -300,18 +386,27 @@ namespace Application.WebApi.Controllers
                 Binary = stream.ToArray(),
                 FileType = attachmentFile.FileName.Split(".").Last().ToLower(),
                 TicketId = ticketId,
+                BlurHash = blurHash,
+                IsRenderableImage = blurHash is not null,
             };
 
             await attachmentRepo.AddAsync(attachment);
 
             string performingUser = this.User.FindFirstValue("username") ?? string.Empty;
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [performingUser]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateNewTicketAttachmentMail(attachment);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Neuer Anhang an Ticket '{ticket.Title}'"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => MailGenerator.GenerateNewTicketAttachmentMail(attachment, localizer),
+                (localizer) => localizer.Localize($"New attachment on ticket '{ticket.Title}'"));
 
             return this.Ok(attachment);
         }
@@ -329,6 +424,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
         public async Task<ActionResult<Ticket>> Put(
@@ -340,11 +436,6 @@ namespace Application.WebApi.Controllers
             [FromServices] UserRepository userRepository,
             [FromBody] TicketPutDTO ticketData)
         {
-            var ticket = await ticketRepo.GetAsync(ticketData.Id);
-
-            if (ticket is null)
-                return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
-
             var userClaim = this.User.FindFirst("username")?.Value;
             var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
             if (userClaim is null || rolesClaim is null)
@@ -353,12 +444,27 @@ namespace Application.WebApi.Controllers
             if (!Enum.TryParse(rolesClaim, out Roles role))
                 return this.Unauthorized();
 
-            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
-            {
-                return this.Forbid();
-            }
+            var ticket = await ticketRepo.GetAsync(ticketData.Id);
 
-            State? state = await stateRepo.GetAsync(ticketData.StateId);
+            if (ticket is null)
+                return this.NotFound($"A ticket with the id '{ticketData.Id}' doesn´t exist.");
+
+            // Only the author, facility manager and admin can change tickets
+            if (!ticket.Author.Equals(userClaim)
+                && !role.HasFlag(Roles.FacilityManager)
+                && !role.HasFlag(Roles.Admin))
+                return this.Forbid();
+
+            var ticketState = ticket.State;
+            var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+
+            // Restrict users from changing the state if there is a default state and the user is not a facility manager or admin
+            if (!role.HasFlag(Roles.FacilityManager)
+                && !role.HasFlag(Roles.Admin)
+                && defaultState is not null
+                && !ticket.State.Id.Equals(ticketData.StateId))
+                return this.Forbid();
+
             Building? building = ticketData.BuildingId is null
                 ? null
                 : await buildingRepo.GetAsync(ticketData.BuildingId.Value);
@@ -369,10 +475,10 @@ namespace Application.WebApi.Controllers
 
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
-            ticket.State = state ?? ticket.State;
-            ticket.LastStateUpdate = state is not null && !state.Id.Equals(ticket.State.Id)
+            ticket.State = ticketState;
+            ticket.LastStateUpdate = !ticketState.Id.Equals(ticket.State.Id)
                 ? DateTime.UtcNow
-                : ticket.LastStateUpdate;
+                : ticket.LastStateUpdate.ToUniversalTime();
             ticket.Building = building ?? ticket.Building;
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;
@@ -381,12 +487,19 @@ namespace Application.WebApi.Controllers
             await ticketRepo.UpdateAsync(ticket);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);
-            var mailAddresses = userRepository.GetMany(mailRecipientIds)
-                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
-                .Select(u => new MailboxAddress(u.UserId, u.Email));
 
-            var mail = mailingService.GenerateTicketChangedMail(ticket, oldTicket);
-            await mailingService.SendMany(mailAddresses, mailingService.FormatMailSubject($"Ticket '{ticket.Title}' wurde geändert"), mail);
+            var mailRecipients = userRepository.GetMany(mailRecipientIds)
+                .Where(u => !string.IsNullOrWhiteSpace(u.Email))
+                .Select(u => new MailRecipient()
+                {
+                    Address = new MailboxAddress(u.UserId, u.Email),
+                    PreferredLcid = u.PreferredEmailLcid,
+                });
+
+            await mailingService.SendManyLocalized(
+                mailRecipients,
+                (localizer) => MailGenerator.GenerateTicketChangedMail(ticket, oldTicket, localizer),
+                (localizer) => localizer.Localize($"Ticket '{ticket.Title}' was changed"));
 
             return this.Ok(ticket);
         }
@@ -398,6 +511,7 @@ namespace Application.WebApi.Controllers
         /// <param name="ticketId">The specific id of the ticket that will be deleted.</param>
         /// <returns>An <see cref="ObjectResult"/> with a result message.</returns>
         [HttpDelete("{ticketId}")]
+        [AuthorizeRoles(Roles.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<string>> Delete(
@@ -408,19 +522,6 @@ namespace Application.WebApi.Controllers
 
             if (ticket is null)
                 return this.NotFound($"A ticket with the id '{ticketId}' doesn´t exist.");
-
-            var userClaim = this.User.FindFirst("username")?.Value;
-            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
-            if (userClaim is null || rolesClaim is null)
-                return this.Unauthorized();
-
-            if (!Enum.TryParse(rolesClaim, out Roles role))
-                return this.Unauthorized();
-
-            if (!ticket.Author.Equals(userClaim) && !role.HasFlag(Roles.FacilityManager) && !role.HasFlag(Roles.Admin))
-            {
-                return this.Forbid();
-            }
 
             await ticketRepo.DeleteAsync(ticket);
 

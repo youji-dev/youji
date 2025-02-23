@@ -105,9 +105,10 @@
       <div class="flex">
         <el-button
           class="text-sm justify-self-end drop-shadow-md"
-          type="primary"
-          @click="isNew ? createTicket() : saveTicketChanges()"
-          >{{ $t("save") }}</el-button
+          type="danger"
+          @click="deleteDialog = true"
+          :hidden="isNew || !isUserAdmin"
+          >{{ $t("delete") }}</el-button
         >
 
         <el-button
@@ -116,9 +117,29 @@
           @click="router.back()"
           >{{ $t("close") }}</el-button
         >
+
+        <el-button
+          class="text-sm justify-self-end drop-shadow-md"
+          type="primary"
+          @click="isNew ? createTicket() : saveTicketChanges()"
+          >{{ $t("save") }}</el-button
+        >
       </div>
     </div>
   </div>
+  <el-dialog v-model="imagePreviewDisplay">
+    <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
+  </el-dialog>
+  <TicketDeleteConfirmationDialog
+    :ticket="ticketModel"
+    :visible="deleteDialog"
+    :beforeClose="
+      () => {
+        deleteDialog = false;
+      }
+    "
+    @deleted="() => { router.push(localePath('/tickets')?.fullPath as string) }"
+  />
 </template>
 
 <script lang="ts" setup async>
@@ -130,7 +151,7 @@ import type ticket from "~/types/api/response/ticketResponse";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 
-import { fromTicketResponse } from "~/types/api/request/editTicket";
+import { fromTicketResponse as editTicketFromResponse } from "~/types/api/request/editTicket";
 import TicketNotFoundError from "~/types/error/ticketNotFound";
 
 import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
@@ -138,8 +159,13 @@ import TicketCommentCollection from "~/components/ticketDetail/ticketCommentColl
 import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
 import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
 const { $api } = useNuxtApp();
+const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
 const i18n = useI18n();
 const localePath = useLocaleRoute();
+
+const { imagePreviewDisplay, imagePreviewSrc } = storeToRefs(
+  useImagePreviewDisplayStore()
+);
 
 const router = useRouter();
 const route = useRoute();
@@ -149,6 +175,7 @@ let isNew = ref((route.params.id as string).toLocaleLowerCase() == "new");
 let is404 = ref(false);
 let loading = ref(true);
 let loadingText = ref(i18n.t("loadingData"));
+let deleteDialog = ref(false);
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);
@@ -167,6 +194,15 @@ onNuxtReady(async () => {
       availableBuildings.value = buildings.data.value ?? [];
       ticketModel.value = ticketData;
       is404.value = false;
+
+      const defaultState = availableStates.value.find(
+        (state) => state.isDefault
+      );
+      const canUserChangeState =
+        isUserAdmin.value || isUserFacilityManager.value || !defaultState;
+      if (isNew.value && !canUserChangeState && defaultState) {
+        ticketModel.value!.state = defaultState;
+      }
     })
     .catch((error) => {
       if (error instanceof TicketNotFoundError) {
@@ -231,7 +267,7 @@ async function saveTicketChanges() {
     loadingText.value = i18n.t("savingTicket");
     loading.value = true;
     const ticketResult = await $api.ticket.edit(
-      fromTicketResponse(ticketModel.value!)
+      editTicketFromResponse(ticketModel.value!)
     );
 
     if (ticketResult.error.value) {

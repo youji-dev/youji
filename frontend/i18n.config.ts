@@ -30,6 +30,7 @@ export default defineI18nConfig(() => ({
       noCsrf: "No CSRF Token. Please reload the page.",
       authSuccess: "Successfully authenticated",
       authError: "Authentication failed",
+      attachmentUploadError: "Attachment upload failed",
       success: "Success",
       error: "Error",
       forbidden: "Access forbidden",
@@ -82,6 +83,7 @@ export default defineI18nConfig(() => ({
       updated: "Updated",
       savingFailed: "Saving failed",
       saved: "Saved",
+      deleted: "Deleted",
       nothingFound: "Nothing found",
       user: "User",
       global: "Global",
@@ -97,6 +99,11 @@ export default defineI18nConfig(() => ({
       language: "System Language",
       languageEmail: "Language (E-Mail)",
       receiveEmailNotifications: "Receive E-Mail notifications",
+      deleteTicketTitle: "Do you really want to delete this Ticket?",
+      deleteTicketDescription:
+        "Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action.",
+      stateChangeNotAllowed:
+        "You can't change the state because a default state is set.",
     },
     de: {
       welcome: "Willkommen",
@@ -126,6 +133,7 @@ export default defineI18nConfig(() => ({
       noCsrf: "Kein CSRF Token. Bitte laden Sie die Seite neu.",
       authSuccess: "Anmeldung erfolgreich",
       authError: "Anmeldung fehlgeschlagen",
+      attachmentUploadError: "Hochladen von Anlage fehlgeschlagen",
       success: "Erfolg",
       error: "Fehler",
       forbidden: "Zugriff verweigert",
@@ -178,6 +186,7 @@ export default defineI18nConfig(() => ({
       updated: "Aktualisiert",
       savingFailed: "Speichern fehlgeschlagen",
       saved: "Gespeichert",
+      deleted: "Gelöscht",
       nothingFound: "Nichts gefunden",
       user: "Benutzer",
       global: "Global",
@@ -193,6 +202,11 @@ export default defineI18nConfig(() => ({
       language: "Systemsprache",
       languageEmail: "Sprache (E-Mail)",
       receiveEmailNotifications: "E-Mail Benachrichtigungen erhalten",
+      deleteTicketTitle: "Wollen Sie dieses Ticket wirklich löschen?",
+      deleteTicketDescription:
+        "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.",
+      stateChangeNotAllowed:
+        "Du kannst den Status nicht ändern, weil ein Standardstatus festgelegt ist.",
     },
   },
 }));

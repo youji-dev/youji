@@ -1,12 +1,11 @@
 <template>
   <div
-    class="w-full h-[calc(100vh - 74px)] lg:h-[calc(100vh - 10px)] p-6 mt-9 lg:mt-0"
+    class="w-full h-[calc(100vh - 74px)] p-6 mt-9 lg:mt-0"
   >
     <div
       class="w-full h-full overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md"
       id="table_container"
     >
-      <PageHeader :text="$t('settings')" class="p-3" />
       <div class="w-full h-full p-3">
         <el-tabs
           type="card"

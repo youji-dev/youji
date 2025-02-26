@@ -5,6 +5,7 @@ import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import type createCommentRequest from "~/types/api/request/createComment";
 import type EditTicketRequest from "~/types/api/request/editTicket";
 import type searchResponse from "~/types/api/response/searchResponse";
+import type CreateAdvancedTicketSearchRequest from "~/types/api/request/advancedTicketSearch";
 
 class TicketRepository {
   private path = "/api/Ticket";
@@ -23,6 +24,13 @@ class TicketRepository {
         skip,
         take,
       },
+    });
+  }
+
+  async advancedSearch(options: CreateAdvancedTicketSearchRequest): Promise<ReturnType<typeof useFetchAuthenticated<searchResponse>>> {
+    return useFetchAuthenticated<searchResponse>(`${this.path}/searchByProperty`, {
+      method: "GET",
+      query: options,
     });
   }
 

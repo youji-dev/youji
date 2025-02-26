@@ -33,17 +33,17 @@ namespace Application.WebApi.Controllers
             if (userClaim is null || rolesClaim is null)
                 return this.Unauthorized();
 
-            var predicate = PredicateBuilder.New<User>(true);
+            IQueryable<User> query = userRepository.GetAll();
 
             if (!Enum.TryParse(rolesClaim, out Roles role))
                 return this.Unauthorized();
 
             if (!role.HasFlag(Roles.Admin))
             {
-                predicate.And(u => u.UserId == userClaim);
+                query = query.Where(user => user.UserId == userClaim);
             }
 
-            return this.Ok(userRepository.GetAll().Where(predicate).ToArray());
+            return this.Ok(query.ToArray());
         }
 
         /// <summary>
@@ -76,19 +76,40 @@ namespace Application.WebApi.Controllers
             [FromRoute] string userId,
             [FromBody] UserPatch userUpdate)
         {
-            User? user = await userRepository.GetAsync(userId);
-            if (user is null)
+            var userClaim = this.User.FindFirst("username")?.Value;
+            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (userClaim is null || rolesClaim is null)
+                return this.Unauthorized();
+
+            if (!Enum.TryParse(rolesClaim, out Roles role))
+                return this.Unauthorized();
+
+            User? patchingUser = await userRepository.GetAsync(userId);
+            if (patchingUser is null)
                 return this.NotFound($"No user found for id '{userId}'");
 
             if (userUpdate.NewRole is not null)
-                user.Type = (Roles)userUpdate.NewRole;
+                patchingUser.Type = (Roles)userUpdate.NewRole;
+
+            if (!role.HasFlag(Roles.Admin))
+            {
+                User? requestingUser = await userRepository.GetAsync(userClaim);
+                if (requestingUser is null)
+                    return this.NotFound($"No user found for id '{userId}'");
+
+                if (requestingUser.UserId != patchingUser.UserId)
+                    return this.Forbid();
+
+                if (userUpdate.NewRole is not null)
+                    return this.Forbid();
+            }
 
             if (userUpdate.NewPreferredEmailLcid is not null)
-                user.PreferredEmailLcid = userUpdate.NewPreferredEmailLcid;
+                patchingUser.PreferredEmailLcid = userUpdate.NewPreferredEmailLcid;
 
-            await userRepository.UpdateAsync(user);
+            await userRepository.UpdateAsync(patchingUser);
 
-            return this.Ok(user);
+            return this.Ok(patchingUser);
         }
 
         /// <summary>

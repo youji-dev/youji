@@ -28,14 +28,19 @@
 
       <el-divider />
       <div class="flex justify-between lg:justify-between items-center py-2">
-        <h1 :title="$t('receiveEmailNotifications')" class="text-lg overflow-hidden text-nowrap overflow-ellipsis w-[75%]">{{ $t("receiveEmailNotifications") }}</h1>
+        <h1
+          :title="$t('receiveEmailNotifications')"
+          class="text-lg overflow-hidden text-nowrap overflow-ellipsis w-[75%]"
+        >
+          {{ $t("receiveEmailNotifications") }}
+        </h1>
         <el-switch></el-switch>
       </div>
       <div class="flex justify-between lg:justify-between items-center py-2">
         <h1 class="text-lg">{{ $t("languageEmail") }}</h1>
         <div class="pl-3 flex items-center">
           <h1 class="text-sm px-3">
-            {{ locale }}
+            {{ emailLocale() }}
           </h1>
           <LanguageEmail />
         </div>
@@ -51,7 +56,25 @@ import LanguageEmail from "../languageEmail.vue";
 import Theme from "../theme.vue";
 const colorMode = useColorMode();
 const i18n = useI18n();
+const { locales } = useI18n();
+const { myUser } = storeToRefs(useSettingsStore());
+const { fetchMyUser } = useSettingsStore();
 const locale = i18n.localeProperties.value.name;
+
+onNuxtReady(async () => {
+  await fetchMyUser();
+});
+
+const emailLocale = () => {
+  if (typeof myUser === undefined) return "";
+  if (myUser.value.preferredEmailLcid.value === null) {
+    return "";
+  } else {
+    return locales.value.filter(
+      (l) => l.code === myUser.value.preferredEmailLcid.value
+    )[0].code;
+  }
+};
 </script>
 
 <style></style>

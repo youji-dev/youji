@@ -13,7 +13,10 @@ class UserRepository {
   }
 
   async edit(state: user): Promise<ReturnType<typeof useFetchAuthenticated<user>>> {
-    return useFetchAuthenticated<user>(this.path, { method: "PUT", body: state });
+    return useFetchAuthenticated<user>(this.path + "/" + state.userId, { method: "PATCH", body: {
+      newRole: Number(state.type),
+      newPreferredEmailLcid: state.preferredEmailLcid
+    } });
   }
 
   async delete(id: string): Promise<ReturnType<typeof useFetchAuthenticated<string>>> {

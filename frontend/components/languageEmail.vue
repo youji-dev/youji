@@ -19,6 +19,8 @@
 <script lang="ts" setup>
 const { locales } = useI18n();
 const colorMode = useColorMode();
+const { myUser } = storeToRefs(useSettingsStore());
+const { updateUsers } = useSettingsStore();
 const {
   public: { TEXT_LIGHT, TEXT_DARK },
 } = useRuntimeConfig();
@@ -27,6 +29,6 @@ const availableLocales = computed(() => {
 });
 
 const switchLocale = (localeKey: string) => {
-  // Switch email locale with backend request
+  console.log(localeKey)
 };
 </script>

@@ -27,8 +27,9 @@ export interface EditableBuilding {
 }
 export interface EditableUser {
   userId: EditableStringProperty;
-  type: EditableNumberProperty;
+  type: EditableStringProperty;
   email: EditableNullableStringProperty;
+  preferredEmailLcid: EditableNullableStringProperty;
 }
 
 export type EditableProperty =
@@ -80,6 +81,7 @@ export const useSettingsStore = defineStore({
     statesLoading: false as boolean,
     buildingsLoading: false as boolean,
     usersLoading: false as boolean,
+    myUser: {} as EditableUser
   }),
   actions: {
     async fetchPriorities() {
@@ -87,17 +89,16 @@ export const useSettingsStore = defineStore({
       const resp = await $api.priority.getAll();
       if (resp.error.value) {
         console.log(resp.error);
-        ElMessage.error("Failed to fetch priorities");
       }
       if (!!resp.data.value) {
         this.priorities = resp.data.value.map(
           (p) =>
-            ({
-              id: { editing: false, value: p.id },
-              color: { editing: false, value: p.color },
-              name: { editing: false, value: p.name },
-              value: { editing: false, value: p.value },
-            } as EditablePriority)
+          ({
+            id: { editing: false, value: p.id },
+            color: { editing: false, value: p.color },
+            name: { editing: false, value: p.name },
+            value: { editing: false, value: p.value },
+          } as EditablePriority)
         );
       }
     },
@@ -107,7 +108,6 @@ export const useSettingsStore = defineStore({
       const resp = await $api.state.getAll();
       if (resp.error.value) {
         console.log(resp.error.value);
-        ElMessage.error("Failed to fetch states");
       }
       if (!!resp.data.value) {
         this.states = resp.data.value.map((s) => ({
@@ -127,7 +127,6 @@ export const useSettingsStore = defineStore({
       const resp = await $api.building.getAll();
       if (resp.error.value) {
         console.log(resp.error.value);
-        ElMessage.error("Failed to fetch buildings");
       }
       if (!!resp.data.value) {
         this.buildings = resp.data.value.map((b) => ({
@@ -143,24 +142,45 @@ export const useSettingsStore = defineStore({
       const resp = await $api.user.getAll();
       if (resp.error.value) {
         console.log(resp.error.value);
-        ElMessage.error("Failed to fetch users");
       }
       if (!!resp.data.value) {
         this.users = resp.data.value.map((u) => ({
           userId: { editing: false, value: u.userId },
-          type: { editing: false, value: u.type },
+          type: { editing: false, value: u.type.toString() },
           email: { editing: false, value: u.email },
+          preferredEmailLcid: {editing: false, value: u.preferredEmailLcid}
         }));
       }
+      console.log(this.users);
       this.usersLoading = false;
     },
-    async updateUsers(updatedUser: EditableUser, operation: "C" | "U" | "D") {
+    async fetchMyUser() {
+      const { username } = useAuthStore();
+      if (this.users.length === 0) {
+        await this.fetchUsers();
+      }
+      for (let u of this.users) {
+        if (u.userId.value === username) {
+          this.myUser = u;
+        }
+      }
+    },
+    async updateUsers(updatedUser: EditableUser) {
+      this.usersLoading = true;
       const { $api } = useNuxtApp();
       const userObj = {
         email: updatedUser.email.value,
-        type: updatedUser.type.value,
+        type: Number(updatedUser.type.value),
         userId: updatedUser.userId.value,
       } as user;
+      let resp = await $api.user.edit(userObj);
+      if (resp.error.value) {
+        document
+          .getElementById("globalsettings")
+          ?.dispatchEvent(new Event("updateFailed"));
+      }
+      await this.fetchUsers();
+      this.usersLoading = false;
     },
     async updateBuildings(
       updatedBuilding: EditableBuilding,
@@ -176,17 +196,36 @@ export const useSettingsStore = defineStore({
         operation === "C"
           ? await $api.building.create(buildingObj.name)
           : operation === "U"
-          ? await $api.building.edit(buildingObj)
-          : await $api.building.delete(buildingObj.id);
+            ? await $api.building.edit(buildingObj)
+            : await $api.building.delete(buildingObj.id);
       if (resp.error.value) {
         if (operation === "D") {
+          console.log(document.getElementById("globalsettings"));
           document
             .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("objectIsRefereced"));
+            ?.dispatchEvent(new Event("objectIsReferenced"));
+        } else {
+          document
+            .getElementById("globalsettings")
+            ?.dispatchEvent(new Event("updateFailed"));
         }
         console.log(resp.error.value);
       }
-
+      if (operation !== "C") {
+        await this.fetchBuildings();
+      } else {
+        if (!resp.error.value) {
+          this.buildings.forEach((b) => {
+            if (b.id.value === updatedBuilding.id.value) {
+              b.id.value = (resp.data.value as building).id;
+              b.new = undefined;
+            }
+          })
+          document
+            .getElementById("globalsettings")
+            ?.dispatchEvent(new Event("saved"));
+        }
+      }
       this.buildingsLoading = false;
     },
     async updateStates(
@@ -225,20 +264,50 @@ export const useSettingsStore = defineStore({
         this.statesLoading = false;
         return;
       }
+      if (updatedState.isDefault.value) {
+        for (let s of this.states) {
+          if (s.isDefault.value && s.id.value !== updatedState.id.value) {
+            document
+              .getElementById("globalsettings")
+              ?.dispatchEvent(new Event("onlyOneDefaultState"));
+            await this.fetchStates();
+            this.statesLoading = false;
+            return;
+          }
+        }
+      }
       let resp =
         operation === "C"
           ? await $api.state.create(stateObj)
           : operation === "U"
-          ? await $api.state.edit(stateObj)
-          : await $api.state.delete(stateObj.id);
-      await this.fetchStates();
+            ? await $api.state.edit(stateObj)
+            : await $api.state.delete(stateObj.id);
       if (resp.error.value) {
         if (operation === "D") {
           document
             .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("objectIsRefereced"));
+            ?.dispatchEvent(new Event("objectIsReferenced"));
+        } else {
+          document
+            .getElementById("globalsettings")
+            ?.dispatchEvent(new Event("updateFailed"));
         }
         console.log(resp.error.value);
+      }
+      if (operation !== "C") {
+        await this.fetchStates();
+      } else {
+        if (!resp.error.value) {
+          this.states.forEach((s) => {
+            if (s.id.value === updatedState.id.value) {
+              s.id.value = (resp.data.value as state).id;
+              s.new = undefined;
+            }
+          })
+          document
+            .getElementById("globalsettings")
+            ?.dispatchEvent(new Event("saved"));
+        }
       }
       this.statesLoading = false;
     },
@@ -259,19 +328,38 @@ export const useSettingsStore = defineStore({
         operation === "C"
           ? await $api.priority.create(priorityObj)
           : operation === "U"
-          ? await $api.priority.edit(priorityObj)
-          : await $api.priority.delete(priorityObj.id);
+            ? await $api.priority.edit(priorityObj)
+            : await $api.priority.delete(priorityObj.id);
       if (resp.error.value) {
         if (operation === "D") {
           document
             .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("objectIsRefereced"));
+            ?.dispatchEvent(new Event("objectIsReferenced"));
+        } else {
+          document
+            .getElementById("globalsettings")
+            ?.dispatchEvent(new Event("updateFailed"));
+        }
+        console.log(resp.error.value);
+      }
+      if (operation !== "C") {
+        await this.fetchPriorities();
+      } else {
+        if (!resp.error.value) {
+          this.priorities.forEach((p) => {
+            if (p.id.value === updatedPriority.id.value) {
+              p.id.value = (resp.data.value as priority).id;
+              p.new = undefined;
+            }
+          })
+          document
+            .getElementById("globalsettings")
+            ?.dispatchEvent(new Event("saved"));
         }
       }
-
       this.prioritiesLoading = false;
     },
 
-    async fetchPreferredEmailLanguage() {},
+    async fetchPreferredEmailLanguage() { },
   },
 });

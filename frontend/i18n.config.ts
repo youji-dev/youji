@@ -1,8 +1,8 @@
 export default defineI18nConfig(() => ({
   legacy: false,
-  locale: "de",
+  locale: "de-DE",
   messages: {
-    en: {
+    "en-EN": {
       welcome: "Welcome",
       username: "Username",
       password: "Password",
@@ -110,7 +110,7 @@ export default defineI18nConfig(() => ({
       empty: "Empty",
       defaultStateNotUpdatable: "The default state cannot be updated",
       confirmDelete: "Delete?",
-      objectIsRefereced: "Object could not be deleted. Make sure that it is not used anywhere.",
+      objectIsReferenced: "Object could not be deleted. Make sure that it is not used anywhere.",
       cancel: "Cancel",
       yes: "Yes",
       no: "No",
@@ -118,8 +118,15 @@ export default defineI18nConfig(() => ({
       addBuilding: "Add Building",
       addPriority: "Add Priority",
       confirmSave: "Save?",
+      userId: "User ID",
+      admin: "Admin",
+      fm: "Facility Manager",
+      teacher: "Teacher",
+      noRole: "No Role",
+      onlyOneDefaultState: "You may only set one state as default",
+      updateFailed: "Updated failed"
     },
-    de: {
+    "de-DE": {
       welcome: "Willkommen",
       username: "Benutzername",
       password: "Passwort",
@@ -227,7 +234,7 @@ export default defineI18nConfig(() => ({
       empty: "Leer",
       defaultStateNotUpdatable: "Der Standardstatus kann nicht aktualisiert werden",
       confirmDelete: "Löschen?",
-      objectIsRefereced: "Objekt konnte nicht gelöscht werden. Stellen Sie sicher, dass es nicht mehr verwendet wird.",
+      objectIsReferenced: "Objekt konnte nicht gelöscht werden. Stellen Sie sicher, dass es nicht mehr verwendet wird.",
       cancel: "Abbrechen",
       yes: "Ja",
       no: "Nein",
@@ -235,6 +242,13 @@ export default defineI18nConfig(() => ({
       addBuilding: "Gebäude hinzufügen",
       addPriority: "Priorität hinzufügen",
       confirmSave: "Speichern?",
+      userId: "Benutzer ID",
+      admin: "Admin",
+      fm: "Hausmeister",
+      teacher: "Lehrer",
+      noRole: "Keine Rolle",
+      onlyOneDefaultState: "Es kann nur ein Status als Standard gesetzt sein",
+      updateFailed: "Update fehlgeschlagen",
     },
   },
 }));

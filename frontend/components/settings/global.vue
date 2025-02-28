@@ -1,10 +1,6 @@
 <template>
-  <div
-    id="globalsettings"
-    class="flex flex-col xl:grid xl:grid-cols-2 xl:gap-4"
-    v-if="!loading"
-  >
-    <div class="">
+  <div class="flex flex-col xl:grid xl:grid-cols-2 xl:gap-4" v-if="!loading">
+    <div id="priorities">
       <h1 class="text-sm">{{ $t("managePriorities") }}</h1>
       <el-table
         :data="priorities"
@@ -14,9 +10,7 @@
         style="width: 100%"
         :default-sort="{ prop: 'name[value]', order: 'descending' }"
         v-loading="prioritiesLoading"
-        @cell-dblclick="
-          (row, column) => handleCellClick(row, column, priorities)
-        "
+        @cell-dblclick="(row, column) => handleCellClick(row, column, priorities)"
       >
         <TableEditableColumn
           prop="value"
@@ -31,7 +25,10 @@
         <el-table-column :label="$t('color')">
           <template #default="{ row }">
             <div class="w-full flex justify-center items-center">
-              <el-color-picker @change="!row.new && updatePriorities(row, 'U')" v-model="row.color.value" />
+              <el-color-picker
+                @change="!row.new && updatePriorities(row, 'U')"
+                v-model="row.color.value"
+              />
             </div>
           </template>
         </el-table-column>
@@ -61,38 +58,23 @@
             >
               <template #reference>
                 <div class="flex items-center justify-center w-full">
-                  <el-button type="primary" size="small" link>{{
-                    $t("save")
-                  }}</el-button>
+                  <el-button type="primary" size="small" link>{{ $t("save") }}</el-button>
                 </div>
               </template>
             </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
-      <div class="w-full ">
-            <div class="w-full flex items-center justify-center py-2 ">
-              <el-button
-                type="primary"
-                link
-                @click="
-                  priorities.push({
-                    color: { editing: false, value: '' },
-                    // We initialize the id with a date in order to identify multiple new objects in the frontend before it's saved. Will be overwritten later.
-                    id: { editing: false, value: new Date().toString() },
-                    name: { editing: false, value: '' },
-                    value: { editing: false, value: 0 },
-                    new: true,
-                  }); 
-                "
-              >
-                {{ $t("addPriority") }}
-                <span class="px-3"><ElIconPlus class="w-5" /></span>
-              </el-button>
-            </div>
-          </div>
+      <div class="w-full">
+        <div class="w-full flex items-center justify-center py-2">
+          <el-button type="primary" link @click="addEmptyPriority()">
+            {{ $t("addPriority") }}
+            <span class="px-3"><ElIconPlus class="w-5" /></span>
+          </el-button>
+        </div>
+      </div>
     </div>
-    <div class="">
+    <div id="buildings">
       <h1 class="text-sm">{{ $t("manageBuildings") }}</h1>
       <el-table
         :data="buildings"
@@ -102,9 +84,7 @@
         max-height="200"
         v-loading="buildingsLoading"
         :default-sort="{ prop: 'name[value]', order: 'descending' }"
-        @cell-dblclick="
-          (row, column) => handleCellClick(row, column, buildings)
-        "
+        @cell-dblclick="(row, column) => handleCellClick(row, column, buildings)"
       >
         <TableEditableColumn
           prop="name"
@@ -137,9 +117,7 @@
             >
               <template #reference>
                 <div class="flex items-center justify-center w-full">
-                  <el-button type="primary" size="small" link>{{
-                    $t("save")
-                  }}</el-button>
+                  <el-button type="primary" size="small" link>{{ $t("save") }}</el-button>
                 </div>
               </template>
             </el-popconfirm>
@@ -148,17 +126,7 @@
       </el-table>
       <div class="w-full">
         <div class="w-full flex items-center justify-center py-2">
-          <el-button
-            type="primary"
-            link
-            @click="
-              buildings.push({
-                id: { editing: false, value: new Date().toString() },
-                name: { editing: false, value: '' },
-                new: true,
-              })
-            "
-          >
+          <el-button type="primary" link @click="addEmptyBuilding()">
             {{ $t("addBuilding") }}
             <span class="px-3"><ElIconPlus class="w-5" /></span>
           </el-button>
@@ -179,24 +147,55 @@
         :data="users"
         border
         class="my-3 lg:my-1"
-        height="300"
-        style="width: 100%;"
+        max-height="300"
+        style="width: 100%"
         v-loading="usersLoading"
-        :default-sort="{prop: 'userId[value]', order: 'descending'}">
-        <el-table-column :label="$t('userId')" prop="userId[value]"/>
-        <el-table-column :label="$t('admin')">
-          <template #default="{row}">
-            <el-checkbox v-model="row.isAdmin"></el-checkbox>
+        :default-sort="{ prop: 'userId[value]', order: 'descending' }"
+      >
+        <el-table-column :label="$t('userId')" prop="userId[value]" />
+        <el-table-column header-align="center" :label="$t('admin')">
+          <template #default="{ row }">
+            <div class="w-full flex justify-center items-center">
+              <el-radio-group v-model="row.type.value" @change="updateUsers(row)">
+                <el-radio value="4" />
+              </el-radio-group>
+              <!-- <el-checkbox v-model="row.isAdmin"></el-checkbox> -->
+            </div>
           </template>
         </el-table-column>
-        <el-table-column :label="$t('fm')">
-          <template #default="{row}">
-            <el-checkbox v-model="row.isFm"></el-checkbox>
+        <el-table-column :label="$t('fm')" header-align="center">
+          <template #default="{ row }">
+            <div class="w-full flex justify-center items-center">
+              <el-radio-group v-model="row.type.value" @change="updateUsers(row)">
+                <el-radio value="2" />
+              </el-radio-group>
+              <!-- <el-checkbox v-model="row.isFm"></el-checkbox> -->
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('teacher')" header-align="center">
+          <template #default="{ row }">
+            <div class="w-full flex justify-center items-center">
+              <el-radio-group v-model="row.type.value" @change="updateUsers(row)">
+                <el-radio value="1" />
+              </el-radio-group>
+              <!-- <el-checkbox v-model="row.isTeacher"></el-checkbox> -->
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column :label="$t('noRole')" header-align="center">
+          <template #default="{ row }">
+            <div class="w-full flex justify-center items-center">
+              <el-radio-group v-model="row.type.value" @change="updateUsers(row)">
+                <el-radio value="0" />
+              </el-radio-group>
+              <!-- <el-checkbox v-model="row.isTeacher"></el-checkbox> -->
+            </div>
           </template>
         </el-table-column>
       </el-table>
     </div>
-    <div class="mt-6 xl:mt-0">
+    <div class="mt-6 xl:mt-0" id="states">
       <h1 class="text-sm">{{ $t("manageStatus") }}</h1>
       <el-table
         :data="states"
@@ -216,7 +215,10 @@
         <el-table-column :label="$t('color')">
           <template #default="{ row }">
             <div class="w-full flex justify-center items-center">
-              <el-color-picker @change="!row.new && updateStates(row, 'U')" v-model="row.color.value" />
+              <el-color-picker
+                @change="!row.new && updateStates(row, 'U')"
+                v-model="row.color.value"
+              />
             </div>
           </template>
         </el-table-column>
@@ -271,9 +273,7 @@
             >
               <template #reference>
                 <div class="flex items-center justify-center w-full">
-                  <el-button type="primary" size="small" link>{{
-                    $t("save")
-                  }}</el-button>
+                  <el-button type="primary" size="small" link>{{ $t("save") }}</el-button>
                 </div>
               </template>
             </el-popconfirm>
@@ -282,21 +282,7 @@
       </el-table>
       <div class="w-full">
         <div class="w-full flex items-center justify-center py-2">
-          <el-button
-            type="primary"
-            link
-            @click="
-              states.push({
-                autoPurgeDays: { editing: false, value: null },
-                color: { editing: false, value: '' },
-                hasAutoPurge: { editing: false, value: false },
-                id: { editing: false, value: '' },
-                isDefault: { editing: false, value: false },
-                name: { editing: false, value: '' },
-                new: true,
-              })
-            "
-          >
+          <el-button type="primary" link @click="addEmptyState()">
             {{ $t("addState") }}
             <span class="px-3"><ElIconPlus class="w-5" /></span>
           </el-button>
@@ -310,9 +296,7 @@
 </template>
 
 <script lang="ts" setup>
-import TableEditableColumn, {
-  handleCellClick,
-} from "../tableEditableColumn.vue";
+import TableEditableColumn, { handleCellClick } from "../tableEditableColumn.vue";
 const i18n = useI18n();
 const {
   priorities,
@@ -343,6 +327,7 @@ onNuxtReady(async () => {
   await fetchStates();
   await fetchUsers();
   loading.value = false;
+  console.log(document.getElementById("globalsettings"));
   document
     .getElementById("globalsettings")
     ?.addEventListener("defaultStateNotUpdatable", () => {
@@ -353,13 +338,99 @@ onNuxtReady(async () => {
     });
   document
     .getElementById("globalsettings")
-    ?.addEventListener("objectIsRefereced", () => {
+    ?.addEventListener("objectIsReferenced", () => {
+      console.log("objectIsReferencedError");
       ElMessage({
         type: "error",
-        message: i18n.t("objectIsRefereced"),
+        message: i18n.t("objectIsReferenced"),
+      });
+    });
+    document
+    .getElementById("globalsettings")
+    ?.addEventListener("onlyOneDefaultState", () => {
+      console.log("onlyOneDefaultState");
+      ElMessage({
+        type: "warning",
+        message: i18n.t("onlyOneDefaultState"),
+      });
+    });
+    document
+    .getElementById("globalsettings")
+    ?.addEventListener("updateFailed", () => {
+      console.log("updateFailed");
+      ElMessage({
+        type: "warning",
+        message: i18n.t("updateFailed"),
+      });
+    });
+    document
+    .getElementById("globalsettings")
+    ?.addEventListener("saved", () => {
+      console.log("saved");
+      ElMessage({
+        type: "success",
+        message: i18n.t("saved"),
       });
     });
 });
+
+function addEmptyPriority() {
+  priorities.value.push({
+    color: { editing: false, value: "" },
+    // We initialize the id with a date in order to identify multiple new objects in the frontend before it's saved. Will be overwritten later.
+    id: { editing: false, value: new Date().toString() },
+    name: { editing: false, value: "" },
+    value: { editing: false, value: 0 },
+    new: true,
+  });
+  setTimeout(() => {
+    scrollToBottom("priorities");
+  }, 250);
+}
+
+function addEmptyBuilding() {
+  buildings.value.push({
+    id: { editing: false, value: new Date().toString() },
+    name: { editing: false, value: "" },
+    new: true,
+  });
+  setTimeout(() => {
+    scrollToBottom("buildings");
+  }, 250);
+}
+
+function addEmptyState() {
+  states.value.push({
+    autoPurgeDays: { editing: false, value: null },
+    color: { editing: false, value: "" },
+    hasAutoPurge: { editing: false, value: false },
+    id: { editing: false, value: "" },
+    isDefault: { editing: false, value: false },
+    name: { editing: false, value: "" },
+    new: true,
+  });
+  setTimeout(() => {
+    scrollToBottom("states");
+  }, 250);
+}
+
+const scrollToBottom = (
+  initialElementId?: string,
+  element?: HTMLElement | null | undefined
+) => {
+  if (!element) {
+    element = document.getElementById(initialElementId as string);
+  }
+  if (!element) return;
+  element.scrollTo({ top: element.scrollHeight, behavior: "smooth" });
+
+  // Scroll all its child elements recursively
+  Array.from(element.children).forEach((child) => {
+    if (child instanceof HTMLElement) {
+      scrollToBottom(initialElementId, child);
+    }
+  });
+};
 </script>
 
 <style></style>

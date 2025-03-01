@@ -17,9 +17,6 @@ using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
-using System.Linq.Expressions;
-using LinqKit;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.WebApi.Controllers
 {
@@ -52,11 +49,15 @@ namespace Application.WebApi.Controllers
             return this.Ok(ticket);
         }
 
+        /// <summary>
+        /// Gets a collection of tickets by the provided search request.
+        /// </summary>
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/></param>
+        /// <param name="searchRequest">The specified search params, sorting order and pagination</param>
+        /// <returns>Actions result with Array of <see cref="Ticket"/></returns>
         [HttpPost("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        /*
         [Authorize]
-        */
         public ActionResult<TicketSearchResponseDTO> GetByProperty(
             [FromServices] TicketRepository ticketRepo,
             [FromBody] TicketSearchRequestDTO searchRequest)
@@ -67,33 +68,27 @@ namespace Application.WebApi.Controllers
             {
                 foreach (var filter in searchRequest.Filters)
                 {
-                    switch (filter.Key)
+                    var searchValue = filter.Value.ToString();
+                    if (searchValue is null)
+                        continue;
+
+                    ticketQuery = filter.Key switch
                     {
-                        case nameof(Ticket.Id):
-                            ticketQuery = ticketQuery.Where(t => t.Id == (Guid)filter.Value);
-                            break;
-                        case nameof(Ticket.Title):
-                            ticketQuery = ticketQuery.Where(t => t.Title.ToLower().Contains(filter.Value.ToString().ToLower()));
-                            break;
-                        case nameof(Ticket.Description):
-                            ticketQuery = ticketQuery.Where(t => t.Description.ToLower().Contains(filter.Value.ToString().ToLower()));
-                            break;
-                        case nameof(Ticket.Priority):
-                            ticketQuery = ticketQuery.Where(t => t.Priority.Id == (Guid)filter.Value);
-                            break;
-                        case nameof(Ticket.State):
-                            ticketQuery = ticketQuery.Where(t => t.State.Id == (Guid)filter.Value);
-                            break;
-                        case nameof(Ticket.Building):
-                            ticketQuery = ticketQuery.Where(t => t.Building.Id == (Guid)filter.Value);
-                            break;
-                        case nameof(Ticket.Room):
-                            ticketQuery = ticketQuery.Where(t => t.Room.ToLower() == filter.Value.ToString().ToLower());
-                            break;
-                        case nameof(Ticket.Object):
-                            ticketQuery = ticketQuery.Where(t => t.Object.ToLower().Contains(filter.Value.ToString().ToLower()));
-                            break;
-                    }
+                        nameof(Ticket.Id) => ticketQuery.Where(t => t.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.Title) => ticketQuery.Where(
+                            t => t.Title.ToLower().Contains(searchValue.ToLower())),
+                        nameof(Ticket.Description) => ticketQuery.Where(t =>
+                            t.Description != null && t.Description.ToLower().Contains(searchValue.ToLower())),
+                        nameof(Ticket.Priority) => ticketQuery.Where(t => t.Priority.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.State) => ticketQuery.Where(t => t.State.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.Building) => ticketQuery.Where(t =>
+                            t.Building != null && t.Building.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.Room) => ticketQuery.Where(t =>
+                            t.Room != null && t.Room.ToLower() == searchValue.ToLower()),
+                        nameof(Ticket.Object) => ticketQuery.Where(t =>
+                            t.Object != null && t.Object.ToLower().Contains(searchValue.ToLower())),
+                        _ => ticketQuery,
+                    };
                 }
             }
 

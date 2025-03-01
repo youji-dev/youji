@@ -54,7 +54,9 @@ namespace Application.WebApi.Controllers
 
         [HttpPost("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        /*
         [Authorize]
+        */
         public ActionResult<TicketSearchResponseDTO> GetByProperty(
             [FromServices] TicketRepository ticketRepo,
             [FromBody] TicketSearchRequestDTO searchRequest)
@@ -63,24 +65,36 @@ namespace Application.WebApi.Controllers
 
             if (searchRequest.Filters != null)
             {
-                var predicate = PredicateBuilder.New<Ticket>(true);
-
                 foreach (var filter in searchRequest.Filters)
                 {
-                    var property = typeof(Ticket).GetProperty(filter.Key, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    if (property == null)
-                        continue;
-
-                    var parameter = Expression.Parameter(typeof(Ticket), "t");
-                    var propertyAccess = Expression.Property(parameter, property);
-                    var value = Expression.Constant(Convert.ChangeType(filter.Value, property.PropertyType));
-                    var equality = Expression.Equal(propertyAccess, value);
-                    var lambda = Expression.Lambda<Func<Ticket, bool>>(equality, parameter);
-
-                    predicate = predicate.And(lambda);
+                    switch (filter.Key)
+                    {
+                        case nameof(Ticket.Id):
+                            ticketQuery = ticketQuery.Where(t => t.Id == (Guid)filter.Value);
+                            break;
+                        case nameof(Ticket.Title):
+                            ticketQuery = ticketQuery.Where(t => t.Title.ToLower().Contains(filter.Value.ToString().ToLower()));
+                            break;
+                        case nameof(Ticket.Description):
+                            ticketQuery = ticketQuery.Where(t => t.Description.ToLower().Contains(filter.Value.ToString().ToLower()));
+                            break;
+                        case nameof(Ticket.Priority):
+                            ticketQuery = ticketQuery.Where(t => t.Priority.Id == (Guid)filter.Value);
+                            break;
+                        case nameof(Ticket.State):
+                            ticketQuery = ticketQuery.Where(t => t.State.Id == (Guid)filter.Value);
+                            break;
+                        case nameof(Ticket.Building):
+                            ticketQuery = ticketQuery.Where(t => t.Building.Id == (Guid)filter.Value);
+                            break;
+                        case nameof(Ticket.Room):
+                            ticketQuery = ticketQuery.Where(t => t.Room.ToLower() == filter.Value.ToString().ToLower());
+                            break;
+                        case nameof(Ticket.Object):
+                            ticketQuery = ticketQuery.Where(t => t.Object.ToLower().Contains(filter.Value.ToString().ToLower()));
+                            break;
+                    }
                 }
-
-                ticketQuery = ticketQuery.Where(predicate);
             }
 
             Ticket[] tickets = [.. ticketQuery];
@@ -111,7 +125,7 @@ namespace Application.WebApi.Controllers
             {
                 Total = totalCount, Results = tickets,
             });
-        }
+}
 
         /// <summary>
         /// Gets the comments of the ticket with the specific id.

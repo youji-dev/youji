@@ -17,16 +17,16 @@ class TicketRepository {
   }
 
   async search(
-    searchTerm: string,
+    filters: Record<string, any>,
     orderByColumn: string,
     orderDesc: boolean,
     skip: number,
     take: number
   ): Promise<ReturnType<typeof useFetchAuthenticated<searchResponse>>> {
     return useFetchAuthenticated<searchResponse>(`${this.path}/search`, {
-      method: "GET",
-      query: {
-        searchTerm,
+      method: "POST",
+      body: {
+        filters,
         orderByColumn,
         orderDesc,
         skip,

@@ -301,7 +301,13 @@ async function fetchTicketsFromStart(fromSearch: boolean) {
   pageLoading.value = fromSearch;
   searchLoading.value = fromSearch;
   loading.value = !fromSearch;
-  await fetchTickets(search.value, 0, 25, sortCol.value, sortDesc.value);
+  await fetchTickets(
+    { Title: search.value },
+    0,
+    25,
+    sortCol.value,
+    sortDesc.value
+  );
   pageLoading.value = false;
   loading.value = false;
   searchLoading.value = false;
@@ -505,7 +511,7 @@ function changeSort(sortData: { column: any; prop: string; order: any }) {
 async function fetchNewPage(page: number) {
   pageLoading.value = true;
   await fetchTickets(
-    search.value,
+    { Title: search.value },
     page * 25 - 25,
     25,
     sortCol.value,

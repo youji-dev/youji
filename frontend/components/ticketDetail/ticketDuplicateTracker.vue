@@ -19,7 +19,6 @@
         :height="230"
         :sort-by="sortState"
         @column-sort="onSort"
-        @end-reached="onEndReached"
       />
     </el-card>
   </div>
@@ -301,24 +300,5 @@ function setCellsHidden() {
 const onSort = (sortBy: SortBy) => {
   sortState.value = sortBy;
   searchForTickets();
-};
-
-const onEndReached = async () => {
-  const response = await $api.ticket.search(
-    ticketFilter,
-    "creationDate",
-    sortState.value.order == TableV2SortOrder.DESC,
-    ticketSearchResult.value.length,
-    15,
-    true
-  );
-
-  if (response.data.value == null) {
-    return;
-  }
-
-  ticketSearchResult.value = ticketSearchResult.value.concat(
-    response.data.value.results
-  );
 };
 </script>

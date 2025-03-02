@@ -122,11 +122,18 @@ const columns: Ref<Column<any>[]> = ref([
     key: "creationDate",
     title: i18n.t("createDate"),
     dataKey: "creationDate",
-    width: 122,
+    width: 150,
     sortable: true,
     cellRenderer: ({ cellData: creationDate }) => (
-      <p> {new Date(creationDate).toLocaleDateString()} </p>
+      <p> {new Date(creationDate).toLocaleString()} </p>
     ),
+  },
+  {
+    key: "author",
+    title: i18n.t("createdBy"),
+    dataKey: "author",
+    width: 150,
+    sortable: true,
   },
   {
     key: "buttons",
@@ -293,10 +300,12 @@ function setCellsHidden() {
     columns.value[2].hidden = true;
     columns.value[3].hidden = true;
     columns.value[4].hidden = true;
+    columns.value[6].hidden = true;
   } else {
     columns.value[2].hidden = false;
     columns.value[3].hidden = false;
     columns.value[4].hidden = false;
+    columns.value[6].hidden = false;
   }
 }
 

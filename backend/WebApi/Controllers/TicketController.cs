@@ -5,12 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Security.Claims;
+using Application.WebApi.Contracts.Request;
 using Application.WebApi.Decorators;
 using Blurhash.ImageSharp;
 using Application.WebApi.Contracts.Response;
 using Common.Enums;
-using Microsoft.EntityFrameworkCore;
 using DomainLayer.BusinessLogic.Mailing;
 using MimeKit;
 using SixLabors.ImageSharp;
@@ -35,7 +37,7 @@ namespace Application.WebApi.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize]
-        public async Task<ActionResult<Ticket>> Get(
+        public async Task<ActionResult<Ticket>> GetById(
             [FromServices] TicketRepository ticketRepo,
             [FromRoute] Guid ticketId)
         {
@@ -48,108 +50,77 @@ namespace Application.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets a ticket filtert by a specific search term and the max amount of results used for pagination.
+        /// Gets a collection of tickets by the provided search request.
         /// </summary>
-        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
-        /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
-        /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
-        /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
-        /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
-        /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
-        [HttpGet("search")]
+        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/></param>
+        /// <param name="searchRequest">The specified search params, sorting order and pagination</param>
+        /// <returns>Actions result with Array of <see cref="Ticket"/></returns>
+        [HttpPost("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize]
-        public ActionResult<TicketSearchDTO> Get(
+        public ActionResult<TicketSearchResponseDTO> GetByProperty(
             [FromServices] TicketRepository ticketRepo,
-            [FromQuery] string? searchTerm = null,
-            [FromQuery] string orderByColumn = "CreationDate",
-            [FromQuery] bool orderDesc = false,
-            [FromQuery] int skip = 0,
-            [FromQuery] int? take = null)
+            [FromBody] TicketSearchRequestDTO searchRequest)
         {
             var ticketQuery = ticketRepo.GetAll();
 
-            if (searchTerm is not null)
+            if (searchRequest.Filters != null)
             {
-                searchTerm = searchTerm.ToLower();
-                ticketQuery = ticketQuery.Where(ticket =>
-                    ((ticket.Description != null) && ticket.Description.ToLower().Contains(searchTerm))
-                    || ((ticket.Building != null) && ticket.Building.Name.ToLower().Contains(searchTerm))
-                    || ((ticket.Room != null) && ticket.Room.ToLower().Contains(searchTerm))
-                    || ticket.Priority.Name.ToLower().Contains(searchTerm)
-                    || ticket.State.Name.ToLower().Contains(searchTerm)
-                    || ticket.Title.ToLower().Contains(searchTerm)
-                    || ticket.Author.ToLower().Contains(searchTerm));
+                foreach (var filter in searchRequest.Filters)
+                {
+                    var searchValue = filter.Value.ToString();
+                    if (searchValue is null)
+                        continue;
+
+                    ticketQuery = filter.Key switch
+                    {
+                        nameof(Ticket.Id) => ticketQuery.Where(t => t.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.Title) => ticketQuery.Where(
+                            t => t.Title.ToLower().Contains(searchValue.ToLower())),
+                        nameof(Ticket.Description) => ticketQuery.Where(t =>
+                            t.Description != null && t.Description.ToLower().Contains(searchValue.ToLower())),
+                        nameof(Ticket.Priority) => ticketQuery.Where(t => t.Priority.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.State) => ticketQuery.Where(t => t.State.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.Building) => ticketQuery.Where(t =>
+                            t.Building != null && t.Building.Id == Guid.Parse(searchValue)),
+                        nameof(Ticket.Room) => ticketQuery.Where(t =>
+                            t.Room != null && t.Room.ToLower() == searchValue.ToLower()),
+                        nameof(Ticket.Object) => ticketQuery.Where(t =>
+                            t.Object != null && t.Object.ToLower().Contains(searchValue.ToLower())),
+                        _ => ticketQuery,
+                    };
+                }
             }
 
             Ticket[] tickets = [.. ticketQuery];
             var totalCount = tickets.Length;
-            ticketQuery =
-                orderDesc
-                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
 
-            if (take is not null)
+            if (!string.IsNullOrEmpty(searchRequest.OrderByColumn))
             {
-                ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
+                var property = typeof(Ticket).GetProperty(searchRequest.OrderByColumn, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+                if (property != null)
+                {
+                    var parameter = Expression.Parameter(typeof(Ticket), "t");
+                    var propertyAccess = Expression.Property(parameter, property);
+                    var lambda = Expression.Lambda(propertyAccess, parameter);
+
+                    string methodName = searchRequest.OrderDesc ? "OrderByDescending" : "OrderBy";
+                    var orderByExpression = typeof(Queryable).GetMethods()
+                        .First(m => m.Name == methodName && m.GetParameters().Length == 2)
+                        .MakeGenericMethod(typeof(Ticket), property.PropertyType);
+
+                    ticketQuery =
+                        (IQueryable<Ticket>)orderByExpression.Invoke(null, [ticketQuery, lambda])!;
+                }
             }
 
-            tickets = [.. ticketQuery];
-            return this.Ok(new TicketSearchDTO
+            tickets = [.. ticketQuery.Skip(searchRequest.Skip).Take(searchRequest.Take)];
+            return this.Ok(new TicketSearchResponseDTO
             {
                 Total = totalCount, Results = tickets,
             });
-        }
-
-        /// <summary>
-        /// Fetches tickets by a given property. Property can be a subclass, classPropertyName has to be specified as the property to be compared in the subclass.
-        /// Supports String|Int|Boolean|DateTime|Guid fields.
-        /// </summary>
-        /// <param name="ticketRepo">Instance of <see cref="TicketRepository"/>.</param>
-        /// <param name="searchTerm">The specific search term as a <see langword="string"/>.</param>
-        /// <param name="property">The property to be searched</param>
-        /// <param name="classPropertyName">The name of the property to be compared in case the ticket property is a class</param>
-        /// <param name="orderByColumn">The column that should be used for returning ordered results <see langword="string"/>.</param>
-        /// <param name="orderDesc">The direction the results should be ordered in (true for descending, false for ascending) <see langword="string"/>.</param>
-        /// <param name="skip">The count of skipped elements as a <see langword="int"/> Default = 0.</param>
-        /// <param name="take">The count of taken elements as a <see langword="int"/> Default = 10.</param>
-        /// <returns>An <see cref="ObjectResult"/> with an <see cref="Array"/> of the filtered tickets.</returns>
-        [HttpGet("searchByProperty")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize]
-        public ActionResult<TicketSearchDTO> GetByProperty(
-            [FromServices] TicketRepository ticketRepo,
-            [FromQuery] string? searchTerm = null,
-            [FromQuery] string property = "Title",
-            [FromQuery] string? classPropertyName = null,
-            [FromQuery] string orderByColumn = "CreationDate",
-            [FromQuery] bool orderDesc = false,
-            [FromQuery] int skip = 0,
-            [FromQuery] int? take = null)
-        {
-            var ticketQuery = searchTerm is null
-                ? ticketRepo.GetAll()
-                : ticketRepo.GetByPropertyValue(searchTerm, property, classPropertyName);
-
-            Ticket[] tickets = [.. ticketQuery];
-            var totalCount = tickets.Length;
-            ticketQuery =
-                orderDesc
-                    ? ticketQuery.OrderByDescending(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip)
-                    : ticketQuery.OrderBy(ticket => EF.Property<Ticket>(ticket, orderByColumn)).Skip(skip);
-
-            if (take is not null)
-            {
-                ticketQuery = (IOrderedQueryable<Ticket>)ticketQuery.Take((int)take);
-            }
-
-            tickets = [.. ticketQuery];
-            return this.Ok(new TicketSearchDTO
-            {
-                Total = totalCount, Results = tickets,
-            });
-        }
+}
 
         /// <summary>
         /// Gets the comments of the ticket with the specific id.

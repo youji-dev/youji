@@ -17,11 +17,12 @@ class TicketRepository {
   }
 
   async search(
-    filters: Record<string, any>,
-    orderByColumn: string,
-    orderDesc: boolean,
-    skip: number,
-    take: number
+    filters: Record<string, any[]>,
+    orderByColumn?: string,
+    orderDesc?: boolean,
+    skip?: number,
+    take?: number,
+    useOr?: boolean
   ): Promise<ReturnType<typeof useFetchAuthenticated<searchResponse>>> {
     return useFetchAuthenticated<searchResponse>(`${this.path}/search`, {
       method: "POST",
@@ -31,6 +32,7 @@ class TicketRepository {
         orderDesc,
         skip,
         take,
+        useOr,
       },
     });
   }

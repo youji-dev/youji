@@ -26,7 +26,6 @@
     </div>
     <div
       class="w-full h-full overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md"
-      id="table_container"
     >
       <div v-if="loading" class="w-full h-full p-10">
         <el-skeleton :rows="18" animated />
@@ -302,7 +301,7 @@ async function fetchTicketsFromStart(fromSearch: boolean) {
   searchLoading.value = fromSearch;
   loading.value = !fromSearch;
   await fetchTickets(
-    { Title: search.value },
+    { Title: [search.value] },
     0,
     25,
     sortCol.value,
@@ -511,7 +510,7 @@ function changeSort(sortData: { column: any; prop: string; order: any }) {
 async function fetchNewPage(page: number) {
   pageLoading.value = true;
   await fetchTickets(
-    { Title: search.value },
+    { Title: [search.value] },
     page * 25 - 25,
     25,
     sortCol.value,

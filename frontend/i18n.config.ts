@@ -90,6 +90,10 @@ export default defineI18nConfig(() => ({
         "Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action.",
       stateChangeNotAllowed:
         "You can't change the state because a default state is set.",
+      duplicateTickets: "Similar Tickets",
+      noDuplicatesFound:
+        "No similar tickets found. Your ticket is truly unique!",
+      openInNewTab: "Open in new tab",
     },
     de: {
       welcome: "Willkommen",
@@ -179,6 +183,10 @@ export default defineI18nConfig(() => ({
         "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.",
       stateChangeNotAllowed:
         "Du kannst den Status nicht ändern, weil ein Standardstatus festgelegt ist.",
+      duplicateTickets: "Ähnliche Tickets",
+      noDuplicatesFound:
+        "Keine Duplikate gefunden. Ihr Ticket ist warlich einzigartig!",
+      openInNewTab: "In neuem neuen Tab öffnen",
     },
   },
 }));

@@ -23,8 +23,7 @@
     "jwt-decode": "^4.0.0",
     "nuxt": "^3.12.4",
     "pinia": "^2.1.7",
-    "vue": "latest",
-    "wink-eng-lite-web-model": "^1.8.1"
+    "vue": "latest"
   },
   "overrides": {
     "vue": "latest"

@@ -13,6 +13,7 @@
       <!-- Results found Page -->
       <el-table-v2
         v-else
+        id="ticketDuplicateTracker"
         :columns="columns"
         :data="ticketSearchResult"
         :width="tableDimensions.width"
@@ -32,6 +33,7 @@ import type state from "~/types/api/response/stateResponse";
 import type priority from "~/types/api/response/priorityResponse";
 import { TableV2SortOrder, type Column, type SortBy } from "element-plus";
 import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
+import { FixedDir } from "element-plus/es/components/table-v2/src/constants.mjs";
 
 const i18n = useI18n();
 const { $api } = useNuxtApp();
@@ -130,6 +132,7 @@ const columns: Ref<Column<any>[]> = ref([
     key: "buttons",
     dataKey: "id",
     width: 70,
+    fixed: FixedDir.RIGHT,
     cellRenderer: ({ cellData: id }) => (
       <el-tooltip
         content={i18n.t("openInNewTab")}
@@ -281,7 +284,7 @@ async function searchForTickets(): Promise<void> {
 function onResize(entries: ResizeObserverEntry[]): void {
   const entry = entries[0];
   const { width, height } = entry.contentRect;
-  tableDimensions.value = { width, height };
+  tableDimensions.value = { width: width - 45, height };
   setCellsHidden();
 }
 
@@ -302,3 +305,9 @@ const onSort = (sortBy: SortBy) => {
   searchForTickets();
 };
 </script>
+
+<style lang="scss">
+#ticketDuplicateTracker {
+  --el-table-header-bg-color: var(--el-bg-color);
+}
+</style>

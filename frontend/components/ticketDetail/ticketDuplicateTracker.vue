@@ -194,7 +194,7 @@ function addTitleFilters(): void {
 
 function addDescriptionFilters(): void {
   if (props.ticket.description) {
-    ticketFilter.District = tokenize(props.ticket.description);
+    ticketFilter.Description = tokenize(props.ticket.description);
   }
 }
 

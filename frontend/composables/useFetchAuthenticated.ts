@@ -37,8 +37,6 @@ const useFetchAuthenticated = <T>(
 
           resolve();
         } catch (error) {
-          authStore.logUserOut();
-          navigateTo(localePath("/login")?.fullPath);
           reject(error);
         } finally {
           refreshPromise = null;

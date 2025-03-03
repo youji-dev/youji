@@ -1,30 +1,26 @@
 <template>
   <div
     class="max-h-[100vh] px-6 py-3 max-w-fit min-w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
-    id="navbar"
-  >
-  <div class="flex items-center justify-between">
-    <Logo/>
-    <div class="flex items-center justify-end">
-      <Theme />
-      <Language />
+    id="navbar">
+    <div class="flex items-center justify-between">
+      <Logo />
+      <div class="flex items-center justify-end">
+        <Theme />
+        <Language />
+      </div>
     </div>
-  </div>
-    <el-menu
-      :default-active="getPageIndex()"
-      class="el-menu-vertical-demo pt-5"
-    >
+    <el-menu :default-active="getPageIndex()" class="el-menu-vertical-demo pt-5">
       <div>
         <el-menu-item index="1" @click="router.push(localeRoute('/tickets')?.fullPath as string)">
-        <el-icon>
+          <el-icon>
             <Files />
           </el-icon>
-          <el-badge :value="9" type="primary" :offset="[-125, 15]">
+          <el-badge v-bind:hidden="!openTickets" :value="openTickets ?? 0" type="primary" :offset="[-125, 15]">
             <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
           </el-badge>
         </el-menu-item>
 
-        <el-menu-item index="2" class="menu-item"  @click="router.push(localeRoute('/tickets/new')?.fullPath as string)">
+        <el-menu-item index="2" class="menu-item" @click="router.push(localeRoute('/tickets/new')?.fullPath as string)">
           <el-icon>
             <Plus />
           </el-icon>
@@ -33,7 +29,7 @@
       </div>
       <div>
         <el-divider></el-divider>
-        <el-menu-item class="menu-item"  @click="router.push(localeRoute('/logout')?.fullPath as string)">
+        <el-menu-item class="menu-item" @click="router.push(localeRoute('/logout')?.fullPath as string)">
           <el-icon class="-rotate-90" color="#EF4444">
             <Upload />
           </el-icon>
@@ -51,12 +47,38 @@
 </template>
 
 <script lang="ts" setup>
-import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
+import { Files, Plus, Setting, Ticket, Upload } from "@element-plus/icons-vue";
+
+const { $api } = useNuxtApp();
+const { statusOptions } = storeToRefs(useTicketsStore());
+const { fetchStatusOptions } = useTicketsStore();
 const localeRoute = useLocaleRoute();
 const route = useRoute();
 const routeObject = reactive({ route });
 const { locale } = useI18n();
 const router = useRouter();
+
+const openTickets: Ref<number | null> = ref(null);
+
+onNuxtReady(async () => {
+  await fetchStatusOptions();
+  openTickets.value = await getOpenTicketCount();
+})
+
+async function getOpenTicketCount(): Promise<number | null> {
+  const filter: Record<string, any[]> = {};
+
+  if (statusOptions.value.some(state => state.hasAutoPurge)) {
+    filter.State = statusOptions.value.filter(x => !x.hasAutoPurge).map(x => x.id);
+  }
+
+  var result = await $api.ticket.search(filter, "CreationDate", false, 0, 0, true);
+
+  if (result.data.value == null)
+    return null;
+
+  return result.data.value.total;
+}
 
 function getPageIndex() {
   if (routeObject.route.fullPath == localeRoute("/tickets", locale.value)?.fullPath) {

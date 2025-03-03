@@ -14,7 +14,6 @@ export const useTicketsStore = defineStore("tickets", {
       const { $api } = useNuxtApp();
       const resp = await $api.state.getAll();
       if (resp.error) {
-        console.log(resp.error);
       }
       if (!!resp.data.value) {
         this.statusOptions = resp.data.value;
@@ -33,7 +32,7 @@ export const useTicketsStore = defineStore("tickets", {
     },
 
     async fetchTickets(
-      search: Record<string, any>,
+      search: Record<string, any[]>,
       skip: number,
       take: number,
       orderByCol: string,
@@ -47,7 +46,6 @@ export const useTicketsStore = defineStore("tickets", {
         skip,
         take
       );
-      console.log("ticket response", resp.data.value);
       if (resp.error.value) {
         console.log(resp.error);
         return;
@@ -56,9 +54,6 @@ export const useTicketsStore = defineStore("tickets", {
         this.totalCount = resp.data.value.total;
         this.tickets = resp.data.value.results;
       }
-    },
-    async fetchNewTickets() {
-      const { $api } = useNuxtApp();
     },
   },
 });

@@ -8,12 +8,12 @@ namespace Application.WebApi.Contracts.Request
         /// <summary>
         /// List of filters to apply to the search
         /// </summary>
-        public Dictionary<string, object>? Filters { get; set; }
+        public Dictionary<string, List<object>>? Filters { get; set; }
 
         /// <summary>
         /// The column to order the results by
         /// </summary>
-        public string? OrderByColumn { get; set; } = "CreationDate";
+        public string OrderByColumn { get; set; } = "CreationDate";
 
         /// <summary>
         /// The order direction of the results
@@ -29,5 +29,10 @@ namespace Application.WebApi.Contracts.Request
         /// The number of results to take. Used for pagination.
         /// </summary>
         public int Take { get; set; } = 25;
+
+        /// <summary>
+        /// Indicates whether to use OR instead of AND for the filters
+        /// </summary>
+        public bool UseOr { get; set; } = false;
     }
 }

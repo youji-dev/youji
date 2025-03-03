@@ -70,6 +70,13 @@
           class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3"
           v-model:ticket="ticketModel"
         />
+
+        <div
+          class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3"
+        >
+          <el-text>{{ $t("duplicateTickets") }}</el-text>
+          <TicketDuplicateTracker v-if="isNew" :ticket="ticketModel" />
+        </div>
       </div>
       <div v-if="is404" class="h-screen flex justify-center items-center">
         <el-result class="" icon="error" :title="$t('resourceNotFound')">
@@ -158,6 +165,7 @@ import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
 import TicketCommentCollection from "~/components/ticketDetail/ticketCommentCollection.vue";
 import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
 import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
+import TicketDuplicateTracker from "~/components/ticketDetail/ticketDuplicateTracker.vue";
 const { $api } = useNuxtApp();
 const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
 const i18n = useI18n();

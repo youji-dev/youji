@@ -14,6 +14,7 @@ using Blurhash.ImageSharp;
 using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using DomainLayer.BusinessLogic.Mailing;
+using LinqKit;
 using MimeKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -66,30 +67,34 @@ namespace Application.WebApi.Controllers
 
             if (searchRequest.Filters != null)
             {
+                var predicate = PredicateBuilder.New<Ticket>(searchRequest.UseOr);
+
                 foreach (var filter in searchRequest.Filters)
                 {
-                    var searchValue = filter.Value.ToString();
-                    if (searchValue is null)
-                        continue;
-
-                    ticketQuery = filter.Key switch
+                    foreach (var value in filter.Value)
                     {
-                        nameof(Ticket.Id) => ticketQuery.Where(t => t.Id == Guid.Parse(searchValue)),
-                        nameof(Ticket.Title) => ticketQuery.Where(
-                            t => t.Title.ToLower().Contains(searchValue.ToLower())),
-                        nameof(Ticket.Description) => ticketQuery.Where(t =>
-                            t.Description != null && t.Description.ToLower().Contains(searchValue.ToLower())),
-                        nameof(Ticket.Priority) => ticketQuery.Where(t => t.Priority.Id == Guid.Parse(searchValue)),
-                        nameof(Ticket.State) => ticketQuery.Where(t => t.State.Id == Guid.Parse(searchValue)),
-                        nameof(Ticket.Building) => ticketQuery.Where(t =>
-                            t.Building != null && t.Building.Id == Guid.Parse(searchValue)),
-                        nameof(Ticket.Room) => ticketQuery.Where(t =>
-                            t.Room != null && t.Room.ToLower() == searchValue.ToLower()),
-                        nameof(Ticket.Object) => ticketQuery.Where(t =>
-                            t.Object != null && t.Object.ToLower().Contains(searchValue.ToLower())),
-                        _ => ticketQuery,
-                    };
+                        var searchValue = value.ToString();
+                        if (searchValue is null)
+                            continue;
+
+                        var filterPredicate = filter.Key switch
+                        {
+                            nameof(Ticket.Id) => PredicateBuilder.New<Ticket>(t => t.Id == Guid.Parse(searchValue)),
+                            nameof(Ticket.Title) => PredicateBuilder.New<Ticket>(t => t.Title.ToLower().Contains(searchValue.ToLower())),
+                            nameof(Ticket.Description) => PredicateBuilder.New<Ticket>(t => t.Description != null && t.Description.ToLower().Contains(searchValue.ToLower())),
+                            nameof(Ticket.Priority) => PredicateBuilder.New<Ticket>(t => t.Priority.Id == Guid.Parse(searchValue)),
+                            nameof(Ticket.State) => PredicateBuilder.New<Ticket>(t => t.State.Id == Guid.Parse(searchValue)),
+                            nameof(Ticket.Building) => PredicateBuilder.New<Ticket>(t => t.Building != null && t.Building.Id == Guid.Parse(searchValue)),
+                            nameof(Ticket.Room) => PredicateBuilder.New<Ticket>(t => t.Room != null && t.Room.ToLower() == searchValue.ToLower()),
+                            nameof(Ticket.Object) => PredicateBuilder.New<Ticket>(t => t.Object != null && t.Object.ToLower().Contains(searchValue.ToLower())),
+                            _ => PredicateBuilder.New<Ticket>(true),
+                        };
+
+                        predicate = searchRequest.UseOr ? predicate.Or(filterPredicate) : predicate.And(filterPredicate);
+                    }
                 }
+
+                ticketQuery = ticketQuery.Where(predicate);
             }
 
             Ticket[] tickets = [.. ticketQuery];

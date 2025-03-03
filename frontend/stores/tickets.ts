@@ -35,7 +35,6 @@ export const useTicketsStore = defineStore("tickets", {
         async fetchTickets(search: string, skip: number, take: number, orderByCol: string, orderDesc: boolean) {
             const { $api } = useNuxtApp();
             const resp = await $api.ticket.search(search, orderByCol, orderDesc, skip, take);
-            console.log("ticket response", resp.data.value);
             if (resp.error.value) {
                 console.log(resp.error)
                 return;
@@ -48,6 +47,7 @@ export const useTicketsStore = defineStore("tickets", {
         },
         async fetchNewTickets() {
             const { $api } = useNuxtApp();
+            // Fetch all tickets with status new
         }
     }
 })

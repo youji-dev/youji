@@ -29,7 +29,6 @@ const availableLocales = computed(() => {
 });
 
 const switchLocale = (localeKey: string) => {
-  console.log(localeKey);
   router.push(switchLocalePath(localeKey));
 };
 </script>

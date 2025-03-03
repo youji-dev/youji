@@ -19,16 +19,18 @@
 <script lang="ts" setup>
 const { locales } = useI18n();
 const colorMode = useColorMode();
-const { myUser } = storeToRefs(useSettingsStore());
-const { updateUsers } = useSettingsStore();
 const {
   public: { TEXT_LIGHT, TEXT_DARK },
 } = useRuntimeConfig();
 const availableLocales = computed(() => {
   return locales.value;
 });
-
-const switchLocale = (localeKey: string) => {
-  console.log(localeKey)
+const { myUser } = storeToRefs(useSettingsStore());
+const { updateMyUser } = useSettingsStore(); 
+const switchLocale = async (localeKey: string) => {
+  if (myUser.value === null) return;
+  let updatedUser = myUser.value;
+  updatedUser.preferredEmailLcid.value = localeKey;
+  await updateMyUser(updatedUser);
 };
 </script>

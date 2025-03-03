@@ -97,7 +97,7 @@ export default defineI18nConfig(() => ({
       color: "Color",
       theme: "Theme",
       language: "System Language",
-      languageEmail: "Language (E-Mail)",
+      languageEmail: "E-Mail Language",
       receiveEmailNotifications: "Receive E-Mail notifications",
       deleteTicketTitle: "Do you really want to delete this Ticket?",
       deleteTicketDescription:
@@ -221,7 +221,7 @@ export default defineI18nConfig(() => ({
       color: "Farbe",
       theme: "Farbschema",
       language: "Systemsprache",
-      languageEmail: "Sprache (E-Mail)",
+      languageEmail: "E-Mail Sprache",
       receiveEmailNotifications: "E-Mail Benachrichtigungen erhalten",
       deleteTicketTitle: "Wollen Sie dieses Ticket wirklich löschen?",
       deleteTicketDescription:

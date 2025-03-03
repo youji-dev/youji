@@ -81,7 +81,7 @@ export const useSettingsStore = defineStore({
     statesLoading: false as boolean,
     buildingsLoading: false as boolean,
     usersLoading: false as boolean,
-    myUser: {} as EditableUser
+    myUser: null as EditableUser | null
   }),
   actions: {
     async fetchPriorities() {
@@ -148,18 +148,14 @@ export const useSettingsStore = defineStore({
           userId: { editing: false, value: u.userId },
           type: { editing: false, value: u.type.toString() },
           email: { editing: false, value: u.email },
-          preferredEmailLcid: {editing: false, value: u.preferredEmailLcid}
+          preferredEmailLcid: { editing: false, value: u.preferredEmailLcid }
         }));
       }
-      console.log(this.users);
       this.usersLoading = false;
     },
-    async fetchMyUser() {
+    fetchMyUser() {
       const { username } = useAuthStore();
-      if (this.users.length === 0) {
-        await this.fetchUsers();
-      }
-      for (let u of this.users) {
+      for (const u of this.users) {
         if (u.userId.value === username) {
           this.myUser = u;
         }
@@ -200,7 +196,6 @@ export const useSettingsStore = defineStore({
             : await $api.building.delete(buildingObj.id);
       if (resp.error.value) {
         if (operation === "D") {
-          console.log(document.getElementById("globalsettings"));
           document
             .getElementById("globalsettings")
             ?.dispatchEvent(new Event("objectIsReferenced"));
@@ -249,7 +244,6 @@ export const useSettingsStore = defineStore({
       const currentState = this.states.filter(
         (s) => stateObj.id === s.id.value
       )[0];
-      console.log(currentState, stateObj);
       if (
         (currentState.isDefault.value &&
           stateObj.isDefault &&
@@ -359,7 +353,25 @@ export const useSettingsStore = defineStore({
       }
       this.prioritiesLoading = false;
     },
+    async updateMyUser(updatedUser: EditableUser) {
+      this.usersLoading = true;
+      const { $api } = useNuxtApp();
+      const userObj = {
+        email: updatedUser.email.value,
+        type: Number(updatedUser.type.value),
+        userId: updatedUser.userId.value,
+        preferredEmailLcid: updatedUser.preferredEmailLcid.value
+      } as user;
+      let resp = await $api.user.edit(userObj);
+      if (resp.error.value) {
+        document
+          .getElementById("usersettings")
+          ?.dispatchEvent(new Event("updateFailed"));
 
-    async fetchPreferredEmailLanguage() { },
-  },
+        await this.fetchUsers();
+        this.fetchMyUser();
+        this.usersLoading = false;
+      }
+    },
+  }
 });

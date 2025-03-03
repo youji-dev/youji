@@ -305,29 +305,17 @@ const {
   users,
   prioritiesLoading,
   buildingsLoading,
-  preferredEmailLanguage,
   statesLoading,
   usersLoading,
 } = storeToRefs(useSettingsStore());
 const {
-  fetchBuildings,
-  fetchPreferredEmailLanguage,
-  fetchPriorities,
-  fetchStates,
-  fetchUsers,
   updateBuildings,
   updatePriorities,
   updateStates,
   updateUsers,
 } = useSettingsStore();
-const loading = ref(true);
+const loading = ref((usersLoading || prioritiesLoading || buildingsLoading || statesLoading));
 onNuxtReady(async () => {
-  await fetchBuildings();
-  await fetchPriorities();
-  await fetchStates();
-  await fetchUsers();
-  loading.value = false;
-  console.log(document.getElementById("globalsettings"));
   document
     .getElementById("globalsettings")
     ?.addEventListener("defaultStateNotUpdatable", () => {
@@ -339,7 +327,6 @@ onNuxtReady(async () => {
   document
     .getElementById("globalsettings")
     ?.addEventListener("objectIsReferenced", () => {
-      console.log("objectIsReferencedError");
       ElMessage({
         type: "error",
         message: i18n.t("objectIsReferenced"),
@@ -348,7 +335,6 @@ onNuxtReady(async () => {
     document
     .getElementById("globalsettings")
     ?.addEventListener("onlyOneDefaultState", () => {
-      console.log("onlyOneDefaultState");
       ElMessage({
         type: "warning",
         message: i18n.t("onlyOneDefaultState"),
@@ -357,7 +343,6 @@ onNuxtReady(async () => {
     document
     .getElementById("globalsettings")
     ?.addEventListener("updateFailed", () => {
-      console.log("updateFailed");
       ElMessage({
         type: "warning",
         message: i18n.t("updateFailed"),
@@ -366,7 +351,6 @@ onNuxtReady(async () => {
     document
     .getElementById("globalsettings")
     ?.addEventListener("saved", () => {
-      console.log("saved");
       ElMessage({
         type: "success",
         message: i18n.t("saved"),

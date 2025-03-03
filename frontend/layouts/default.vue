@@ -2,8 +2,8 @@
   <div
     class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll"
   >
-    <Sidebar class="flex-none" />
-    <SidebarMobile class="flex-none" />
+    <Sidebar class="flex-none" :openTicketsCount="openTickets" />
+    <SidebarMobile class="flex-none" :openTicketsCount="openTickets" />
     <slot />
   </div>
 </template>
@@ -11,6 +11,40 @@
 <script lang="ts" setup>
 import SidebarMobile from "~/components/sidebar-mobile.vue";
 import Sidebar from "~/components/sidebar.vue";
+
+const { $api } = useNuxtApp();
+const { statusOptions } = storeToRefs(useTicketsStore());
+const { fetchStatusOptions } = useTicketsStore();
+
+const openTickets = ref<number | null>(null);
+
+onNuxtReady(async () => {
+  await fetchStatusOptions();
+  openTickets.value = await getOpenTicketCount();
+});
+
+async function getOpenTicketCount(): Promise<number | null> {
+  const filter: Record<string, any[]> = {};
+
+  if (statusOptions.value.some((state) => state.hasAutoPurge)) {
+    filter.State = statusOptions.value
+      .filter((x) => !x.hasAutoPurge)
+      .map((x) => x.id);
+  }
+
+  var result = await $api.ticket.search(
+    filter,
+    "CreationDate",
+    false,
+    0,
+    0,
+    true
+  );
+
+  if (result.data.value == null) return null;
+
+  return result.data.value.total;
+}
 </script>
 
 <style>

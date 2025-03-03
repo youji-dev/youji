@@ -40,7 +40,12 @@
             <el-icon>
               <Files />
             </el-icon>
-            <el-badge :value="9" type="primary" :offset="[-125, 15]">
+            <el-badge
+              v-bind:hidden="!openTickets"
+              :value="openTickets ?? 0"
+              type="primary"
+              :offset="[-125, 15]"
+            >
               <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
             </el-badge>
           </el-menu-item>
@@ -88,12 +93,45 @@
 <script lang="ts" setup>
 import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
 import Logo from "./logo.vue";
+
+const { $api } = useNuxtApp();
+const { statusOptions } = storeToRefs(useTicketsStore());
+const { fetchStatusOptions } = useTicketsStore();
 const drawer = ref(false);
 const router = useRouter();
 const localeRoute = useLocaleRoute();
 const route = useRoute();
 const routeObject = reactive({ route });
 const { locale } = useI18n();
+const openTickets: Ref<number | null> = ref(null);
+
+onNuxtReady(async () => {
+  await fetchStatusOptions();
+  openTickets.value = await getOpenTicketCount();
+});
+
+async function getOpenTicketCount(): Promise<number | null> {
+  const filter: Record<string, any[]> = {};
+
+  if (statusOptions.value.some((state) => state.hasAutoPurge)) {
+    filter.State = statusOptions.value
+      .filter((x) => !x.hasAutoPurge)
+      .map((x) => x.id);
+  }
+
+  var result = await $api.ticket.search(
+    filter,
+    "CreationDate",
+    false,
+    0,
+    0,
+    true
+  );
+
+  if (result.data.value == null) return null;
+
+  return result.data.value.total;
+}
 
 function getPageIndex() {
   if (

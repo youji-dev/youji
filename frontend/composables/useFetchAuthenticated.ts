@@ -51,6 +51,7 @@ const useFetchAuthenticated = <T>(
     retry: 1,
     retryStatusCodes: [401],
     retryDelay: 500,
+    cache: "no-cache",
 
     onRequest({ options }) {
       options.headers = {

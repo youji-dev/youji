@@ -10,12 +10,17 @@
         v-if="ticketSearchResult.length === 0"
         :description="$t('noDuplicatesFound')"
       />
-      <el-table v-else :data="ticketSearchResult"
-      :height="tableDimensions['height']" class="h-full w-full
-      overflow-x-scroll" :default-sort="{ prop: sortColProp, order: sortDesc ?
-      'descending' : 'ascending', }" @sort-change="changeSort"
-      :sort-by="sortCol" @row-dblclick="(row: any, column: any, event: Event) =>
-      { router.push(localeRoute(`/tickets/${row.id}`)?.fullPath as string) }"
+      <!-- Results found Page -->
+      <el-table-v2
+        v-else
+        id="ticketDuplicateTracker"
+        :columns="columns"
+        :data="ticketSearchResult"
+        :width="tableDimensions.width"
+        :height="230"
+        :sort-by="sortState"
+        @column-sort="onSort"
+      />
     </el-card>
   </div>
 </template>

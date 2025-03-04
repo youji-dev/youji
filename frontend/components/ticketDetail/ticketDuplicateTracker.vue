@@ -1,21 +1,129 @@
 <template>
   <div>
     <el-card
+      style="height: 275px"
       class="block drop-shadow-xl base-bg-light dark:base-bg-dark"
       v-resize-observer="onResize"
     >
-      <!-- No Results found Page -->
       <el-empty
-        style="height: 230px"
         v-if="ticketSearchResult.length === 0"
+        style="height: 250px"
         :description="$t('noDuplicatesFound')"
       />
-      <el-table v-else :data="ticketSearchResult"
-      :height="tableDimensions['height']" class="h-full w-full
-      overflow-x-scroll" :default-sort="{ prop: sortColProp, order: sortDesc ?
-      'descending' : 'ascending', }" @sort-change="changeSort"
-      :sort-by="sortCol" @row-dblclick="(row: any, column: any, event: Event) =>
-      { router.push(localeRoute(`/tickets/${row.id}`)?.fullPath as string) }"
+      <el-table
+        v-else
+        :data="ticketSearchResult"
+        class="h-full w-full overflow-x-scroll"
+        :fit="true"
+        :height="tableDimensions.height"
+        @row-dblclick="(row: any, column: any, event: Event) => {
+        openInNewTab(localeRoute(`/tickets/${row.id}`)?.fullPath as string) }"
+      >
+        <el-table-column
+          class="hidden lg:block"
+          prop="title"
+          filter-class-name="Title"
+          :label="$t('title')"
+          :width="tableDimensions.width / 7"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          class="hidden lg:block"
+          prop="state.name"
+          :label="$t('status')"
+          :width="tableDimensions.width / 7"
+        >
+          <template #default="scope">
+            <div class="flex justify-start items-center">
+              <ColoredSelect
+                :options="
+                  statusOptions.map((opt) => {
+                    return new ColoredSelectOption(opt, opt.color);
+                  })
+                "
+                :current="
+                  new ColoredSelectOption(
+                    scope.row.state,
+                    scope.row.state.color
+                  )
+                "
+                keyText="id"
+                labelText="name"
+                :changeCallback="() => {}"
+                :readOnly="true"
+              />
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          class="hidden lg:block"
+          prop="building.name"
+          :label="$t('building')"
+          :width="tableDimensions.width / 7"
+        />
+        <el-table-column
+          class="hidden lg:block"
+          prop="room"
+          :label="$t('room')"
+          :width="tableDimensions.width / 7"
+        />
+        <el-table-column
+          class="hidden lg:block"
+          prop="room"
+          :label="$t('room')"
+          :width="tableDimensions.width / 7"
+        />
+        <el-table-column
+          class="hidden lg:block"
+          prop="priority.name"
+          :label="$t('priority')"
+          :width="tableDimensions.width / 7"
+        >
+          <template #default="scope">
+            <div class="flex justify-start items-center">
+              <ColoredSelect
+                :options="
+                  priorityOptions.map((opt) => {
+                    return new ColoredSelectOption(opt, opt.color);
+                  })
+                "
+                :current="
+                  new ColoredSelectOption(
+                    scope.row.priority,
+                    scope.row.priority.color
+                  )
+                "
+                keyText="id"
+                labelText="name"
+                :changeCallback="() => {}"
+                :readOnly="true"
+              />
+            </div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          class="hidden lg:block"
+          prop="creationDate"
+          :label="$t('createDate')"
+          :width="tableDimensions.width / 7"
+        >
+          <template #default="scope">
+            <p>{{ new Date(scope.row.creationDate).toLocaleString() }}</p>
+          </template>
+        </el-table-column>
+        <el-table-column width="70" fixed="right">
+          <template #default="scope">
+            <el-button
+              link
+              type="primary"
+              size="small"
+              @click="openInNewTab(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)"
+            >
+              <ElIconEdit class="w-5 mx-2"></ElIconEdit>
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-card>
   </div>
 </template>
@@ -47,117 +155,10 @@ let limit = 0;
 const refreshTimeout: Ref<NodeJS.Timeout | null> = ref(null);
 const ticketSearchResult = ref<ticket[]>([]);
 
-const sortState = ref<SortBy>({
-  key: "creationDate",
-  order: TableV2SortOrder.DESC,
-});
 const tableDimensions = ref({
   width: 0,
   height: 0,
 });
-const columns: Ref<Column<any>[]> = ref([
-  {
-    key: "title",
-    title: i18n.t("title"),
-    dataKey: "title",
-    width: 250,
-  },
-  {
-    key: "state",
-    title: i18n.t("state"),
-    dataKey: "state",
-    width: 200,
-    cellRenderer: ({ cellData: state }) => (
-      <ColoredSelect
-        options={statusOptions.value.map((state: state) => ({
-          option: state,
-          color: state.color,
-        }))}
-        current={new ColoredSelectOption(state, state.color)}
-        keyText="id"
-        labelText="name"
-        changeCallback={() => {}}
-        readOnly={true}
-      />
-    ),
-  },
-  {
-    key: "building",
-    title: i18n.t("building"),
-    dataKey: "building",
-    width: 150,
-    cellRenderer: ({ cellData: building }) => building.name,
-  },
-  {
-    key: "room",
-    title: i18n.t("room"),
-    dataKey: "room",
-    width: 100,
-  },
-  {
-    key: "priority",
-    title: i18n.t("priority"),
-    dataKey: "priority",
-    width: 150,
-    cellRenderer: ({ cellData: priority }) => (
-      <ColoredSelect
-        options={priorityOptions.value.map((priority: priority) => ({
-          option: priority,
-          color: priority.color,
-        }))}
-        current={new ColoredSelectOption(priority, priority.color)}
-        keyText="id"
-        labelText="name"
-        changeCallback={() => {}}
-        readOnly={true}
-      />
-    ),
-  },
-  {
-    key: "creationDate",
-    title: i18n.t("createDate"),
-    dataKey: "creationDate",
-    width: 150,
-    sortable: true,
-    cellRenderer: ({ cellData: creationDate }) => (
-      <p> {new Date(creationDate).toLocaleString()} </p>
-    ),
-  },
-  {
-    key: "author",
-    title: i18n.t("createdBy"),
-    dataKey: "author",
-    width: 150,
-    sortable: true,
-  },
-  {
-    key: "buttons",
-    dataKey: "id",
-    width: 70,
-    fixed: FixedDir.RIGHT,
-    cellRenderer: ({ cellData: id }) => (
-      <el-tooltip
-        content={i18n.t("openInNewTab")}
-        placement="top-start"
-        show-after={500}
-      >
-        <el-button
-          link
-          type="primary"
-          size="small"
-          onClick={() => {
-            window.open(
-              localeRoute(`/tickets/${id}`)?.fullPath as string,
-              "_blank"
-            );
-          }}
-        >
-          <ElIconEdit class="w-5 mx-2" />
-        </el-button>
-      </el-tooltip>
-    ),
-  },
-]);
 
 onNuxtReady(async () => {
   await fetchStatusOptions();
@@ -269,7 +270,7 @@ async function searchForTickets(): Promise<void> {
   var response = await $api.ticket.search(
     ticketFilter,
     "creationDate",
-    sortState.value.order == TableV2SortOrder.DESC,
+    true,
     0,
     15,
     true
@@ -286,28 +287,15 @@ async function searchForTickets(): Promise<void> {
 function onResize(entries: ResizeObserverEntry[]): void {
   const entry = entries[0];
   const { width, height } = entry.contentRect;
-  tableDimensions.value = { width: width - 45, height };
-  setCellsHidden();
+  tableDimensions.value = { width: width - 100, height };
 }
 
-function setCellsHidden() {
-  if (tableDimensions.value.width < 1000) {
-    columns.value[2].hidden = true;
-    columns.value[3].hidden = true;
-    columns.value[4].hidden = true;
-    columns.value[6].hidden = true;
-  } else {
-    columns.value[2].hidden = false;
-    columns.value[3].hidden = false;
-    columns.value[4].hidden = false;
-    columns.value[6].hidden = false;
+function openInNewTab(url: string) {
+  const win = window.open(url, "_blank");
+  if (win) {
+    win.focus();
   }
 }
-
-const onSort = (sortBy: SortBy) => {
-  sortState.value = sortBy;
-  searchForTickets();
-};
 </script>
 
 <style lang="scss">

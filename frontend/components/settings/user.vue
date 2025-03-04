@@ -40,7 +40,7 @@
         <h1 class="text-lg">{{ $t("languageEmail") }}</h1>
         <div class="pl-3 flex items-center">
           <h1 class="text-sm px-3">
-            <span v-if="_emailLocale !== ''">{{ _emailLocale }}</span>
+            <span v-if="_emailLocale !== ''">{{ _emailLocale ? _emailLocale : $t('null') }}</span>
             <span v-else><ElIconLoading class="animate-spin w-3"/></span>
           </h1>
           <LanguageEmail />
@@ -62,10 +62,10 @@ const { myUser } = storeToRefs(useSettingsStore());
 const locale = i18n.localeProperties.value.name;
 const _emailLocale = computed(() => {
   if (myUser.value === null) {
-    return "";
+    return null;
   }
   if (myUser.value.preferredEmailLcid === null) {
-    return "";
+    return null;
   } else {
     if (!locales.value) return "";
     return locales.value.filter(

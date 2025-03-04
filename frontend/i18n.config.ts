@@ -124,7 +124,7 @@ export default defineI18nConfig(() => ({
       teacher: "Teacher",
       noRole: "No Role",
       onlyOneDefaultState: "You may only set one state as default",
-      updateFailed: "Updated failed"
+      updateFailed: "Updated failed",
       duplicateTickets: "Similar Tickets",
       noDuplicatesFound:
         "No similar tickets found. Your ticket is truly unique!",

@@ -17,20 +17,22 @@ class TicketRepository {
   }
 
   async search(
-    searchTerm: string,
-    orderByColumn: string,
-    orderDesc: boolean,
-    skip: number,
-    take: number
+    filters: Record<string, any[]>,
+    orderByColumn?: string,
+    orderDesc?: boolean,
+    skip?: number,
+    take?: number,
+    useOr?: boolean
   ): Promise<ReturnType<typeof useFetchAuthenticated<searchResponse>>> {
     return useFetchAuthenticated<searchResponse>(`${this.path}/search`, {
-      method: "GET",
-      query: {
-        searchTerm,
+      method: "POST",
+      body: {
+        filters,
         orderByColumn,
         orderDesc,
         skip,
         take,
+        useOr,
       },
     });
   }
@@ -95,14 +97,14 @@ class TicketRepository {
       method: "GET",
       query: { lang: language },
       onResponse({ response }) {
-        const filename = response.headers
-          .get("Content-Disposition")
-          ?.split("filename=")[1]
-          ?.trim();
+        const filename = `ticket_${id}_${new Date(
+          Date.now()
+        ).toISOString()}.pdf`;
+
         const url = window.URL.createObjectURL(new Blob([response._data]));
         const link = document.createElement("a");
         link.href = url;
-        link.setAttribute("download", filename ?? "ticket.pdf");
+        link.setAttribute("download", filename);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

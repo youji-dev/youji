@@ -125,6 +125,10 @@ export default defineI18nConfig(() => ({
       noRole: "No Role",
       onlyOneDefaultState: "You may only set one state as default",
       updateFailed: "Updated failed"
+      duplicateTickets: "Similar Tickets",
+      noDuplicatesFound:
+        "No similar tickets found. Your ticket is truly unique!",
+      openInNewTab: "Open in new tab",
     },
     "de-DE": {
       welcome: "Willkommen",
@@ -249,6 +253,10 @@ export default defineI18nConfig(() => ({
       noRole: "Keine Rolle",
       onlyOneDefaultState: "Es kann nur ein Status als Standard gesetzt sein",
       updateFailed: "Update fehlgeschlagen",
+      duplicateTickets: "Ähnliche Tickets",
+      noDuplicatesFound:
+        "Keine Duplikate gefunden. Ihr Ticket ist warlich einzigartig!",
+      openInNewTab: "In neuem neuen Tab öffnen",
     },
   },
 }));

@@ -5,7 +5,7 @@ namespace Application.WebApi.Contracts.Response
     /// <summary>
     /// Represents a comment data transfer object for post operation.
     /// </summary>
-    public class TicketSearchDTO
+    public class TicketSearchResponseDTO
     {
         /// <summary>
         /// The total number of ticket results without pagination.

@@ -94,7 +94,6 @@ export function handleCellClick(row: any, col: any, data: any) {
   let cellObj = data.filter((obj: any) => obj.id.value === row.id.value)[0][
     col.property.split("[")[0]
   ];
-  console.log("cell", cellObj);
   if (cellObj.editing !== "undefined") {
     cellObj.editing = !cellObj.editing;
   }

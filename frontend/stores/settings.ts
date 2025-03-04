@@ -157,11 +157,7 @@ export const useSettingsStore = defineStore({
     },
     fetchMyUser() {
       const { username } = useAuthStore();
-      for (const u of this.users) {
-        if (u.userId.value === username) {
-          this.myUser = u;
-        }
-      }
+      this.myUser = this.users.find(u => u.userId.value === username) ?? null;
     },
     async updateUsers(updatedUser: EditableUser) {
       this.usersLoading = true;

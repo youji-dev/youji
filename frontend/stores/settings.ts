@@ -82,7 +82,8 @@ export const useSettingsStore = defineStore({
     statesLoading: false as boolean,
     buildingsLoading: false as boolean,
     usersLoading: false as boolean,
-    myUser: null as EditableUser | null
+    myUser: null as EditableUser | null,
+    initialLoading: false as boolean,
   }),
   actions: {
     async fetchPriorities() {
@@ -165,11 +166,14 @@ export const useSettingsStore = defineStore({
     async updateUsers(updatedUser: EditableUser) {
       this.usersLoading = true;
       const { $api } = useNuxtApp();
-      const userObj = {
+      const {isUserAdmin} = useAuthStore();
+      let userObj = {
         userId: updatedUser.userId.value,
-        preferredEmailLcid: updatedUser.preferredEmailLcid.value,
-        newRole: Number(updatedUser.type.value)
+        newPreferredEmailLcid: updatedUser.preferredEmailLcid.value,
       } as EditUserRequest;
+      if (isUserAdmin) {
+        userObj.newRole = Number(updatedUser.type.value);
+      }
       let resp = await $api.user.edit(userObj);
       if (resp.error.value) {
         document
@@ -354,7 +358,7 @@ export const useSettingsStore = defineStore({
       }
       this.prioritiesLoading = false;
     },
-    async updateMyUser(updatedUser: { userId: string, preferredEmailLcid: string, newRole?: number }) {
+    async updateMyUser(updatedUser: { userId: string, newPreferredEmailLcid: string, newRole?: number }) {
       this.usersLoading = true;
       const { $api } = useNuxtApp();
       let resp = await $api.user.edit(updatedUser);

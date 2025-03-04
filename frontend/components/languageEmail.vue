@@ -40,7 +40,7 @@ const switchLocale = async (localeKey: string) => {
   if (myUser.value === null) return;
   await updateMyUser({
     userId: myUser.value.userId.value,
-    preferredEmailLcid: localeKey,
+    newPreferredEmailLcid: localeKey,
   });
   await fetchUsers();
   fetchMyUser();

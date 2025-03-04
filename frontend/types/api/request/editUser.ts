@@ -1,5 +1,5 @@
 export default interface EditUserRequest {
     userId: string,
-    preferredEmailLcid: string,
+    newPreferredEmailLcid: string,
     newRole?: number
   }

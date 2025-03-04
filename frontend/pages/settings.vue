@@ -28,6 +28,7 @@ import Global from "~/components/settings/global.vue";
 import User from "~/components/settings/user.vue";
 const activeName = ref("user");
 const { isUserAdmin } = storeToRefs(useAuthStore());
+const {initialLoading} = storeToRefs(useSettingsStore());
 const {
   fetchBuildings,
   fetchPriorities,
@@ -37,11 +38,13 @@ const {
 } = useSettingsStore()
 
 onNuxtReady(async () => {
+  initialLoading.value = true;
   await fetchBuildings();
   await fetchPriorities();
   await fetchStates();
   await fetchUsers();
   fetchMyUser();
+  initialLoading.value = false;
 });
 </script>
 <style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col xl:grid xl:grid-cols-2 xl:gap-4" v-if="!loading">
+  <div class="flex flex-col xl:grid xl:grid-cols-2 xl:gap-4" v-if="!initialLoading">
     <div id="priorities">
       <h1 class="text-sm">{{ $t("managePriorities") }}</h1>
       <el-table
@@ -307,6 +307,7 @@ const {
   buildingsLoading,
   statesLoading,
   usersLoading,
+  initialLoading,
 } = storeToRefs(useSettingsStore());
 const {
   updateBuildings,

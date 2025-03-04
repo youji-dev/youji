@@ -1,5 +1,8 @@
 <template>
-  <el-card :v-loading="loading" class="drop-shadow-xl base-bg-light dark:base-bg-dark lg:min-h-[13.9rem]">
+  <el-card
+    :v-loading="loading"
+    class="drop-shadow-xl base-bg-light dark:base-bg-dark lg:min-h-[13.9rem]"
+  >
     <el-text class="text-xl">{{ $t("files") }}</el-text>
     <el-upload
       v-model:file-list="ticket.attachments"
@@ -11,19 +14,40 @@
       :on-success="onUploadSuccess"
     >
       <template #file="{ file }">
-        <UnLazyImage v-if="file.blurHash" class="object-cover aspect-square w-full" :src="$api.attachment.generateAttachmentURL(file.id)" :blurhash="file.blurHash" :lazy-load="true" />
+        <UnLazyImage
+          v-if="file.blurHash"
+          class="object-cover aspect-square w-full"
+          :src="$api.attachment.generateAttachmentURL(file.id)"
+          :blurhash="file.blurHash"
+          :lazy-load="true"
+        />
 
-        <div v-else class="justify-center align-center text-center w-full h-full flex flex-col">
-          <FileIcons class="self-center" :width="30" :height="30" :name="file.name" />
+        <div
+          v-else
+          class="justify-center align-center text-center w-full h-full flex flex-col"
+        >
+          <FileIcons
+            class="self-center"
+            :width="30"
+            :height="30"
+            :name="file.name"
+          />
           <p>{{ file.name }}</p>
         </div>
 
         <div>
           <span class="el-upload-list__item-actions">
-            <span v-if="file.blurHash" class="el-upload-list__item-preview" @click="openPreview(file)">
+            <span
+              v-if="file.blurHash"
+              class="el-upload-list__item-preview"
+              @click="openPreview(file)"
+            >
               <el-icon><zoom-in /></el-icon>
             </span>
-            <span class="el-upload-list__item-delete" @click="downloadFile(file)">
+            <span
+              class="el-upload-list__item-delete"
+              @click="downloadFile(file)"
+            >
               <el-icon>
                 <Download />
               </el-icon>
@@ -45,7 +69,7 @@
 
 <script lang="ts" setup>
 import type ticket from "~/types/api/response/ticketResponse";
-import { Upload, ZoomIn, Download, Delete, Ticket, Files } from "@element-plus/icons-vue";
+import { Upload, ZoomIn, Download, Delete } from "@element-plus/icons-vue";
 import FileIcons from "file-icons-vue";
 import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
 import type { UploadFile } from "element-plus";
@@ -57,14 +81,18 @@ const props = defineProps<{
 const { $api } = useNuxtApp();
 const i18n = useI18n();
 
-const { setImagePreviewDisplay, setImagePreviewSrc } = useImagePreviewDisplayStore();
+const { setImagePreviewDisplay, setImagePreviewSrc } =
+  useImagePreviewDisplayStore();
 
 const {
   public: { BACKEND_URL, ACCESS_TOKEN_NAME },
 } = useRuntimeConfig();
 
 function getUploadRequestHeaders(): Record<string, any> {
-  const token = useCookie(ACCESS_TOKEN_NAME, { secure: true, sameSite: "strict" }).value;
+  const token = useCookie(ACCESS_TOKEN_NAME, {
+    secure: true,
+    sameSite: "strict",
+  }).value;
 
   return {
     Authorization: `Bearer ${token}`,
@@ -127,7 +155,9 @@ async function deleteFile(file: ticketAttachment) {
       }
     }
 
-    props.ticket.attachments = props.ticket.attachments.filter((attachment) => attachment.id !== file.id);
+    props.ticket.attachments = props.ticket.attachments.filter(
+      (attachment) => attachment.id !== file.id
+    );
   } catch (error) {
     ElNotification({
       title: i18n.t("error"),

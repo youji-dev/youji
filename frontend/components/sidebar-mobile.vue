@@ -36,7 +36,12 @@
             <el-icon>
               <Files />
             </el-icon>
-            <el-badge :value="9" type="primary" :offset="[-125, 15]">
+            <el-badge
+              v-bind:hidden="!openTicketsCount"
+              :value="openTicketsCount ?? 0"
+              type="primary"
+              :offset="[-125, 15]"
+            >
               <span class="w-fit h-fit">{{ $t("ticketOverview") }}</span>
             </el-badge>
           </el-menu-item>
@@ -84,12 +89,17 @@
 <script lang="ts" setup>
 import { Files, Plus, Setting, Upload } from "@element-plus/icons-vue";
 import Logo from "./logo.vue";
+
 const drawer = ref(false);
 const router = useRouter();
 const localeRoute = useLocaleRoute();
 const route = useRoute();
 const routeObject = reactive({ route });
 const { locale } = useI18n();
+
+const props = defineProps<{
+  openTicketsCount: number | null;
+}>();
 
 function getPageIndex() {
   if (

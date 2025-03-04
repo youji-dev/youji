@@ -69,7 +69,11 @@ const _emailLocale = computed(() => {
   } else {
     if (!locales.value) return "";
     return locales.value.filter(
-      (l) => l.code === myUser.value?.preferredEmailLcid.value
+      (l) => {
+        if(l.code === myUser.value?.preferredEmailLcid.value) {
+          return l.name;
+        }
+      }
     )[0].name;
   }
 });

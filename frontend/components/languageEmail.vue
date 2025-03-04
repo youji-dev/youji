@@ -1,6 +1,10 @@
 <template>
   <el-popover placement="top" :width="100" trigger="click">
-    <div v-for="availLocale in availableLocales" @click="switchLocale(availLocale.code)" class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">
+    <div
+      v-for="availLocale in availableLocales"
+      @click="switchLocale(availLocale.code)"
+      class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400"
+    >
       <div class="flex items-center w-1/3">
         <Icon :name="availLocale.icon" />
       </div>
@@ -10,7 +14,12 @@
     </div>
     <template #reference>
       <el-button type="primary" :size="'default'" plain circle>
-        <Icon name="material-symbols:language" :style="{ backgroundColor: colorMode.value === 'light' ? TEXT_LIGHT : TEXT_DARK }" />
+        <Icon
+          name="material-symbols:language"
+          :style="{
+            backgroundColor: colorMode.value === 'light' ? TEXT_LIGHT : TEXT_DARK,
+          }"
+        />
       </el-button>
     </template>
   </el-popover>
@@ -26,11 +35,14 @@ const availableLocales = computed(() => {
   return locales.value;
 });
 const { myUser } = storeToRefs(useSettingsStore());
-const { updateMyUser } = useSettingsStore(); 
+const { updateMyUser, fetchUsers, fetchMyUser } = useSettingsStore();
 const switchLocale = async (localeKey: string) => {
   if (myUser.value === null) return;
-  let updatedUser = myUser.value;
-  updatedUser.preferredEmailLcid.value = localeKey;
-  await updateMyUser(updatedUser);
+  await updateMyUser({
+    userId: myUser.value.userId.value,
+    preferredEmailLcid: localeKey,
+  });
+  await fetchUsers();
+  fetchMyUser();
 };
 </script>

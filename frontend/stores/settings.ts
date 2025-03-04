@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import type EditUserRequest from "~/types/api/request/editUser";
 import type building from "~/types/api/response/buildingResponse";
 import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
@@ -165,10 +166,10 @@ export const useSettingsStore = defineStore({
       this.usersLoading = true;
       const { $api } = useNuxtApp();
       const userObj = {
-        email: updatedUser.email.value,
-        type: Number(updatedUser.type.value),
         userId: updatedUser.userId.value,
-      } as user;
+        preferredEmailLcid: updatedUser.preferredEmailLcid.value,
+        newRole: Number(updatedUser.type.value)
+      } as EditUserRequest;
       let resp = await $api.user.edit(userObj);
       if (resp.error.value) {
         document
@@ -353,23 +354,15 @@ export const useSettingsStore = defineStore({
       }
       this.prioritiesLoading = false;
     },
-    async updateMyUser(updatedUser: EditableUser) {
+    async updateMyUser(updatedUser: { userId: string, preferredEmailLcid: string, newRole?: number }) {
       this.usersLoading = true;
       const { $api } = useNuxtApp();
-      const userObj = {
-        email: updatedUser.email.value,
-        type: Number(updatedUser.type.value),
-        userId: updatedUser.userId.value,
-        preferredEmailLcid: updatedUser.preferredEmailLcid.value
-      } as user;
-      let resp = await $api.user.edit(userObj);
+      let resp = await $api.user.edit(updatedUser);
       if (resp.error.value) {
         document
           .getElementById("usersettings")
           ?.dispatchEvent(new Event("updateFailed"));
 
-        await this.fetchUsers();
-        this.fetchMyUser();
         this.usersLoading = false;
       }
     },

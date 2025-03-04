@@ -1,4 +1,5 @@
 import type CreateUserRequest from "~/types/api/request/createUser";
+import type EditUserRequest from "~/types/api/request/editUser";
 import type user from "~/types/api/response/userResponse";
 
 class UserRepository {
@@ -12,11 +13,17 @@ class UserRepository {
     return useFetchAuthenticated<user>(this.path, { method: "POST", body: state });
   }
 
-  async edit(state: user): Promise<ReturnType<typeof useFetchAuthenticated<user>>> {
-    return useFetchAuthenticated<user>(this.path + "/" + state.userId, { method: "PATCH", body: {
-      newRole: Number(state.type),
-      newPreferredEmailLcid: state.preferredEmailLcid
-    } });
+  async edit(state: EditUserRequest): Promise<ReturnType<typeof useFetchAuthenticated<user>>> {
+    const { isUserAdmin } = useAuthStore();
+    return useFetchAuthenticated<user>(this.path + "/" + state.userId, {
+      method: "PATCH", body: isUserAdmin ? {
+        newPreferredEmailLcid: state.preferredEmailLcid,
+      } :
+        {
+          newPreferredEmailLcid: state.preferredEmailLcid,
+          newRole: state.newRole
+        }
+    });
   }
 
   async delete(id: string): Promise<ReturnType<typeof useFetchAuthenticated<string>>> {

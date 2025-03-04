@@ -64,7 +64,7 @@ const _emailLocale = computed(() => {
   if (myUser.value === null) {
     return null;
   }
-  if (myUser.value.preferredEmailLcid === null) {
+  if (myUser.value.preferredEmailLcid.value === null) {
     return null;
   } else {
     if (!locales.value) return "";

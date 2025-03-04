@@ -37,8 +37,6 @@ const useFetchAuthenticated = <T>(
 
           resolve();
         } catch (error) {
-          authStore.logUserOut();
-          navigateTo(localePath("/login")?.fullPath);
           reject(error);
         } finally {
           refreshPromise = null;
@@ -53,6 +51,7 @@ const useFetchAuthenticated = <T>(
     retry: 1,
     retryStatusCodes: [401],
     retryDelay: 500,
+    cache: "no-cache",
 
     onRequest({ options }) {
       options.headers = {

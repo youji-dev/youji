@@ -67,7 +67,7 @@ namespace Application.WebApi.Controllers
 
             if (searchRequest.Filters != null)
             {
-                var predicate = PredicateBuilder.New<Ticket>(searchRequest.UseOr);
+                var predicate = PredicateBuilder.New<Ticket>(true);
 
                 foreach (var filter in searchRequest.Filters)
                 {

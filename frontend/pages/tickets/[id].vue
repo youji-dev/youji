@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mt-20 md:mt-5 max-h-[92vh] overflow-y-clip"
+    class="mt-20 lg:mt-5 max-h-[92vh] overflow-y-clip"
     :style="{ width: width }"
   >
     <div v-loading="loading" v-if="!is404 && ticketModel" class="px-5 pb-3">
@@ -70,6 +70,13 @@
           class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3"
           v-model:ticket="ticketModel"
         />
+
+        <div
+          class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3"
+        >
+          <el-text>{{ $t("duplicateTickets") }}</el-text>
+          <TicketDuplicateTracker v-if="isNew" :ticket="ticketModel" />
+        </div>
       </div>
       <div v-if="is404" class="h-screen flex justify-center items-center">
         <el-result class="" icon="error" :title="$t('resourceNotFound')">
@@ -105,9 +112,10 @@
       <div class="flex">
         <el-button
           class="text-sm justify-self-end drop-shadow-md"
-          type="primary"
-          @click="isNew ? createTicket() : saveTicketChanges()"
-          >{{ $t("save") }}</el-button
+          type="danger"
+          @click="deleteDialog = true"
+          :hidden="isNew || !isUserAdmin"
+          >{{ $t("delete") }}</el-button
         >
 
         <el-button
@@ -116,12 +124,29 @@
           @click="router.back()"
           >{{ $t("close") }}</el-button
         >
+
+        <el-button
+          class="text-sm justify-self-end drop-shadow-md"
+          type="primary"
+          @click="isNew ? createTicket() : saveTicketChanges()"
+          >{{ $t("save") }}</el-button
+        >
       </div>
     </div>
   </div>
   <el-dialog v-model="imagePreviewDisplay">
     <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
   </el-dialog>
+  <TicketDeleteConfirmationDialog
+    :ticket="ticketModel"
+    :visible="deleteDialog"
+    :beforeClose="
+      () => {
+        deleteDialog = false;
+      }
+    "
+    @deleted="() => { router.push(localePath('/tickets')?.fullPath as string) }"
+  />
 </template>
 
 <script lang="ts" setup async>
@@ -140,7 +165,9 @@ import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
 import TicketCommentCollection from "~/components/ticketDetail/ticketCommentCollection.vue";
 import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
 import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
+import TicketDuplicateTracker from "~/components/ticketDetail/ticketDuplicateTracker.vue";
 const { $api } = useNuxtApp();
+const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
 const i18n = useI18n();
 const localePath = useLocaleRoute();
 
@@ -156,6 +183,7 @@ let isNew = ref((route.params.id as string).toLocaleLowerCase() == "new");
 let is404 = ref(false);
 let loading = ref(true);
 let loadingText = ref(i18n.t("loadingData"));
+let deleteDialog = ref(false);
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);
@@ -174,6 +202,15 @@ onNuxtReady(async () => {
       availableBuildings.value = buildings.data.value ?? [];
       ticketModel.value = ticketData;
       is404.value = false;
+
+      const defaultState = availableStates.value.find(
+        (state) => state.isDefault
+      );
+      const canUserChangeState =
+        isUserAdmin.value || isUserFacilityManager.value || !defaultState;
+      if (isNew.value && !canUserChangeState && defaultState) {
+        ticketModel.value!.state = defaultState;
+      }
     })
     .catch((error) => {
       if (error instanceof TicketNotFoundError) {

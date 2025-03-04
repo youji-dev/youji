@@ -4,6 +4,7 @@ import PriorityRepository from "~/repositories/priority";
 import BuildingRepository from "~/repositories/building";
 import CommentRepository from "~/repositories/comment";
 import AttachmentRepository from "~/repositories/attachment";
+import UserRepository from "~/repositories/user";
 
 interface IApiInstance {
   ticket: TicketRepository;
@@ -12,6 +13,7 @@ interface IApiInstance {
   building: BuildingRepository;
   comment: CommentRepository;
   attachment: AttachmentRepository;
+  user: UserRepository;
 }
 
 export default defineNuxtPlugin(() => {
@@ -22,6 +24,7 @@ export default defineNuxtPlugin(() => {
     building: new BuildingRepository(),
     comment: new CommentRepository(),
     attachment: new AttachmentRepository(),
+    user: new UserRepository(),
   };
 
   return {

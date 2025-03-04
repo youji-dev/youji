@@ -1,6 +1,9 @@
-﻿using Application.WebApi.Decorators;
+﻿using System.Security.Claims;
+using Application.WebApi.Decorators;
 using Common.Contracts.Patch;
 using Common.Enums;
+using LinqKit;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
@@ -8,15 +11,15 @@ using PersistenceLayer.DataAccess.Repositories;
 namespace Application.WebApi.Controllers
 {
     /// <summary>
-    /// Controller that provides endpoints to manage role assignment requests.
+    /// Controller that provides endpoints to manage user entity requests.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    [AuthorizeRoles(Roles.Admin)]
+    [Authorize]
     public class UserController : ControllerBase
     {
         /// <summary>
-        /// Gets all role assignments.
+        /// Gets a collection of users. All users if the request is made by an admin, otherwise only the user itself.
         /// </summary>
         /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <returns>An <see cref="ObjectResult"/> with all users.</returns>
@@ -25,23 +28,39 @@ namespace Application.WebApi.Controllers
         public ActionResult<User[]> Get(
             [FromServices] UserRepository userRepository)
         {
-            return this.Ok(userRepository.GetAll().ToArray());
+            var userClaim = this.User.FindFirst("username")?.Value;
+            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (userClaim is null || rolesClaim is null)
+                return this.Unauthorized();
+
+            IQueryable<User> query = userRepository.GetAll();
+
+            if (!Enum.TryParse(rolesClaim, out Roles role))
+                return this.Unauthorized();
+
+            if (!role.HasFlag(Roles.Admin))
+            {
+                query = query.Where(user => user.UserId == userClaim);
+            }
+
+            return this.Ok(query.ToArray());
         }
 
         /// <summary>
-        /// Adds a new role assignment entity.
+        /// Adds a new user entity
         /// </summary>
-        /// <param name="roleAssignmentRepo">Instance of <see cref="UserRepository"/></param>
-        /// <param name="roleAssignment">The <see cref="User"/> that should be added.</param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
+        /// <param name="newUser">The <see cref="User"/> that should be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the new user entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<User>> Post(
-            [FromServices] UserRepository roleAssignmentRepo,
-            [FromBody] User roleAssignment)
+            [FromServices] UserRepository userRepository,
+            [FromBody] User newUser)
         {
-            await roleAssignmentRepo.AddAsync(roleAssignment);
-            return this.Ok(roleAssignment);
+            await userRepository.AddAsync(newUser);
+            return this.Ok(newUser);
         }
 
         /// <summary>
@@ -57,22 +76,43 @@ namespace Application.WebApi.Controllers
             [FromRoute] string userId,
             [FromBody] UserPatch userUpdate)
         {
-            User? user = await userRepository.GetAsync(userId);
-            if (user is null)
+            var userClaim = this.User.FindFirst("username")?.Value;
+            var rolesClaim = this.User.FindFirst(ClaimTypes.Role)?.Value;
+            if (userClaim is null || rolesClaim is null)
+                return this.Unauthorized();
+
+            if (!Enum.TryParse(rolesClaim, out Roles role))
+                return this.Unauthorized();
+
+            User? patchingUser = await userRepository.GetAsync(userId);
+            if (patchingUser is null)
                 return this.NotFound($"No user found for id '{userId}'");
 
             if (userUpdate.NewRole is not null)
-                user.Type = (Roles)userUpdate.NewRole;
+                patchingUser.Type = (Roles)userUpdate.NewRole;
+
+            if (!role.HasFlag(Roles.Admin))
+            {
+                User? requestingUser = await userRepository.GetAsync(userClaim);
+                if (requestingUser is null)
+                    return this.NotFound($"No user found for id '{userId}'");
+
+                if (requestingUser.UserId != patchingUser.UserId)
+                    return this.Forbid();
+
+                if (userUpdate.NewRole is not null)
+                    return this.Forbid();
+            }
 
             if (userUpdate.NewPreferredEmailLcid is not null)
-                user.PreferredEmailLcid = userUpdate.NewPreferredEmailLcid;
+                patchingUser.PreferredEmailLcid = userUpdate.NewPreferredEmailLcid;
 
             if (userUpdate.NewAreEmailNotificationsAllowed is not null)
-                user.AllowsEmailNotifications = (bool)userUpdate.NewAreEmailNotificationsAllowed;
+                patchingUser.AllowsEmailNotifications = (bool)userUpdate.NewAreEmailNotificationsAllowed;
 
-            await userRepository.UpdateAsync(user);
+            await userRepository.UpdateAsync(patchingUser);
 
-            return this.Ok(user);
+            return this.Ok(patchingUser);
         }
 
         /// <summary>
@@ -84,6 +124,7 @@ namespace Application.WebApi.Controllers
         [HttpDelete("{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<string>> Delete(
             [FromServices] UserRepository userRepository,
             [FromRoute] string userId)

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
 namespace PersistenceLayer.DataAccess.Entities

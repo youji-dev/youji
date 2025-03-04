@@ -37,11 +37,15 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the added state entity.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Post(
             [FromServices] StateRepository stateRepo,
             [FromBody] StatePostDTO stateData)
         {
+            if (stateData.IsDefault && stateRepo.Find(state => state.IsDefault).Any())
+                return this.BadRequest("A default state already exists.");
+
             var state = new State()
             {
                 Id = default,
@@ -49,6 +53,7 @@ namespace Application.WebApi.Controllers
                 Color = stateData.Color,
                 HasAutoPurge = stateData.HasAutoPurge,
                 AutoPurgeDays = stateData.AutoPurgeDays,
+                IsDefault = stateData.IsDefault,
             };
 
             await stateRepo.AddAsync(state);
@@ -64,6 +69,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated state.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Admin)]
         public async Task<ActionResult<State>> Put(
@@ -75,10 +81,14 @@ namespace Application.WebApi.Controllers
             if (state is null)
                 return this.NotFound($"A state with the id '{stateData.Id}' doesn´t exist.");
 
+            if (stateData.IsDefault && stateRepo.Find(state => state.IsDefault).Any())
+                return this.BadRequest("A default state already exists.");
+
             state.Name = stateData.Name;
             state.Color = stateData.Color;
             state.HasAutoPurge = stateData.HasAutoPurge;
             state.AutoPurgeDays = stateData.AutoPurgeDays;
+            state.IsDefault = stateData.IsDefault;
 
             await stateRepo.UpdateAsync(state);
             return this.Ok(state);

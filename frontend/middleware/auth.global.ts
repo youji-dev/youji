@@ -1,6 +1,6 @@
-export default defineNuxtRouteMiddleware(async (to) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
   const { getUserData } = useAuthStore();
-  const { authenticated } = storeToRefs(useAuthStore());
+  const { authenticated, isUserTeacher } = storeToRefs(useAuthStore());
   const {
     public: { ACCESS_TOKEN_NAME },
   } = useRuntimeConfig();
@@ -12,6 +12,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const localeRoute = useLocaleRoute();
   const { logUserOut } = useAuthStore();
   const { checkIfTokenIsValid } = useAuthStore();
+  const currentFullFromPath = from.fullPath.endsWith("/") ? from.fullPath.slice(from.fullPath.length, from.fullPath.length) : from.fullPath;
+  const currentFullToPath = to.fullPath.endsWith("/") ? to.fullPath.slice(to.fullPath.length, to.fullPath.length) : to.fullPath;
   if (to.fullPath === localeRoute("/login")?.fullPath) {
     return;
   }
@@ -39,5 +41,9 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!token.value && !to?.name?.toString().startsWith("login")) {
     abortNavigation();
     return navigateTo(localeRoute("/login")?.fullPath);
+  }
+  if (currentFullFromPath === localeRoute("/login")?.fullPath && isUserTeacher.value && currentFullToPath !== localeRoute("/tickets/new")?.fullPath) {
+    abortNavigation();
+    return navigateTo(localeRoute("/tickets/new")?.fullPath);
   }
 });

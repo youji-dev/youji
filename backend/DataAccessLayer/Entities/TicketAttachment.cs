@@ -43,6 +43,11 @@ namespace PersistenceLayer.DataAccess.Entities
         public required Guid TicketId { get; set; }
 
         /// <summary>
+        /// Whether the attachment is a renderable image
+        /// </summary>
+        public bool IsRenderableImage { get; set; }
+
+        /// <summary>
         /// The refernce type of the relatet tickets.
         /// </summary>
         [JsonIgnore]

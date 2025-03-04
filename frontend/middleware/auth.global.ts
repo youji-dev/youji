@@ -43,7 +43,6 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     return navigateTo(localeRoute("/login")?.fullPath);
   }
   if (currentFullFromPath === localeRoute("/login")?.fullPath && isUserTeacher.value && currentFullToPath !== localeRoute("/tickets/new")?.fullPath) {
-    console.log("redirecting teacher");
     abortNavigation();
     return navigateTo(localeRoute("/tickets/new")?.fullPath);
   }

@@ -21,6 +21,8 @@ export const useAuthStore = defineStore("auth", {
     isUserAdmin: (state) => (state.userRole & Roles.Admin) > 0,
     isUserFacilityManager: (state) =>
       (state.userRole & Roles.FacilityManager) > 0,
+    isUserTeacher: (state) =>
+      (state.userRole & Roles.Teacher) > 0,
   },
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {

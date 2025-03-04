@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async (to, from) => {
   const { getUserData } = useAuthStore();
-  const { authenticated, userRole } = storeToRefs(useAuthStore());
+  const { authenticated, isUserTeacher } = storeToRefs(useAuthStore());
   const {
     public: { ACCESS_TOKEN_NAME },
   } = useRuntimeConfig();
@@ -12,6 +12,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const localeRoute = useLocaleRoute();
   const { logUserOut } = useAuthStore();
   const { checkIfTokenIsValid } = useAuthStore();
+  const currentFullFromPath = from.fullPath.endsWith("/") ? from.fullPath.slice(from.fullPath.length, from.fullPath.length) : from.fullPath;
+  const currentFullToPath = to.fullPath.endsWith("/") ? to.fullPath.slice(to.fullPath.length, to.fullPath.length) : to.fullPath;
   if (to.fullPath === localeRoute("/login")?.fullPath) {
     return;
   }
@@ -40,7 +42,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     abortNavigation();
     return navigateTo(localeRoute("/login")?.fullPath);
   }
-  if ((from.fullPath === localeRoute("/login")?.fullPath || from.fullPath === localeRoute("/login")?.fullPath + "/") && userRole.value.toString() === "1" && to.fullPath !== localeRoute("/tickets/new")?.fullPath) {
+  if (currentFullFromPath === localeRoute("/login")?.fullPath && isUserTeacher.value && currentFullToPath !== localeRoute("/tickets/new")?.fullPath) {
     console.log("redirecting teacher");
     abortNavigation();
     return navigateTo(localeRoute("/tickets/new")?.fullPath);

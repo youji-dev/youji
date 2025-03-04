@@ -1,24 +1,49 @@
 <template>
   <!-- Route: /login -->
   <!-- Page for login mask -->
-  <el-form :model="form" label-width="auto" class="w-full min-h-lvh flex items-center justify-center">
+  <el-form
+    :model="form"
+    label-width="auto"
+    class="w-full min-h-lvh flex items-center justify-center"
+    @keyup.enter="loginUser()"
+  >
     <div
-      class="w-full md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark">
-      <el-divider content-position="left" border-style="transparent"> 
+      class="w-full md:w-2/3 lg:w-2/5 xl:w-1/3 2xl:w-1/4 mx-3 flex flex-col justify-center items-center py-3 rounded-lg shadow-md base-bg-light dark:base-bg-dark"
+    >
+      <el-divider content-position="left" border-style="transparent">
         <Logo></Logo>
         <!-- <el-text size="large">{{ $t("ticketSystem") }}</el-text> -->
       </el-divider>
       <el-form-item class="w-full px-10 mt-3">
-        <el-input v-model="form.username" :placeholder="$t('username')" :prefix-icon="User" Text />
+        <el-input
+          v-model="form.username"
+          :placeholder="$t('username')"
+          :prefix-icon="User"
+          Text
+        />
       </el-form-item>
       <el-form-item class="w-full px-10">
-        <el-input v-model="form.password" :placeholder="$t('password')" :prefix-icon="Lock" Password type="password"
-          show-password>
+        <el-input
+          v-model="form.password"
+          :placeholder="$t('password')"
+          :prefix-icon="Lock"
+          Password
+          type="password"
+          show-password
+        >
         </el-input>
       </el-form-item>
       <div class="flex items-center justify-between w-full">
-        <el-button :loading="loading" :loading-icon="Loading" type="primary" plain round @click="loginUser()"
-          class="ml-auto mr-10">{{ $t("login") }}</el-button>
+        <el-button
+          :loading="loading"
+          :loading-icon="Loading"
+          type="primary"
+          plain
+          round
+          @click="loginUser()"
+          class="ml-auto mr-10"
+          >{{ $t("login") }}</el-button
+        >
       </div>
     </div>
   </el-form>
@@ -26,7 +51,7 @@
 
 <script lang="ts" setup>
 definePageMeta({
-  layout: "base"
+  layout: "base",
 });
 import { Loading, Lock, User } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
@@ -44,7 +69,6 @@ let form = ref({
   password: "",
 });
 const loading = ref(false);
-
 
 async function loginUser() {
   loading.value = true;

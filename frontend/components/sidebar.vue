@@ -3,13 +3,9 @@
     class="max-h-[100vh] px-6 py-3 max-w-fit min-w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
     id="navbar"
   >
-    <div class="flex items-center justify-between">
-      <Logo />
-      <div class="flex items-center justify-end">
-        <Theme />
-        <Language />
-      </div>
-    </div>
+  <div class="flex items-center justify-between">
+    <Logo/>
+  </div>
     <el-menu
       :default-active="getPageIndex()"
       class="el-menu-vertical-demo pt-5"

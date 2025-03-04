@@ -43,12 +43,12 @@ export default defineNuxtConfig({
     // Icons from https://www.npmjs.com/package/@iconify-json/flag
     locales: [
       {
-        code: "en",
+        code: "en-EN",
         name: "English",
         icon: "flag:gb-4x3",
       },
       {
-        code: "de",
+        code: "de-DE",
         name: "Deutsch",
         icon: "flag:de-4x3",
       },

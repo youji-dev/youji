@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mt-20 md:mt-5 max-h-[92vh] overflow-y-clip"
+    class="mt-20 lg:mt-5 max-h-[92vh] overflow-y-clip"
     :style="{ width: width }"
   >
     <div v-loading="loading" v-if="!is404 && ticketModel" class="px-5 pb-3">

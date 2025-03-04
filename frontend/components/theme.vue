@@ -1,5 +1,5 @@
 <template>
-  <el-button @click="toggleTheme" :size="'small'" circle plain type="primary" :icon="determineIcon()"></el-button>
+  <el-button @click="toggleTheme" :size="'default'" circle plain type="primary" :icon="determineIcon()"></el-button>
 </template>
 
 <script lang="ts" setup>

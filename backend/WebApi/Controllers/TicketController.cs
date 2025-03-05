@@ -102,18 +102,20 @@ namespace Application.WebApi.Controllers
             {
                 Expression<Func<Ticket, object>> keySelector = searchRequest.OrderByColumn switch
                 {
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
                     nameof(Ticket.Id) => t => t.Id.ToString(),
                     nameof(Ticket.Title) => t => t.Title,
-                    nameof(Ticket.Description) => t => t.Description,
+                    nameof(Ticket.Description) => t => t.Description ?? string.Empty,
                     nameof(Ticket.Priority) => t => t.Priority.Name,
                     nameof(Ticket.State) => t => t.State.Name,
                     nameof(Ticket.Building) => t => t.Building.Name,
-                    nameof(Ticket.Room) => t => t.Room,
-                    nameof(Ticket.Object) => t => t.Object,
+                    nameof(Ticket.Room) => t => t.Room ?? string.Empty,
+                    nameof(Ticket.Object) => t => t.Object ?? string.Empty,
                     nameof(Ticket.CreationDate) => t => t.CreationDate,
                     nameof(Ticket.Author) => t => t.Author,
                     _ => throw new ArgumentException("Invalid OrderBy column"),
                 };
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
                 ticketQuery = searchRequest.OrderDesc ? ticketQuery.OrderByDescending(keySelector) : ticketQuery.OrderBy(keySelector);
             }

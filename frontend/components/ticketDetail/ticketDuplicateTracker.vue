@@ -24,14 +24,14 @@
           prop="title"
           filter-class-name="Title"
           :label="$t('title')"
-          :width="tableDimensions.width / 7"
+          :width="tableDimensions.width / 6"
           show-overflow-tooltip
         />
         <el-table-column
           class="hidden lg:block"
           prop="state.name"
           :label="$t('status')"
-          :width="tableDimensions.width / 7"
+          :width="tableDimensions.width / 6"
         >
           <template #default="scope">
             <div class="flex justify-start items-center">
@@ -59,25 +59,19 @@
           class="hidden lg:block"
           prop="building.name"
           :label="$t('building')"
-          :width="tableDimensions.width / 7"
+          :width="tableDimensions.width / 6"
         />
         <el-table-column
           class="hidden lg:block"
           prop="room"
           :label="$t('room')"
-          :width="tableDimensions.width / 7"
-        />
-        <el-table-column
-          class="hidden lg:block"
-          prop="room"
-          :label="$t('room')"
-          :width="tableDimensions.width / 7"
+          :width="tableDimensions.width / 6"
         />
         <el-table-column
           class="hidden lg:block"
           prop="priority.name"
           :label="$t('priority')"
-          :width="tableDimensions.width / 7"
+          :width="tableDimensions.width / 6"
         >
           <template #default="scope">
             <div class="flex justify-start items-center">
@@ -105,7 +99,7 @@
           class="hidden lg:block"
           prop="creationDate"
           :label="$t('createDate')"
-          :width="tableDimensions.width / 7"
+          :width="tableDimensions.width / 6"
         >
           <template #default="scope">
             <p>{{ new Date(scope.row.creationDate).toLocaleString() }}</p>
@@ -132,13 +126,8 @@
 import { vResizeObserver } from "@vueuse/components";
 import ColoredSelect from "~/components/coloredSelect.vue";
 import type ticket from "~/types/api/response/ticketResponse";
-import type state from "~/types/api/response/stateResponse";
-import type priority from "~/types/api/response/priorityResponse";
-import { TableV2SortOrder, type Column, type SortBy } from "element-plus";
 import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
-import { FixedDir } from "element-plus/es/components/table-v2/src/constants.mjs";
 
-const i18n = useI18n();
 const { $api } = useNuxtApp();
 const { statusOptions, priorityOptions } = storeToRefs(useTicketsStore());
 const { fetchStatusOptions, fetchPriorityOptions } = useTicketsStore();
@@ -149,9 +138,6 @@ const props = defineProps<{
 }>();
 
 let ticketFilter: Record<string, any[]> = {};
-let skip = 0;
-let take = 0;
-let limit = 0;
 const refreshTimeout: Ref<NodeJS.Timeout | null> = ref(null);
 const ticketSearchResult = ref<ticket[]>([]);
 
@@ -269,7 +255,7 @@ async function searchForTickets(): Promise<void> {
 
   var response = await $api.ticket.search(
     ticketFilter,
-    "creationDate",
+    "CreationDate",
     true,
     0,
     15,

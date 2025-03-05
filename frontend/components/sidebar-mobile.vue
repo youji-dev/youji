@@ -14,7 +14,7 @@
 
     <el-drawer
       v-model="drawer"
-      :title="$t('youji')"
+      :title="$t('ticketSystem')"
       :with-header="false"
       :direction="'ltr'"
       style="min-width: fit-content; max-width: fit-content; height: 100vh"

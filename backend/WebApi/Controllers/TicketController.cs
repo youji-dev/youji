@@ -15,6 +15,7 @@ using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using DomainLayer.BusinessLogic.Mailing;
 using LinqKit;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MimeKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -97,28 +98,30 @@ namespace Application.WebApi.Controllers
                 ticketQuery = ticketQuery.Where(predicate);
             }
 
-            Ticket[] tickets = [.. ticketQuery];
-            var totalCount = tickets.Length;
-
             if (!string.IsNullOrEmpty(searchRequest.OrderByColumn))
             {
-                var property = typeof(Ticket).GetProperty(searchRequest.OrderByColumn, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-
-                if (property != null)
+                Expression<Func<Ticket, object>> keySelector = searchRequest.OrderByColumn switch
                 {
-                    var parameter = Expression.Parameter(typeof(Ticket), "t");
-                    var propertyAccess = Expression.Property(parameter, property);
-                    var lambda = Expression.Lambda(propertyAccess, parameter);
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+                    nameof(Ticket.Id) => t => t.Id.ToString(),
+                    nameof(Ticket.Title) => t => t.Title,
+                    nameof(Ticket.Description) => t => t.Description ?? string.Empty,
+                    nameof(Ticket.Priority) => t => t.Priority.Name,
+                    nameof(Ticket.State) => t => t.State.Name,
+                    nameof(Ticket.Building) => t => t.Building.Name,
+                    nameof(Ticket.Room) => t => t.Room ?? string.Empty,
+                    nameof(Ticket.Object) => t => t.Object ?? string.Empty,
+                    nameof(Ticket.CreationDate) => t => t.CreationDate,
+                    nameof(Ticket.Author) => t => t.Author,
+                    _ => throw new ArgumentException("Invalid OrderBy column"),
+                };
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
 
-                    string methodName = searchRequest.OrderDesc ? "OrderByDescending" : "OrderBy";
-                    var orderByExpression = typeof(Queryable).GetMethods()
-                        .First(m => m.Name == methodName && m.GetParameters().Length == 2)
-                        .MakeGenericMethod(typeof(Ticket), property.PropertyType);
-
-                    ticketQuery =
-                        (IQueryable<Ticket>)orderByExpression.Invoke(null, [ticketQuery, lambda])!;
-                }
+                ticketQuery = searchRequest.OrderDesc ? ticketQuery.OrderByDescending(keySelector) : ticketQuery.OrderBy(keySelector);
             }
+
+            Ticket[] tickets = [.. ticketQuery];
+            var totalCount = tickets.Length;
 
             tickets = [.. ticketQuery.Skip(searchRequest.Skip).Take(searchRequest.Take)];
             return this.Ok(new TicketSearchResponseDTO

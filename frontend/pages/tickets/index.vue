@@ -218,6 +218,7 @@
         layout="prev, pager, next"
         :total="totalCount"
         :page-size="25"
+        :current-page="pageNumber"
         @current-change="fetchNewPage"
       />
     </div>
@@ -257,6 +258,7 @@ const { fetchStatusOptions, fetchPriorityOptions, fetchTickets } =
   useTicketsStore();
 const loading = ref(true);
 const pageLoading = ref(false);
+const pageNumber = ref(1);
 const searchLoading = ref(false);
 const sortCol = ref("CreationDate");
 const sortColProp = ref("creationDate");
@@ -497,6 +499,7 @@ function changeSort(sortData: { column: any; prop: string; order: any }) {
   sortColProp.value = sortData.prop;
   sortDesc.value = sortData.order === "ascending" ? false : true;
   searchLoading.value = true;
+  pageNumber.value = 1;
   fetchNewPage(1)
     .then(() => {
       searchLoading.value = false;
@@ -508,6 +511,7 @@ function changeSort(sortData: { column: any; prop: string; order: any }) {
 }
 
 async function fetchNewPage(page: number) {
+  pageNumber.value = page;
   pageLoading.value = true;
   await fetchTickets(
     { Title: [search.value] },

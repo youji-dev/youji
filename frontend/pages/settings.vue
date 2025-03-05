@@ -38,12 +38,11 @@ const {
 } = useSettingsStore()
 
 onNuxtReady(async () => {
-  initialLoading.value = true;
+  await fetchUsers();
   await fetchBuildings();
   await fetchPriorities();
   await fetchStates();
-  await fetchUsers();
-  fetchMyUser();
+  await fetchMyUser();
   initialLoading.value = false;
 });
 </script>

@@ -3,7 +3,6 @@ import type EditUserRequest from "~/types/api/request/editUser";
 import type building from "~/types/api/response/buildingResponse";
 import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
-import type user from "~/types/api/response/userResponse";
 
 export interface EditablePriority {
   id: EditableStringProperty;
@@ -31,6 +30,7 @@ export interface EditableUser {
   type: EditableStringProperty;
   email: EditableNullableStringProperty;
   preferredEmailLcid: EditableNullableStringProperty;
+  allowsEmailNotifications: EditableBooleanProperty;
 }
 
 export type EditableProperty =
@@ -83,7 +83,7 @@ export const useSettingsStore = defineStore({
     buildingsLoading: false as boolean,
     usersLoading: false as boolean,
     myUser: null as EditableUser | null,
-    initialLoading: false as boolean,
+    initialLoading: true as boolean,
   }),
   actions: {
     async fetchPriorities() {
@@ -150,14 +150,18 @@ export const useSettingsStore = defineStore({
           userId: { editing: false, value: u.userId },
           type: { editing: false, value: u.type.toString() },
           email: { editing: false, value: u.email },
-          preferredEmailLcid: { editing: false, value: u.preferredEmailLcid }
+          preferredEmailLcid: { editing: false, value: u.preferredEmailLcid },
+          allowsEmailNotifications: { editing: false, value: u.allowsEmailNotifications }
         }));
       }
       this.usersLoading = false;
     },
     fetchMyUser() {
       const { username } = useAuthStore();
-      this.myUser = this.users.find(u => u.userId.value === username) ?? null;
+      return new Promise((resolve) => {
+        this.myUser = this.users.find(u => u.userId.value === username) ?? null;
+        resolve(true);
+      })
     },
     async updateUsers(updatedUser: EditableUser) {
       this.usersLoading = true;
@@ -354,7 +358,7 @@ export const useSettingsStore = defineStore({
       }
       this.prioritiesLoading = false;
     },
-    async updateMyUser(updatedUser: { userId: string, newPreferredEmailLcid: string, newRole?: number }) {
+    async updateMyUser(updatedUser: EditUserRequest) {
       this.usersLoading = true;
       const { $api } = useNuxtApp();
       let resp = await $api.user.edit(updatedUser);

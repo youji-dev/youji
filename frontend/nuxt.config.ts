@@ -6,6 +6,32 @@ export default defineNuxtConfig({
     server: true,
     client: true,
   },
+  app: {
+    head: {
+      title:
+        "Youji - Hausmeister Ticketing System der Industrieschule Chemnitz",
+      link: [
+        {
+          rel: "apple-touch-icon",
+          sizes: "180x180",
+          href: "/apple-touch-icon.png",
+        },
+        {
+          rel: "icon",
+          type: "image/png",
+          sizes: "32x32",
+          href: "/favicon-32x32.png",
+        },
+        {
+          rel: "icon",
+          type: "image/png",
+          sizes: "16x16",
+          href: "/favicon-16x16.png",
+        },
+        { rel: "manifest", href: "/site.webmanifest" },
+      ],
+    },
+  },
   routeRules: {
     "**/login": { ssr: false },
   },
@@ -36,7 +62,7 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@nuxtjs/i18n",
     "@element-plus/nuxt",
-    "@unlazy/nuxt"
+    "@unlazy/nuxt",
   ],
   i18n: {
     strategy: "prefix",

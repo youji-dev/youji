@@ -366,9 +366,8 @@ export const useSettingsStore = defineStore({
         document
           .getElementById("usersettings")
           ?.dispatchEvent(new Event("updateFailed"));
-
-        this.usersLoading = false;
       }
+      this.usersLoading = false;
     },
   }
 });

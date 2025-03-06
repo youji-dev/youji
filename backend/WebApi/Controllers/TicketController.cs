@@ -449,6 +449,9 @@ namespace Application.WebApi.Controllers
             ticket.Object = ticketData.Object ?? ticket.Object;
             ticket.Room = ticketData.Room ?? ticket.Room;
 
+            if (ticket.Equals(oldTicket))
+                return this.NoContent();
+
             await ticketRepo.UpdateAsync(ticket);
 
             var mailRecipientIds = ticketRepo.GetInvolvedUsersIds(ticket, [userClaim]);

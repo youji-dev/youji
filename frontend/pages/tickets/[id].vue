@@ -297,15 +297,19 @@ async function saveTicketChanges() {
         throw new Error(i18n.t("error"));
       }
     }
-
-    if (ticketResult.data.value) {
+    else {
       ElMessage({
         message: i18n.t("saved"),
         type: "success",
         duration: 5000,
       });
-      ticketModel.value = ticketResult.data.value;
+
+      // no data is returned when nothing was changed
+      if (ticketResult.data.value) {
+        ticketModel.value = ticketResult.data.value;
+      }
     }
+
   } catch (error) {
     ElNotification({
       title: i18n.t("error"),

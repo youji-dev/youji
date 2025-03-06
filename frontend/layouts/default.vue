@@ -27,19 +27,17 @@ async function getOpenTicketCount(): Promise<number | null> {
   const filter: Record<string, any[]> = {};
 
   if (statusOptions.value.some((state) => state.hasAutoPurge)) {
-    filter.State = statusOptions.value
-      .filter((x) => !x.hasAutoPurge)
-      .map((x) => x.id);
+    filter.State = statusOptions.value.filter((x) => !x.hasAutoPurge).map((x) => x.id);
   }
 
-  var result = await $api.ticket.search(
-    filter,
-    "CreationDate",
-    false,
-    0,
-    0,
-    true
-  );
+  var result = await $api.ticket.search({
+    filters: filter,
+    orderByColumn: "CreationDate",
+    orderDesc: false,
+    skip: 0,
+    take: 0,
+    useOr: true,
+  });
 
   if (result.data.value == null) return null;
 

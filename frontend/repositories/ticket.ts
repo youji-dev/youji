@@ -4,6 +4,7 @@ import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse
 import type ticketComment from "~/types/api/response/ticketCommentResponse";
 import type EditTicketRequest from "~/types/api/request/editTicket";
 import type searchResponse from "~/types/api/response/searchResponse";
+import type SearchTicketsRequest from "~/types/api/request/searchTickets";
 
 class TicketRepository {
   private path = "/api/Ticket";
@@ -17,24 +18,12 @@ class TicketRepository {
   }
 
   async search(
-    filters: Record<string, any[]>,
-    orderByColumn?: string,
-    orderDesc?: boolean,
-    skip?: number,
-    take?: number,
-    useOr?: boolean
+    state: SearchTicketsRequest
   ): Promise<ReturnType<typeof useFetchAuthenticated<searchResponse>>> {
     return useFetchAuthenticated<searchResponse>(`${this.path}/search`, {
       method: "POST",
-      body: {
-        filters,
-        orderByColumn,
-        orderDesc,
-        skip,
-        take,
-        useOr,
-      },
-      key: JSON.stringify({ filters, orderByColumn, orderDesc, skip, take }),
+      body: state,
+      key: JSON.stringify({ filters: state.filters, orderByColumn: state.orderByColumn, orderDesc: state.orderDesc, skip: state.skip, take: state.take }),
     });
   }
 

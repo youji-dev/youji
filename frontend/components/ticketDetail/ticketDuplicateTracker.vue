@@ -268,12 +268,14 @@ async function searchForTickets(): Promise<void> {
   }
 
   var response = await $api.ticket.search(
-    ticketFilter,
-    "creationDate",
-    true,
-    0,
-    15,
-    true
+    {
+      filters: ticketFilter,
+    orderByColumn: "creationDate",
+    orderDesc: true,
+    skip: 0,
+    take: 15,
+    useOr: true
+    }
   );
 
   if (response.data.value == null) {

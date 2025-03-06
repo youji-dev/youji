@@ -31,7 +31,7 @@
           </div>
           <el-menu-item
             index="1"
-            @click="router.push(localeRoute('/tickets')?.fullPath as string)"
+            @click="router.push(localeRoute('/tickets')?.fullPath as string); drawer = !drawer;"
           >
             <el-icon>
               <Files />
@@ -50,7 +50,7 @@
             index="2"
             class="menu-item"
             @click="
-              router.push(localeRoute('/tickets/new')?.fullPath as string)
+              router.push(localeRoute('/tickets/new')?.fullPath as string); drawer = !drawer;
             "
           >
             <el-icon>
@@ -63,7 +63,7 @@
           <el-divider></el-divider>
           <el-menu-item
             class="menu-item"
-            @click="router.push(localeRoute('/logout')?.fullPath as string)"
+            @click="router.push(localeRoute('/logout')?.fullPath as string); drawer = !drawer;"
           >
             <el-icon class="-rotate-90" color="#EF4444">
               <Upload />
@@ -73,7 +73,7 @@
           <el-menu-item
             class="menu-item"
             index="3"
-            @click="router.push(localeRoute('/settings')?.fullPath as string)"
+            @click="router.push(localeRoute('/settings')?.fullPath as string); drawer = !drawer;"
           >
             <el-icon class="-rotate-90">
               <Setting />

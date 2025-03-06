@@ -3,44 +3,46 @@ services:
     container_name: Youji_Database
     image: postgres:latest
     hostname: database
-    restart: always
+    restart: unless-stopped
     networks:
       - database
     volumes:
       - database:/var/lib/postgresql/data
+      - ./dockerfiles/demo.sql:/docker-entrypoint-initdb.d/youji.sql
     env_file: .env
     healthcheck:
-      interval: 5s
+      interval: 6s
       retries: 5
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      timeout: 5s
+      timeout: 6s
 
   youji-backend:
     container_name: Youji-Backend
-    image: youji/backend:latest
-    build: ./backend
-    restart: always
+    image: ghcr.io/youji-dev/youji-backend:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
     depends_on:
       database:
         condition: service_healthy
+      dev-mail:
+        condition: service_started
     networks:
       - database
+      - mail
     volumes:
-      - ./backend/WebApi/appsettings.json:/App/appsettings.json
-    ports:
-      - "8123:5003"
+      - ./dockerfiles/backend.appsettings.json:/App/appsettings.json
 
   youji-frontend:
     container_name: Youji-Frontend
-    image: youji/frontend:latest
-    build: ./frontend
+    image: ghcr.io/youji-dev/youji-frontend:latest
+    ports:
+      - "3000:3000"
     depends_on:
       - youji-backend
-    restart: always
+    restart: unless-stopped
     environment:
-      - NUXT_PUBLIC_BACKEND_URL=https://YOUR-PUBLIC-API-HOST
-    ports:
-      - "80:80"
+      - NUXT_PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL}
 
 networks:
   database:

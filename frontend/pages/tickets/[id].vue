@@ -1,7 +1,12 @@
 <template>
-  <div
+  <el-form
     class="mt-20 lg:mt-5 max-h-[92vh] overflow-y-clip"
     :style="{ width: width }"
+    label-position="top"
+    ref="ticketFormInstance"
+    :model="ticketModel"
+    :rules="ticketFormRules"
+    status-icon
   >
     <div v-loading="loading" v-if="!is404 && ticketModel" class="px-5 pb-3">
       <TicketHeader
@@ -20,12 +25,13 @@
         :element-loading-text="loadingText"
       >
         <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
-          <el-text>{{ $t("title") }}</el-text>
-          <el-input
-            v-model="ticketModel.title"
-            :placeholder="$t('enter')"
-            class="drop-shadow-md dark:base-bg-dark"
-          />
+          <el-form-item :label="$t('title')" prop="title">
+            <el-input
+              v-model="ticketModel.title"
+              :placeholder="$t('enter')"
+              class="drop-shadow-md dark:base-bg-dark"
+            />
+          </el-form-item>
         </div>
 
         <DropdownGroup
@@ -33,17 +39,20 @@
           class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start"
         />
 
-        <div class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4">
-          <el-text>{{ $t("description") }}</el-text>
+        <el-form-item
+          class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4"
+          :label="$t('description')"
+          prop="description"
+        >
           <el-input
             v-model="ticketModel.description"
             type="textarea"
             class="drop-shadow-md max-h-full dark:base-bg-dark"
-            :rows="15"
+            :rows="13"
             resize="vertical"
             :placeholder="$t('enter')"
           />
-        </div>
+        </el-form-item>
 
         <div
           v-if="!isNew"
@@ -128,12 +137,12 @@
         <el-button
           class="text-sm justify-self-end drop-shadow-md"
           type="primary"
-          @click="isNew ? createTicket() : saveTicketChanges()"
+          @click="onSaveClick()"
           >{{ $t("save") }}</el-button
         >
       </div>
     </div>
-  </div>
+  </el-form>
   <el-dialog v-model="imagePreviewDisplay">
     <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
   </el-dialog>
@@ -151,6 +160,8 @@
 
 <script lang="ts" setup async>
 import { Printer } from "@element-plus/icons-vue";
+import type { FormInstance, FormRules } from "element-plus";
+
 import type building from "~/types/api/response/buildingResponse";
 import type priority from "~/types/api/response/priorityResponse";
 import type state from "~/types/api/response/stateResponse";
@@ -166,6 +177,7 @@ import TicketCommentCollection from "~/components/ticketDetail/ticketCommentColl
 import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
 import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
 import TicketDuplicateTracker from "~/components/ticketDetail/ticketDuplicateTracker.vue";
+
 const { $api } = useNuxtApp();
 const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
 const i18n = useI18n();
@@ -187,7 +199,29 @@ let deleteDialog = ref(false);
 let availableStates: Ref<state[]> = ref([] as state[]);
 let availablePriorities: Ref<priority[]> = ref([] as priority[]);
 let availableBuildings: Ref<building[]> = ref([] as building[]);
+
+let ticketFormInstance = ref<FormInstance>();
 let ticketModel: Ref<ticket | null> = ref(null);
+const ticketFormRules = reactive<FormRules<ticket>>({
+  title: [
+    { required: true, message: i18n.t("titleRequired"), trigger: "blur" },
+  ],
+  state: [
+    { required: true, message: i18n.t("stateRequired"), trigger: "blur" },
+    {
+      validator: (rule: any, value: any, callback: any) => {
+        if (!canUserChangeStateCheck() && !ticketModel.value?.state.isDefault) {
+          callback(new Error(i18n.t("defaultStateForced")));
+        } else {
+          callback();
+        }
+      },
+    },
+  ],
+  priority: [
+    { required: true, message: i18n.t("priorityRequired"), trigger: "blur" },
+  ],
+});
 
 onNuxtReady(async () => {
   await Promise.all([
@@ -206,8 +240,7 @@ onNuxtReady(async () => {
       const defaultState = availableStates.value.find(
         (state) => state.isDefault
       );
-      const canUserChangeState =
-        isUserAdmin.value || isUserFacilityManager.value || !defaultState;
+      const canUserChangeState = canUserChangeStateCheck();
       if (isNew.value && !canUserChangeState && defaultState) {
         ticketModel.value!.state = defaultState;
       }
@@ -229,6 +262,22 @@ onNuxtReady(async () => {
   determineViewWidth();
   window.addEventListener("resize", determineViewWidth);
 });
+
+const defaultStateValidator = (rule: any, value: any, callback: any) => {
+  if (!canUserChangeStateCheck() && ticketModel.value?.state.isDefault) {
+    callback(new Error(i18n.t("defaultStateForced")));
+  } else {
+    callback();
+  }
+};
+
+function canUserChangeStateCheck(): boolean {
+  const defaultState = availableStates.value.find((state) => state.isDefault);
+
+  const isUserPrivileged = isUserAdmin.value || isUserFacilityManager.value;
+
+  return isUserPrivileged || !defaultState;
+}
 
 async function fetchOrInitializeTicket(id: string): Promise<ticket> {
   if (id === "new") {
@@ -268,6 +317,24 @@ async function fetchOrInitializeTicket(id: string): Promise<ticket> {
     return await fetchOrInitializeTicket("new");
   }
   return ticketData;
+}
+
+async function onSaveClick() {
+  if (!ticketFormInstance.value) return;
+  await ticketFormInstance.value.validate(async (isValid) => {
+    if (!isValid) {
+      ElNotification({
+        title: i18n.t("error"),
+        message: i18n.t("formInvalid"),
+        type: "error",
+        duration: 5000,
+      });
+      return;
+    } else {
+      if (isNew.value) await createTicket();
+      else await saveTicketChanges();
+    }
+  });
 }
 
 async function saveTicketChanges() {

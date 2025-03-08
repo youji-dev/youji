@@ -1,7 +1,6 @@
 <template>
-  <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-1">
-    <div>
-      <el-text>{{ $t("state") }}</el-text>
+  <div class="grid lg:grid-cols-2 lg:grid-rows-4 gap-x-1">
+    <el-form-item :label="$t('state')" prop="state">
       <el-tooltip
         :content="$t('stateChangeNotAllowed')"
         placement="top"
@@ -41,9 +40,8 @@
           </template>
         </el-select>
       </el-tooltip>
-    </div>
-    <div>
-      <el-text>{{ $t("priority") }}</el-text>
+    </el-form-item>
+    <el-form-item :label="$t('priority')" prop="priority">
       <el-select
         v-model="ticket.priority"
         value-key="id"
@@ -76,9 +74,12 @@
           </div>
         </template>
       </el-select>
-    </div>
-    <div class="lg:col-span-full">
-      <el-text>{{ $t("building") }}</el-text>
+    </el-form-item>
+    <el-form-item
+      :label="$t('building')"
+      prop="building"
+      class="lg:col-span-full"
+    >
       <el-select
         v-model="ticket.building"
         class="drop-shadow-xl dark:base-bg-dark"
@@ -93,23 +94,21 @@
           :value="building"
         />
       </el-select>
-    </div>
-    <div class="lg:col-span-full">
-      <el-text>{{ $t("room") }}</el-text>
+    </el-form-item>
+    <el-form-item :label="$t('room')" prop="room" class="lg:col-span-full">
       <el-input
         v-model="ticket.room"
         class="drop-shadow-xl dark:base-bg-dark"
         :placeholder="$t('enter')"
       />
-    </div>
-    <div class="lg:col-span-full">
-      <el-text>{{ $t("object") }}</el-text>
+    </el-form-item>
+    <el-form-item :label="$t('object')" prop="object" class="lg:col-span-full">
       <el-input
         v-model="ticket.object"
         class="drop-shadow-xl dark:base-bg-dark"
         :placeholder="$t('enter')"
       />
-    </div>
+    </el-form-item>
   </div>
 </template>
 

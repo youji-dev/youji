@@ -110,7 +110,8 @@ export default defineI18nConfig(() => ({
       empty: "Empty",
       defaultStateNotUpdatable: "The default state cannot be updated",
       confirmDelete: "Delete?",
-      objectIsReferenced: "Object could not be deleted. Make sure that it is not used anywhere.",
+      objectIsReferenced:
+        "Object could not be deleted. Make sure that it is not used anywhere.",
       cancel: "Cancel",
       yes: "Yes",
       no: "No",
@@ -129,6 +130,11 @@ export default defineI18nConfig(() => ({
       noDuplicatesFound:
         "No similar tickets found. Your ticket is truly unique!",
       openInNewTab: "Open in new tab",
+      titleRequired: "Title is required",
+      stateRequired: "State is required",
+      defaultStateForced: "A default state is configured and cannot be changed",
+      priorityRequired: "Priority is required",
+      formInvalid: "The form is invalid",
     },
     "de-DE": {
       welcome: "Willkommen",
@@ -231,14 +237,16 @@ export default defineI18nConfig(() => ({
       deleteTicketDescription:
         "Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.",
       stateChangeNotAllowed:
-        "Du kannst den Status nicht ändern, weil ein Standardstatus festgelegt ist.",
+        "Sie können den Status nicht ändern, weil ein Standardstatus festgelegt ist.",
       default: "Standard",
       autoPurge: "Automatisch löschen",
       autoPurgeDays: "Löschen nach (Tage)",
       empty: "Leer",
-      defaultStateNotUpdatable: "Der Standardstatus kann nicht aktualisiert werden",
+      defaultStateNotUpdatable:
+        "Der Standardstatus kann nicht aktualisiert werden",
       confirmDelete: "Löschen?",
-      objectIsReferenced: "Objekt konnte nicht gelöscht werden. Stellen Sie sicher, dass es nicht mehr verwendet wird.",
+      objectIsReferenced:
+        "Objekt konnte nicht gelöscht werden. Stellen Sie sicher, dass es nicht mehr verwendet wird.",
       cancel: "Abbrechen",
       yes: "Ja",
       no: "Nein",
@@ -257,6 +265,12 @@ export default defineI18nConfig(() => ({
       noDuplicatesFound:
         "Keine Duplikate gefunden. Ihr Ticket ist warlich einzigartig!",
       openInNewTab: "In neuem neuen Tab öffnen",
+      titleRequired: "Titel ist ein Pflichtfeld",
+      stateRequired: "Status ist ein Pflichtfeld",
+      defaultStateForced:
+        "Da ein Standardstatus festgelegt ist, können sie diesen nicht ändern",
+      priorityRequired: "Priorität ist ein Pflichtfeld",
+      formInvalid: "Ihre Eingaben sind ungültig",
     },
   },
 }));

@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 ARG TARGETARCH
 WORKDIR /App
 
@@ -18,12 +18,14 @@ RUN dotnet ef migrations bundle --project "DataAccessLayer/PersistenceLayer.Data
 # Build runtime image
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
+ENV ASPNETCORE_HTTP_PORTS=80
 
 RUN apt-get update && apt-get install -y jq
 
 COPY --from=build-env /App/out .
 COPY --from=build-env /App/updateDatabase /App/updateDatabase
 COPY --from=build-env /App/docker-entrypoint.sh /App/docker-entrypoint.sh
-EXPOSE 8080
+EXPOSE 80
+
 ENTRYPOINT [ "sh" ]
 CMD ["/App/docker-entrypoint.sh"]

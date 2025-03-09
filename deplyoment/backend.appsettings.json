@@ -1,0 +1,49 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=database;Database=<DATENBANK_NAME_HIER>;Username=<DATENBANK_NUTZER_HIER>;Password=<DATENBANK_PASSWORT_HIER>"
+  },
+  "DevAuth": false,
+  "JWTKey": "<JWT SIGNATURE SCHLÜSSEL HIER>",
+  "SessionLifeTime": 720,
+  "LDAP": {
+    "Host": "<LDAP HOST>",
+    "Port": "<LDAP PORT>",
+    "BaseDN": "<BASE DN>",
+    "EMailAttributeName": "<EMAIL ATTRIBUTE userPrincipalName>"
+  },
+  "CORS": {
+    "AllowedOrigins": [
+      "<LISTE AUS ALLE ZULASSIGEN ORIGINEN>"
+    ],
+    "AllowedHeaders": [
+      "Authorization",
+      "content-type"
+    ],
+    "AllowedMethods": [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE"
+    ]
+  },
+  "Mail": {
+    "SenderName": "<Email Absender Anzeigename>",
+    "SenderAddress": "<Email Absender Adresse>",
+    "SmtpAddress": "<SMTP SERVER ADRESSE>",
+    "SmtpPort": <SMTP PORT HIER>,
+    "UseSsl": <VERWENDET SMPT SERVER SSL>,
+    "SubjectFormat": "<FORMAT DER EMAIL SUBJEKT>",
+    "SmtpUser": "<SMTP LOGIN USER>",
+    "SmtpPassword": "<SMTP LOGIN PASSWORT>"
+  },
+  "Images": {
+    "UnrenderableMimeTypes": "image/svg+xml"
+  }
+}

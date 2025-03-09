@@ -389,6 +389,7 @@ namespace Application.WebApi.Controllers
         /// <returns>An <see cref="ObjectResult"/> with the updated ticket.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         [AuthorizeRoles(Roles.Teacher | Roles.FacilityManager | Roles.Admin)]
@@ -448,6 +449,9 @@ namespace Application.WebApi.Controllers
             ticket.Priority = priority ?? ticket.Priority;
             ticket.Object = ticketData.Object ?? ticket.Object;
             ticket.Room = ticketData.Room ?? ticket.Room;
+
+            if (ticket.Equals(oldTicket))
+                return this.NoContent();
 
             await ticketRepo.UpdateAsync(ticket);
 

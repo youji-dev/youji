@@ -1,5 +1,5 @@
 <template>
-  <el-popover placement="top" :width="100" trigger="click">
+  <el-popover placement="top" :width="100" trigger="click" ref="popover">
     <div
       v-for="availLocale in availableLocales"
       @click="switchLocale(availLocale.code)"
@@ -17,7 +17,8 @@
         <Icon
           name="material-symbols:language"
           :style="{
-            backgroundColor: colorMode.value === 'light' ? TEXT_LIGHT : TEXT_DARK,
+            backgroundColor:
+              colorMode.value === 'light' ? TEXT_LIGHT : TEXT_DARK,
           }"
         />
       </el-button>
@@ -31,12 +32,18 @@ const colorMode = useColorMode();
 const {
   public: { TEXT_LIGHT, TEXT_DARK },
 } = useRuntimeConfig();
+
 const availableLocales = computed(() => {
   return locales.value;
 });
 const { myUser } = storeToRefs(useSettingsStore());
 const { updateMyUser, fetchUsers, fetchMyUser } = useSettingsStore();
+const popover = ref();
 const switchLocale = async (localeKey: string) => {
+  if (popover.value) {
+    popover.value.hide();
+  }
+
   if (myUser.value === null) return;
   await updateMyUser({
     userId: myUser.value.userId.value,

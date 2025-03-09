@@ -8,7 +8,6 @@ services:
       - database
     volumes:
       - database:/var/lib/postgresql/data
-      - ./dockerfiles/demo.sql:/docker-entrypoint-initdb.d/youji.sql
     env_file: .env
     healthcheck:
       interval: 6s
@@ -28,6 +27,7 @@ services:
       dev-mail:
         condition: service_started
     networks:
+      - default
       - database
       - mail
     volumes:
@@ -38,6 +38,8 @@ services:
     image: ghcr.io/youji-dev/youji-frontend:latest
     ports:
       - "3000:3000"
+    networks:
+      - default
     depends_on:
       - youji-backend
     restart: unless-stopped
@@ -45,6 +47,8 @@ services:
       - NUXT_PUBLIC_BACKEND_URL=${PUBLIC_BACKEND_URL}
 
 networks:
+  default:
+    driver: bridge
   database:
     internal: true
 

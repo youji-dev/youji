@@ -88,7 +88,7 @@ In den folgenden Dateien des `deployment` Verzeichnisses müssen folgende Konfig
 | Images.UnrenderableMimeTypes          | Nicht darstellbare Bildformate. Für diese Formate wird kein BlurHash generiert und im Frontend keine Bilddarstellung angezeigt | string   | "image/svg+xml"                                                          |
 
 > [!CAUTION]
-> Der Wert `DevAuth` sollte in Produktiv Umgebungen **IMMER** auf `false` sein. Ist dieser Aktiv werden Login Mechaniken effektiv ausgehebelt. Dann ist ein Login mit einem beliebigen Nutzer und Passwort immer möglich. Nicht bekannte Nutzer werden angelegt
+> Der Wert `DevAuth` sollte in Produktiv Umgebungen **IMMER** auf `false` sein. Ist dieser aktiv werden Login Mechaniken effektiv ausgehebelt. Dann ist ein Login mit einem beliebigen Nutzer und Passwort immer möglich. Nicht bekannte Nutzer werden angelegt
 
 > [!TIP]
 > Für die Generierung des `JWTKey` kann [jwtsecret](https://jwtsecret.com/generate) verwendet werden.

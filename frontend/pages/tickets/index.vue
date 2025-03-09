@@ -63,7 +63,7 @@
           class="hidden lg:block"
           prop="author"
           filter-class-name="Author"
-          :label="$t('username')"
+          :label="$t('createdBy')"
           width="150"
           show-overflow-tooltip
           sortable

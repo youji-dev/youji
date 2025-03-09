@@ -13,8 +13,7 @@
       <el-table
         v-else
         :data="ticketSearchResult"
-        class="h-full w-full overflow-x-scroll"
-        :fit="true"
+        class="w-full overflow-x-scroll"
         :height="tableDimensions.height"
         @row-dblclick="(row: any, column: any, event: Event) => {
         openInNewTab(localeRoute(`/tickets/${row.id}`)?.fullPath as string) }"
@@ -24,20 +23,20 @@
           prop="title"
           filter-class-name="Title"
           :label="$t('title')"
-          :width="tableDimensions.width / 6"
+          min-width="250"
           show-overflow-tooltip
         />
         <el-table-column
           class="hidden lg:block"
           prop="state.name"
           :label="$t('status')"
-          :width="tableDimensions.width / 6"
+          width="200"
         >
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
                 :options="
-                  statusOptions.map((opt) => {
+                  statusOptions.map((opt: state) => {
                     return new ColoredSelectOption(opt, opt.color);
                   })
                 "
@@ -59,25 +58,25 @@
           class="hidden lg:block"
           prop="building.name"
           :label="$t('building')"
-          :width="tableDimensions.width / 6"
+          width="150"
         />
         <el-table-column
           class="hidden lg:block"
           prop="room"
           :label="$t('room')"
-          :width="tableDimensions.width / 6"
+          width="100"
         />
         <el-table-column
           class="hidden lg:block"
           prop="priority.name"
           :label="$t('priority')"
-          :width="tableDimensions.width / 6"
+          width="200"
         >
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
                 :options="
-                  priorityOptions.map((opt) => {
+                  priorityOptions.map((opt: priority) => {
                     return new ColoredSelectOption(opt, opt.color);
                   })
                 "
@@ -95,11 +94,11 @@
             </div>
           </template>
         </el-table-column>
+        <el-table-column prop="author" :label="$t('createdBy')" width="150" />
         <el-table-column
-          class="hidden lg:block"
           prop="creationDate"
           :label="$t('createDate')"
-          :width="tableDimensions.width / 6"
+          width="200"
         >
           <template #default="scope">
             <p>{{ new Date(scope.row.creationDate).toLocaleString() }}</p>
@@ -125,6 +124,8 @@
 <script lang="tsx" setup>
 import { vResizeObserver } from "@vueuse/components";
 import ColoredSelect from "~/components/coloredSelect.vue";
+import type priority from "~/types/api/response/priorityResponse";
+import type state from "~/types/api/response/stateResponse";
 import type ticket from "~/types/api/response/ticketResponse";
 import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
 
@@ -273,7 +274,7 @@ async function searchForTickets(): Promise<void> {
 function onResize(entries: ResizeObserverEntry[]): void {
   const entry = entries[0];
   const { width, height } = entry.contentRect;
-  tableDimensions.value = { width: width - 100, height };
+  tableDimensions.value = { width: width - 100, height: height - 10 };
 }
 
 function openInNewTab(url: string) {

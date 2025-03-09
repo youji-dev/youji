@@ -8,15 +8,27 @@
         class="my-3 lg:my-1"
         max-height="200"
         style="width: 100%"
-        :default-sort="{ prop: 'name[value]', order: 'descending' }"
+        :default-sort="{ prop: 'value[value]', order: 'descending' }"
         v-loading="prioritiesLoading"
         @cell-dblclick="(row, column) => handleCellClick(row, column, priorities)"
       >
-        <TableEditableColumn
-          prop="value"
-          :label="$t('priority')"
-          :save-callback="updatePriorities"
-        />
+        <el-table-column prop="value[value]" :label="$t('priority')">
+          <template #default="{ row, index }">
+            <div class="flex items-center justify-around">
+              <span v-if="!row.new" class="caret-wrapper"
+                ><i
+                  class="sort-caret ascending"
+                  @click="increasePriorityValue(row.id.value)"
+                ></i
+                ><i
+                  class="sort-caret descending"
+                  @click="decreasePriorityValue(row.id.value)"
+                ></i
+              ></span>
+              <h1 class="text-sm px-3">{{ row.value.value }}</h1>
+            </div>
+          </template>
+        </el-table-column>
         <TableEditableColumn
           prop="name"
           :label="$t('name')"
@@ -135,14 +147,6 @@
     </div>
     <div class="">
       <h1 class="text-sm">{{ $t("manageUsers") }}</h1>
-      <!-- <label for="select-fms" class="text-xs m-0 py-3">{{
-        $t("selectFms")
-      }}</label>
-      <el-select id="select-fms" multiple></el-select>
-      <label for="select-admins" class="text-xs m-0 py-3">{{
-        $t("selectAdmins")
-      }}</label>
-      <el-select id="select-admins" multiple></el-select> -->
       <el-table
         :data="users"
         border
@@ -312,10 +316,13 @@ const {
 const {
   updateBuildings,
   updatePriorities,
+  fetchPriorities,
   updateStates,
   updateUsers,
 } = useSettingsStore();
-const loading = ref((usersLoading || prioritiesLoading || buildingsLoading || statesLoading));
+const loading = ref(
+  usersLoading || prioritiesLoading || buildingsLoading || statesLoading
+);
 onNuxtReady(async () => {
   document
     .getElementById("globalsettings")
@@ -333,7 +340,7 @@ onNuxtReady(async () => {
         message: i18n.t("objectIsReferenced"),
       });
     });
-    document
+  document
     .getElementById("globalsettings")
     ?.addEventListener("onlyOneDefaultState", () => {
       ElMessage({
@@ -341,22 +348,18 @@ onNuxtReady(async () => {
         message: i18n.t("onlyOneDefaultState"),
       });
     });
-    document
-    .getElementById("globalsettings")
-    ?.addEventListener("updateFailed", () => {
-      ElMessage({
-        type: "warning",
-        message: i18n.t("updateFailed"),
-      });
+  document.getElementById("globalsettings")?.addEventListener("updateFailed", () => {
+    ElMessage({
+      type: "warning",
+      message: i18n.t("updateFailed"),
     });
-    document
-    .getElementById("globalsettings")
-    ?.addEventListener("saved", () => {
-      ElMessage({
-        type: "success",
-        message: i18n.t("saved"),
-      });
+  });
+  document.getElementById("globalsettings")?.addEventListener("saved", () => {
+    ElMessage({
+      type: "success",
+      message: i18n.t("saved"),
     });
+  });
 });
 
 function addEmptyPriority() {
@@ -365,12 +368,12 @@ function addEmptyPriority() {
     // We initialize the id with a date in order to identify multiple new objects in the frontend before it's saved. Will be overwritten later.
     id: { editing: false, value: new Date().toString() },
     name: { editing: false, value: "" },
-    value: { editing: false, value: 0 },
+    value: { editing: false, value: findNewPriorityNo() },
     new: true,
   });
-  setTimeout(() => {
-    scrollToBottom("priorities");
-  }, 250);
+  // setTimeout(() => {
+  //   scrollToBottom("priorities");
+  // }, 250);
 }
 
 function addEmptyBuilding() {
@@ -416,6 +419,66 @@ const scrollToBottom = (
     }
   });
 };
+
+async function decreasePriorityValue(priorityId: string) {
+  const { thisPrioIndex, lowerPrioIndex } = findPriorityAndAround(priorityId);
+  if (lowerPrioIndex === null) return;
+  if (thisPrioIndex !== null) {
+    let updatedThisPrio = priorities.value[thisPrioIndex];
+    let updatedLowerPrio = priorities.value[lowerPrioIndex];
+    updatedThisPrio.value.value--;
+    updatedLowerPrio.value.value++;
+    await updatePriorities(updatedThisPrio, "U");
+    await updatePriorities(updatedLowerPrio, "U");
+    await fetchPriorities();
+  }
+}
+
+async function increasePriorityValue(priorityId: string) {
+  const { thisPrioIndex, higherPrioIndex } = findPriorityAndAround(priorityId);
+  if (higherPrioIndex === null) return;
+  if (thisPrioIndex !== null) {
+    let updatedThisPrio = priorities.value[thisPrioIndex];
+    let updatedHigherPrio = priorities.value[higherPrioIndex];
+    updatedThisPrio.value.value++;
+    updatedHigherPrio.value.value--;
+    await updatePriorities(updatedThisPrio, "U");
+    await updatePriorities(updatedHigherPrio, "U");
+    await fetchPriorities();
+  }
+}
+
+function findPriorityAndAround(
+  priorityId: string
+): {
+  thisPrioIndex: number | null;
+  lowerPrioIndex: number | null;
+  higherPrioIndex: number | null;
+} {
+  let higherPrio = null;
+  let lowerPrio = null;
+  let thisPrio = null;
+  priorities.value.forEach((p, index) => {
+    if (p.id.value === priorityId) {
+      thisPrio = index;
+      lowerPrio = typeof priorities.value[index - 1] !== undefined ? index - 1 : null;
+      higherPrio = typeof priorities.value[index + 1] !== undefined ? index + 1 : null;
+      return;
+    }
+  });
+  return {
+    thisPrioIndex: thisPrio,
+    higherPrioIndex: higherPrio,
+    lowerPrioIndex: lowerPrio,
+  };
+}
+function findNewPriorityNo() {
+  let highest = 0;
+  priorities.value.forEach((p) => {
+    if (p.value.value > highest) highest = p.value.value;
+  });
+  return highest + 1;
+}
 </script>
 
 <style></style>

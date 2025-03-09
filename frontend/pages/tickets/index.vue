@@ -133,7 +133,7 @@
           prop="priority.name"
           filter-class-name="Priority"
           :label="$t('priority')"
-          :filters="priorityOptions.map((opt: priority) => { return { text: opt.name, value: opt.id } })"
+          :filters="priorityOptionsSorted.map((opt: priority) => { return { text: opt.name, value: opt.id } })"
           :filter-method="filterTag"
           filter-placement="bottom-end"
           width="200"
@@ -152,7 +152,7 @@
                   )
                 "
                 :options="
-                  priorityOptions.map((opt) => {
+                  priorityOptionsSorted.map((opt) => {
                     return new ColoredSelectOption(opt, opt.color);
                   })
                 "
@@ -285,6 +285,11 @@ const tableDimensions = ref({
   width: 0,
   height: 0,
 });
+let priorityOptionsSorted = computed(() =>
+  priorityOptions.value.sort(
+    (prioA: priority, prioB: priority) => prioB.value - prioA.value
+  )
+);
 
 onMounted(async () => {
   getTableDimensions();

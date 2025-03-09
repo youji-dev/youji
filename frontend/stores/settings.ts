@@ -101,7 +101,7 @@ export const useSettingsStore = defineStore({
             name: { editing: false, value: p.name },
             value: { editing: false, value: p.value },
           } as EditablePriority)
-        );
+        ).sort((a, b) => a.value.value - b.value.value);
       }
     },
     async fetchStates() {

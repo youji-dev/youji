@@ -1,7 +1,7 @@
 <!-- Für eine angenehmere Darstellung dieser Datei kann https://github.com/youji-dev/youji aufgerufen werden -->
 
 ![Youji Banner Dark](./resources/ReadmeBannerDark.png#gh-dark-mode-only)
-![Youji Banner Dark](./resources/ReadmeBannerLight.png#gh-light-mode-only)
+![Youji Banner Light](./resources/ReadmeBannerLight.png#gh-light-mode-only)
 
 # Youji
 

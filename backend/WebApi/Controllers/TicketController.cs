@@ -6,7 +6,6 @@ using PersistenceLayer.DataAccess.Entities;
 using PersistenceLayer.DataAccess.Repositories;
 using System.Collections.ObjectModel;
 using System.Linq.Expressions;
-using System.Reflection;
 using System.Security.Claims;
 using Application.WebApi.Contracts.Request;
 using Application.WebApi.Decorators;
@@ -15,8 +14,6 @@ using Application.WebApi.Contracts.Response;
 using Common.Enums;
 using DomainLayer.BusinessLogic.Mailing;
 using LinqKit;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using MimeKit;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 
@@ -421,8 +418,8 @@ namespace Application.WebApi.Controllers
                 && !role.HasFlag(Roles.Admin))
                 return this.Forbid();
 
-            var ticketState = ticket.State;
-            var defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
+            State ticketState = ticket.State;
+            State? defaultState = stateRepo.Find(state => state.IsDefault).FirstOrDefault();
 
             // Restrict users from changing the state if there is a default state and the user is not a facility manager or admin
             if (!role.HasFlag(Roles.FacilityManager)
@@ -430,6 +427,8 @@ namespace Application.WebApi.Controllers
                 && defaultState is not null
                 && !ticket.State.Id.Equals(ticketData.StateId))
                 return this.Forbid();
+
+            State? state = await stateRepo.GetAsync(ticketData.StateId);
 
             Building? building = ticketData.BuildingId is null
                 ? null
@@ -441,7 +440,7 @@ namespace Application.WebApi.Controllers
 
             ticket.Title = ticketData.Title ?? ticket.Title;
             ticket.Description = ticketData.Description ?? ticket.Description;
-            ticket.State = ticketState;
+            ticket.State = state ?? ticket.State;
             ticket.LastStateUpdate = !ticketState.Id.Equals(ticket.State.Id)
                 ? DateTime.UtcNow
                 : ticket.LastStateUpdate.ToUniversalTime();

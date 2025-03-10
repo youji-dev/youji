@@ -166,7 +166,7 @@ export const useSettingsStore = defineStore({
     async updateUsers(updatedUser: EditableUser) {
       this.usersLoading = true;
       const { $api } = useNuxtApp();
-      const {isUserAdmin} = useAuthStore();
+      const { isUserAdmin, username } = useAuthStore();
       let userObj = {
         userId: updatedUser.userId.value,
         newPreferredEmailLcid: updatedUser.preferredEmailLcid.value,
@@ -182,6 +182,11 @@ export const useSettingsStore = defineStore({
       }
       await this.fetchUsers();
       this.usersLoading = false;
+      if (username === updatedUser.userId.value) {
+        document
+          .getElementById("globalsettings")
+          ?.dispatchEvent(new Event("ownRoleChanged"));
+      }
     },
     async updateBuildings(
       updatedBuilding: EditableBuilding,

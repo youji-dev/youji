@@ -391,8 +391,8 @@ function findPriorityAndAround(
   priorities.value.forEach((p, index) => {
     if (p.id.value === priorityId) {
       thisPrio = index;
-      lowerPrio = typeof priorities.value[index - 1] !== undefined ? index - 1 : null;
-      higherPrio = typeof priorities.value[index + 1] !== undefined ? index + 1 : null;
+      lowerPrio = typeof priorities.value[index - 1] !== 'undefined' ? index - 1 : null;
+      higherPrio = typeof priorities.value[index + 1] !== 'undefined' ? index + 1 : null;
       return;
     }
   });

@@ -121,6 +121,8 @@ export default defineI18nConfig(() => ({
       defaultStateForced: "A default state is configured and cannot be changed",
       priorityRequired: "Priority is required",
       formInvalid: "The form is invalid",
+      ownPermissingChangeWarningTitle: "Change your own permission?",
+      ownPermissingChangeWarningDescription: "Warning! You have just changed your own role. Until you log out or your session is extended in the background, you will retain the access rights you had at login. You can revert this change.",
     },
     "de-DE": {
       username: "Benutzername",
@@ -243,6 +245,8 @@ export default defineI18nConfig(() => ({
         "Da ein Standardstatus festgelegt ist, können sie diesen nicht ändern",
       priorityRequired: "Priorität ist ein Pflichtfeld",
       formInvalid: "Ihre Eingaben sind ungültig",
+      ownPermissingChangeWarningTitle: "Die eigenen Berechtigungen ändern?",
+      ownPermissingChangeWarningDescription: "Warnung! Sie haben soeben Ihre eigene Rolle geändert. Bis Sie sich abmelden oder Ihre Sitzung im Hintergrund verlängert wird, behalten Sie die Zugriffsrechte, die Sie beim Anmelden hatten. Sie können diese Änderung rückgängig machen.",
     },
   },
 }));

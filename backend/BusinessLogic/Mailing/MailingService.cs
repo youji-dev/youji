@@ -55,7 +55,10 @@ namespace DomainLayer.BusinessLogic.Mailing
                 string language = recipient.PreferredLcid ?? "en-EN";
 
                 if (localizerResourceStream is not null)
+                {
+                    localizerResourceStream.Position = 0;
                     localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(language));
+                }
 
                 MimeMessage message = new();
                 message.From.Add(senderMail);

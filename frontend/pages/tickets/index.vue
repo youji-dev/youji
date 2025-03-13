@@ -6,7 +6,7 @@
     :onresize="determineViewWidth()"
   >
     <div class="flex flex-row items-center justify-end w-full py-2">
-      <div class="w-1/2 flex justify-center items-center md:w-1/3 lg:w-1/5">
+      <div class="w-full sm:w-1/2 lg:w-1/3 xl:w-1/4 flex justify-center items-center ">
         <el-input
           v-model="search"
           class="w-full mr-1"

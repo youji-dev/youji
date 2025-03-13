@@ -80,9 +80,6 @@
           prop="state.name"
           filter-class-name="State"
           :label="$t('status')"
-          :filters="statusOptions.map((opt: state) => { return { text: opt.name, value: opt.id } })"
-          :filter-method="filterTag"
-          filter-placement="bottom-end"
           width="200"
           sortable
         >
@@ -133,9 +130,6 @@
           prop="priority.name"
           filter-class-name="Priority"
           :label="$t('priority')"
-          :filters="priorityOptionsSorted.map((opt: priority) => { return { text: opt.name, value: opt.id } })"
-          :filter-method="filterTag"
-          filter-placement="bottom-end"
           width="200"
           sortable
         >
@@ -503,14 +497,14 @@ function changeSort(sortData: { column: any; prop: string; order: any }) {
   sortCol.value = sortData.column.filterClassName;
   sortColProp.value = sortData.prop;
   sortDesc.value = sortData.order === "ascending" ? false : true;
-  searchLoading.value = true;
+  pageLoading.value = true;
   pageNumber.value = 1;
   fetchNewPage(1)
     .then(() => {
-      searchLoading.value = false;
+      pageLoading.value = false;
     })
     .catch((e) => {
-      searchLoading.value = false;
+      pageLoading.value = false;
       console.error(e);
     });
 }

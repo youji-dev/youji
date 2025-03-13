@@ -237,7 +237,7 @@ export default defineI18nConfig(() => ({
       updateFailed: "Update fehlgeschlagen",
       duplicateTickets: "Ähnliche Tickets",
       noDuplicatesFound:
-        "Keine Duplikate gefunden. Ihr Ticket ist warlich einzigartig!",
+        "Keine Duplikate gefunden. Ihr Ticket ist wahrlich einzigartig!",
       openInNewTab: "In neuem neuen Tab öffnen",
       titleRequired: "Titel ist ein Pflichtfeld",
       stateRequired: "Status ist ein Pflichtfeld",

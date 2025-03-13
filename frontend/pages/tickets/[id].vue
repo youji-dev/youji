@@ -1,6 +1,6 @@
 <template>
   <el-form
-    class="mt-20 lg:mt-5 max-h-[92vh] overflow-y-clip"
+    class="mt-20 lg:mt-5 max-h-full overflow-y-clip"
     :style="{ width: width }"
     label-position="top"
     ref="ticketFormInstance"
@@ -15,7 +15,7 @@
       ></TicketHeader>
     </div>
     <div
-      class="overflow-y-auto px-5 max-h-[75vh] md:max-h-[82vh]"
+      class="overflow-y-auto px-5 max-h-[84vh] md:max-h-[88vh]"
       :style="{ width: width }"
     >
       <div
@@ -81,10 +81,11 @@
         />
 
         <div
+          v-if="isNew"
           class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3"
         >
           <el-text>{{ $t("duplicateTickets") }}</el-text>
-          <TicketDuplicateTracker v-if="isNew" :ticket="ticketModel" />
+          <TicketDuplicateTracker :ticket="ticketModel" />
         </div>
       </div>
       <div v-if="is404" class="h-screen flex justify-center items-center">
@@ -101,7 +102,7 @@
       </div>
     </div>
     <div
-      class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7"
+      class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7 sticky bottom-0 page-bg-light dark:page-bg-dark"
     >
       <el-tooltip
         :disabled="!isNew"
@@ -363,8 +364,7 @@ async function saveTicketChanges() {
       } else {
         throw new Error(i18n.t("error"));
       }
-    }
-    else {
+    } else {
       ElMessage({
         message: i18n.t("saved"),
         type: "success",
@@ -376,7 +376,6 @@ async function saveTicketChanges() {
         ticketModel.value = ticketResult.data.value;
       }
     }
-
   } catch (error) {
     ElNotification({
       title: i18n.t("error"),

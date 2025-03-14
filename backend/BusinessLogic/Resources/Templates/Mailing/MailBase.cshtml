@@ -50,9 +50,9 @@
     }
 
     .content {
-        margin-top: 0.5rem;
-        margin-inline: 10ch;
-        max-width: 80ch;
+        margin: 1rem;
+        width: min(80ch, 100%);
+        justify-self: center;
     }
 
     .card-list {
@@ -83,5 +83,12 @@
 
     .icon {
         width: 2ch;
+    }
+
+    span.color-dot {
+        border-radius: 100%;
+        width: 0.8em;
+        height: 0.8em;
+        display: inline-block;
     }
 </style>

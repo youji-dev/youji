@@ -58,6 +58,18 @@ namespace DomainLayer.BusinessLogic.Mailing
         }
 
         /// <summary>
+        /// Generate a mail body for a new ticket
+        /// </summary>
+        /// <param name="newTicket">The new ticket</param>
+        /// <param name="localizer">Localizer for mail generation</param>
+        /// <returns>The generated mail body</returns>
+        public static MimeEntity GenerateNewTicketMail(Ticket newTicket, Localizer localizer)
+        {
+            NewTicketModel mailModel = NewTicketModel.FromTicket(newTicket, localizer);
+            return GenerateMail(mailModel);
+        }
+
+        /// <summary>
         /// Generate the mail body for a model
         /// </summary>
         /// <param name="mailModel">The model to use as a data provider</param>

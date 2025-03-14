@@ -21,38 +21,58 @@
 		<Value lang="de">Kommentar von</Value>
 	</Entry>
 	<Entry>
-		<Key>Title changed</Key>
-		<Value lang="en">Title changed</Value>
-		<Value lang="de">Titel geändert</Value>
+		<Key>changed</Key>
+		<Value lang="en">changed</Value>
+		<Value lang="de">geändert</Value>
 	</Entry>
 	<Entry>
-		<Key>Description changed</Key>
-		<Value lang="en">Description changed</Value>
-		<Value lang="de">Beschreibung geändert</Value>
+		<Key>Title</Key>
+		<Value lang="en">Title</Value>
+		<Value lang="de">Titel</Value>
 	</Entry>
 	<Entry>
-		<Key>Priority changed</Key>
-		<Value lang="en">Priority changed</Value>
-		<Value lang="de">Priorität geändert</Value>
+		<Key>Description</Key>
+		<Value lang="en">Description</Value>
+		<Value lang="de">Beschreibung</Value>
 	</Entry>
 	<Entry>
-		<Key>State changed</Key>
-		<Value lang="en">State changed</Value>
-		<Value lang="de">Status geändert</Value>
+		<Key>Priority</Key>
+		<Value lang="en">Priority</Value>
+		<Value lang="de">Priorität</Value>
 	</Entry>
 	<Entry>
-		<Key>Building changed</Key>
-		<Value lang="en">Building changed</Value>
-		<Value lang="de">Gebäude geändert</Value>
+		<Key>State</Key>
+		<Value lang="en">State</Value>
+		<Value lang="de">Status</Value>
 	</Entry>
 	<Entry>
-		<Key>Room changed</Key>
-		<Value lang="en">Room changed</Value>
-		<Value lang="de">Raum geändert</Value>
+		<Key>Building</Key>
+		<Value lang="en">Building</Value>
+		<Value lang="de">Gebäude</Value>
 	</Entry>
 	<Entry>
-		<Key>Affected object changed</Key>
-		<Value lang="en">Affected object changed</Value>
-		<Value lang="de">Betroffenes Objekt geändert</Value>
+		<Key>Room</Key>
+		<Value lang="en">Room</Value>
+		<Value lang="de">Raum</Value>
+	</Entry>
+	<Entry>
+		<Key>Affected object</Key>
+		<Value lang="en">Affected object</Value>
+		<Value lang="de">Betroffenes Objekt</Value>
+	</Entry>
+	<Entry>
+		<Key>New ticket: '{0}'</Key>
+		<Value lang="en">New ticket: '{0}'</Value>
+		<Value lang="de">Neues Ticket: '{0}'</Value>
+	</Entry>
+	<Entry>
+		<Key>Author</Key>
+		<Value lang="en">Author</Value>
+		<Value lang="de">Autor</Value>
+	</Entry>
+	<Entry>
+		<Key>Creation date</Key>
+		<Value lang="en">Creation date</Value>
+		<Value lang="de">Erstellungsdatum</Value>
 	</Entry>
 </I18N>

@@ -5,6 +5,7 @@ using Common.Extensions;
 using I18N.DotNet;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace DomainLayer.BusinessLogic.Mailing
@@ -12,7 +13,7 @@ namespace DomainLayer.BusinessLogic.Mailing
     /// <summary>
     /// Provides methods for mailing
     /// </summary>
-    public class MailingService(IConfiguration configuration)
+    public class MailingService(IConfiguration configuration, ILogger<MailingService> logger)
     {
         private readonly string mailSenderName = configuration.GetValueOrThrow("SenderName", ["Mail"]);
         private readonly string mailSenderAddress = configuration.GetValueOrThrow("SenderAddress", ["Mail"]);
@@ -31,28 +32,40 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="mailGenerator">A generator function that produces the mail body</param>
         /// <param name="subjectGenerator">A generator function that produces the mail subject</param>
         /// <returns>A Task representing the asynchronous operation</returns>
-        public async Task SendManyLocalized(
+        public async Task<bool> SendManyLocalized(
             IEnumerable<MailRecipient> recipients,
             Func<Localizer, MimeEntity> mailGenerator,
             Func<Localizer, string> subjectGenerator)
         {
             using SmtpClient client = new();
-            await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
 
-            if (this.mailServerAuthenticationUsername != string.Empty || this.mailServerAuthenticationPassword != string.Empty)
+            try
             {
-                await client.AuthenticateAsync(
-                    this.mailServerAuthenticationUsername,
-                    this.mailServerAuthenticationPassword);
+                await client.ConnectAsync(this.mailServerAddress, this.mailServerPort, this.useSsl);
+
+                if (this.mailServerAuthenticationUsername != string.Empty || this.mailServerAuthenticationPassword != string.Empty)
+                {
+                    await client.AuthenticateAsync(
+                        this.mailServerAuthenticationUsername,
+                        this.mailServerAuthenticationPassword);
+                }
             }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Could not connect to SMTP server while trying to send e-mails");
+                return false;
+            }
+
+            var senderMail = new MailboxAddress(this.mailSenderName, this.mailSenderAddress);
 
             Localizer localizer = new();
             using var localizerResourceStream = Assembly.GetExecutingAssembly().GetResource("Mailing.I18N.xml");
 
-            var senderMail = new MailboxAddress(this.mailSenderName, this.mailSenderAddress);
-            foreach (var recipient in recipients)
+            var localeGroups = recipients.GroupBy(r => r.PreferredLcid);
+
+            foreach (var localeGroup in localeGroups)
             {
-                string language = recipient.PreferredLcid ?? "en-EN";
+                string language = localeGroup.Key ?? "en-EN";
 
                 if (localizerResourceStream is not null)
                 {
@@ -60,18 +73,31 @@ namespace DomainLayer.BusinessLogic.Mailing
                     localizer.LoadXML(localizerResourceStream, CultureInfo.GetCultureInfo(language));
                 }
 
-                MimeMessage message = new();
-                message.From.Add(senderMail);
-                message.To.Add(recipient.Address);
-                message.Subject = string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectGenerator(localizer));
+                string subject = string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectGenerator(localizer));
+                MimeEntity body = mailGenerator(localizer);
 
-                var body = mailGenerator(localizer);
-                message.Body = body;
+                foreach (var recipient in localeGroup)
+                {
+                    MimeMessage message = new();
+                    message.From.Add(senderMail);
+                    message.To.Add(recipient.Address);
+                    message.Subject = subject;
+                    message.Body = body;
 
-                await client.SendAsync(message);
+                    try
+                    {
+                        await client.SendAsync(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, $"Failed to send e-mail");
+                    }
+                }
             }
 
             await client.DisconnectAsync(true);
+
+            return true;
         }
     }
 }

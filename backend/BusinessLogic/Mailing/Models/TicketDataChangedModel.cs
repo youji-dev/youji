@@ -6,7 +6,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// <summary>
     /// Model for ticket master-/meta-data changes e-mail
     /// </summary>
-    public record TicketDataChangedModel : MailModel
+    public class TicketDataChangedModel : MailModel
     {
         /// <inheritdoc/>
         public override string TemplateName { get; } = "TicketDataChanged";
@@ -59,6 +59,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
             {
                 MailTitle = localizer.Localize($"Ticket '{newTicket.Title}' was changed"),
                 Localizer = localizer,
+                RelatedTicketId = newTicket.Id,
             };
 
             if (newTicket.Title != oldTicket.Title)

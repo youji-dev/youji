@@ -1,11 +1,13 @@
-﻿using System.Text;
-using DomainLayer.BusinessLogic.Mailing;
+﻿using DomainLayer.BusinessLogic.Mailing;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
 
 namespace Application.WebApi.Controllers
 {
 #if DEBUG
+    /// <summary>
+    /// Controller for testing purposes; excluded in compile-time when not building for Debug
+    /// </summary>
     [Route("[controller]")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "The underscore ensures this controller is at the top of swagger")]
     public class _TESTINGController : ControllerBase
@@ -20,6 +22,9 @@ namespace Application.WebApi.Controllers
         private User[] mockUsers;
         private IEnumerable<MailRecipient> mockRecipients;
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="_TESTINGController"/>
+        /// </summary>
         public _TESTINGController()
         {
             this.mockUsers = [
@@ -97,7 +102,7 @@ namespace Application.WebApi.Controllers
                     Id = Guid.NewGuid(),
                     CreationDate = DateTime.Now,
                     Description = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.",
-                    Priority = this.mockPriorities[0],
+                    Priority = this.mockPriorities[1],
                     State = this.mockStates[0],
                     Building = this.mockBuildings[0],
                     Room = "200",
@@ -110,7 +115,7 @@ namespace Application.WebApi.Controllers
                     Id = Guid.NewGuid(),
                     CreationDate = DateTime.Now,
                     Description = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam",
-                    Priority = this.mockPriorities[1],
+                    Priority = this.mockPriorities[2],
                     State = this.mockStates[1],
                     Building = this.mockBuildings[1],
                     Room = "Locker room",
@@ -119,7 +124,8 @@ namespace Application.WebApi.Controllers
             ];
 
             this.mockComments = [
-                new() {
+                new()
+                {
                     Id = Guid.NewGuid(),
                     Author = this.mockUsers[0].UserId,
                     CreationDate = DateTime.Parse("02/05/2024"),
@@ -141,28 +147,33 @@ namespace Application.WebApi.Controllers
             ];
         }
 
+        /// <summary>
+        /// Send all kinds of e-mails for all supported locales with mock data
+        /// </summary>
+        /// <param name="mailService">Instance of <see cref="MailingService"/></param>
+        /// <returns>A Task representing the asynchronous operation</returns>
         [HttpGet("SendAllMails")]
         public async Task SendMails(
             [FromServices] MailingService mailService)
         {
             await mailService.SendManyLocalized(
                 this.mockRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketMail(this.mockTickets[0], localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketMail(this.mockTickets[0], localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New ticket: '{this.mockTickets[0].Title}'"));
 
             await mailService.SendManyLocalized(
                 this.mockRecipients,
-                (localizer) => MailGenerator.GenerateTicketChangedMail(this.mockTickets[1], this.mockTickets[0], localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateTicketChangedMail(this.mockTickets[1], this.mockTickets[0], localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"Ticket '{this.mockTickets[0].Title}' was changed"));
 
             await mailService.SendManyLocalized(
                 this.mockRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketCommentMail(this.mockComments[0], localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketCommentMail(this.mockComments[0], localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New comment on ticket '{this.mockComments[0].Ticket?.Title}'"));
 
             await mailService.SendManyLocalized(
                 this.mockRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketAttachmentMail(this.mockAttachments[0], localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketAttachmentMail(this.mockAttachments[0], localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New attachment on ticket '{this.mockAttachments[0].Ticket?.Title}'"));
         }
     }

@@ -11,7 +11,7 @@
 @if (Model.TitleChange is not null)
 {
     <h2>@Model.Localizer.Localize("Title") @Model.Localizer.Localize("changed")</h2>
-    <p>@Model.TitleChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="->" class="icon" /> @Model.TitleChange?.NewValue</p>
+    <p>@Model.TitleChange?.OldValue <img src="@Model.AutoValues.ArrowRightIconSrc" alt="->" class="icon" /> @Model.TitleChange?.NewValue</p>
 }
 
 @if (Model.DescriptionChange is not null)
@@ -19,7 +19,7 @@
     <h2>@Model.Localizer.Localize("Description") @Model.Localizer.Localize("changed")</h2>
     <div class="card">
         <p>@Model.DescriptionChange?.OldValue</p>
-        <img src="@Model.ArrowDownIconSrc" alt="v" class="icon card-separator" />
+        <img src="@Model.AutoValues.ArrowDownIconSrc" alt="v" class="icon card-separator" />
         <p>@Model.DescriptionChange?.NewValue</p>
     </div>
 }
@@ -29,7 +29,7 @@
     <h2>@Model.Localizer.Localize("Priority") @Model.Localizer.Localize("changed")</h2>
     <p>
         <span class="color-dot" style="background-color: @Model.PriorityChange?.OldValue.Color"></span> @Model.PriorityChange?.OldValue.Name
-        <img src="@Model.ArrowRightIconSrc" alt="---" class="icon" />
+        <img src="@Model.AutoValues.ArrowRightIconSrc" alt="---" class="icon" />
         <span class="color-dot" style="background-color: @Model.PriorityChange?.NewValue.Color"></span> @Model.PriorityChange?.NewValue.Name
     </p>
 }
@@ -39,7 +39,7 @@
     <h2>@Model.Localizer.Localize("State") @Model.Localizer.Localize("changed")</h2>
     <p>
         <span class="color-dot" style="background-color: @Model.StateChange?.OldValue.Color"></span> @Model.StateChange?.OldValue.Name
-        <img src="@Model.ArrowRightIconSrc" alt="---" class="icon" />
+        <img src="@Model.AutoValues.ArrowRightIconSrc" alt="---" class="icon" />
         <span class="color-dot" style="background-color: @Model.StateChange?.NewValue.Color"></span> @Model.StateChange?.NewValue.Name
     </p>
 }
@@ -47,17 +47,17 @@
 @if (Model.BuildingChange is not null)
 {
     <h2>@Model.Localizer.Localize("Building") @Model.Localizer.Localize("changed")</h2>
-    <p>@Model.BuildingChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.BuildingChange?.NewValue</p>
+    <p>@Model.BuildingChange?.OldValue <img src="@Model.AutoValues.ArrowRightIconSrc" alt="---" class="icon" />  @Model.BuildingChange?.NewValue</p>
 }
 
 @if (Model.RoomChange is not null)
 {
     <h2>@Model.Localizer.Localize("Room") @Model.Localizer.Localize("changed")</h2>
-    <p>@Model.RoomChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.RoomChange?.NewValue</p>
+    <p>@Model.RoomChange?.OldValue <img src="@Model.AutoValues.ArrowRightIconSrc" alt="---" class="icon" />  @Model.RoomChange?.NewValue</p>
 }
 
 @if (Model.ObjectChange is not null)
 {
     <h2>@Model.Localizer.Localize("Affected object") @Model.Localizer.Localize("changed")</h2>
-    <p>@Model.ObjectChange?.OldValue <img src="@Model.ArrowRightIconSrc" alt="---" class="icon"/>  @Model.ObjectChange?.NewValue</p>
+    <p>@Model.ObjectChange?.OldValue <img src="@Model.AutoValues.ArrowRightIconSrc" alt="---" class="icon" />  @Model.ObjectChange?.NewValue</p>
 }

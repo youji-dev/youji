@@ -6,7 +6,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// <summary>
     /// Model for new comment email
     /// </summary>
-    public record NewTicketCommentModel : MailModel
+    public class NewTicketCommentModel : MailModel
     {
         /// <inheritdoc/>
         public override string TemplateName { get; } = "NewTicketComment";
@@ -35,6 +35,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                 Author = comment.Author,
                 Content = comment.Content,
                 Localizer = localizer,
+                RelatedTicketId = comment.TicketId,
             };
         }
     }

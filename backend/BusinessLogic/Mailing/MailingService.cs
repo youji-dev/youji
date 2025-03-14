@@ -25,6 +25,9 @@ namespace DomainLayer.BusinessLogic.Mailing
         private readonly CompositeFormat mailSubjectFormat = CompositeFormat.Parse(
             configuration.GetValueOrThrow("SubjectFormat", ["Mail"]));
 
+        private readonly MailGenConfigurationDto mailGenConfigurationDto = new(
+            configuration.GetValueOrThrow("FrontendTicketBaseUri", ["Mail"]));
+
         /// <summary>
         /// Send same mail to many recipients with recipient-specific localization
         /// </summary>
@@ -34,7 +37,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <returns>A Task representing the asynchronous operation</returns>
         public async Task<bool> SendManyLocalized(
             IEnumerable<MailRecipient> recipients,
-            Func<Localizer, MimeEntity> mailGenerator,
+            Func<Localizer, MailGenConfigurationDto, MimeEntity> mailGenerator,
             Func<Localizer, string> subjectGenerator)
         {
             using SmtpClient client = new();
@@ -74,7 +77,7 @@ namespace DomainLayer.BusinessLogic.Mailing
                 }
 
                 string subject = string.Format(CultureInfo.InvariantCulture, this.mailSubjectFormat, subjectGenerator(localizer));
-                MimeEntity body = mailGenerator(localizer);
+                MimeEntity body = mailGenerator(localizer, this.mailGenConfigurationDto);
 
                 foreach (var recipient in localeGroup)
                 {

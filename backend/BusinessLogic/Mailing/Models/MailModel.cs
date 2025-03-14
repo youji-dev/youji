@@ -5,7 +5,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// <summary>
     /// Base mail model
     /// </summary>
-    public abstract record MailModel
+    public abstract class MailModel
     {
         /// <summary>
         /// Filename of the corresponding Razor-Template
@@ -23,18 +23,39 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
         public required Localizer Localizer { get; set; }
 
         /// <summary>
-        /// The youji logo src
+        /// Contains all properties that are automatically provided by the mail generator; manual values will be overwritten
         /// </summary>
-        public string LogoSrc { get; set; } = string.Empty;
+        public ProvidedValues AutoValues { get; } = new();
 
         /// <summary>
-        /// src for an 'arrow-right' icon
+        /// Id of a related ticket
         /// </summary>
-        public string ArrowRightIconSrc { get; set; } = string.Empty;
+        public Guid? RelatedTicketId { get; init; }
 
         /// <summary>
-        /// src for an 'arrow-down' icon
+        /// Represents all properties that are automatically provided by the mail generator
         /// </summary>
-        public string ArrowDownIconSrc { get; set; } = string.Empty;
+        public class ProvidedValues()
+        {
+            /// <summary>
+            /// The youji logo src
+            /// </summary>
+            public string LogoSrc { get; set; } = string.Empty;
+
+            /// <summary>
+            /// src for an 'arrow-right' icon
+            /// </summary>
+            public string ArrowRightIconSrc { get; set; } = string.Empty;
+
+            /// <summary>
+            /// src for an 'arrow-down' icon
+            /// </summary>
+            public string ArrowDownIconSrc { get; set; } = string.Empty;
+
+            /// <summary>
+            /// Hyperref for a "Take me there" function
+            /// </summary>
+            public string GoToHyperref { get; set; } = string.Empty;
+        }
     }
 }

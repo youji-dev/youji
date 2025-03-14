@@ -10,44 +10,44 @@
 
 <div class="meta-data">
     <p>@Model.Localizer.Localize("Author")</p>
-    <p>@Model.Ticket.Author</p>
+    <p>@Model.NewTicket.Author</p>
 
     <p>@Model.Localizer.Localize("Creation date")</p>
     <p>@Model.FormattedCreationDate</p>
 
     <p>@Model.Localizer.Localize("Priority")</p>
     <p>
-        <span class="color-dot" style="background-color: @Model.Ticket.Priority.Color"></span>
-        @Model.Ticket.Priority.Name
+        <span class="color-dot" style="background-color: @Model.NewTicket.Priority.Color"></span>
+        @Model.NewTicket.Priority.Name
     </p>
 
     <p>@Model.Localizer.Localize("State")</p>
     <p>
-        <span class="color-dot" style="background-color: @Model.Ticket.State.Color"></span>
-        @Model.Ticket.State.Name
+        <span class="color-dot" style="background-color: @Model.NewTicket.State.Color"></span>
+        @Model.NewTicket.State.Name
     </p>
 
-    @if (!string.IsNullOrEmpty(Model.Ticket.Building?.Name))
+    @if (!string.IsNullOrEmpty(Model.NewTicket.Building?.Name))
     {
         <p>@Model.Localizer.Localize("Building")</p>
-        <p>@Model.Ticket.Building?.Name</p>
+        <p>@Model.NewTicket.Building?.Name</p>
     }
     
-    @if (!string.IsNullOrEmpty(Model.Ticket.Room))
+    @if (!string.IsNullOrEmpty(Model.NewTicket.Room))
     {
         <p>@Model.Localizer.Localize("Room")</p>
-        <p>@Model.Ticket.Room</p>
+        <p>@Model.NewTicket.Room</p>
     }
     
-    @if (!string.IsNullOrEmpty(Model.Ticket.Object))
+    @if (!string.IsNullOrEmpty(Model.NewTicket.Object))
     {
         <p>@Model.Localizer.Localize("Affected object")</p>
-        <p>@Model.Ticket.Object</p>
+        <p>@Model.NewTicket.Object</p>
     }
 </div>
 
-@if (!string.IsNullOrEmpty(Model.Ticket.Description)) {
-    <p>@Model.Ticket.Description</p>
+@if (!string.IsNullOrEmpty(Model.NewTicket.Description)) {
+    <p>@Model.NewTicket.Description</p>
 }
 
 <style>

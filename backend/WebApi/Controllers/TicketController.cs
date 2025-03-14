@@ -300,7 +300,7 @@ namespace Application.WebApi.Controllers
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketCommentMail(comment, localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketCommentMail(comment, localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New comment on ticket '{ticket.Title}'"));
 
             return this.Ok(comment);
@@ -367,7 +367,7 @@ namespace Application.WebApi.Controllers
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketAttachmentMail(attachment, localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketAttachmentMail(attachment, localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New attachment on ticket '{ticket.Title}'"));
 
             return this.Ok(attachment);
@@ -459,7 +459,7 @@ namespace Application.WebApi.Controllers
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
-                (localizer) => MailGenerator.GenerateTicketChangedMail(ticket, oldTicket, localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateTicketChangedMail(ticket, oldTicket, localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"Ticket '{ticket.Title}' was changed"));
 
             return this.Ok(ticket);

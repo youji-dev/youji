@@ -75,4 +75,9 @@
 		<Value lang="en">Creation date</Value>
 		<Value lang="de">Erstellungsdatum</Value>
 	</Entry>
+	<Entry>
+		<Key>Open ticket</Key>
+		<Value lang="en">Open ticket</Value>
+		<Value lang="de">Ticket öffnen</Value>
+	</Entry>
 </I18N>

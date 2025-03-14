@@ -4,22 +4,41 @@
 
 <!-- Begin document -->
 
-<div class="container">
-    <header>
-        <div>
-            <h1>@Model.MailTitle</h1>
+<div style="width: 100%; height: 100%;">
+    <header class="bg-primary" style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        gap: 5ch;
+        padding-inline: 5ch;"
+    >
+        <h1 style="margin: 0">@Model.MailTitle</h1>
+
+        <img src="@Model.AutoValues.LogoSrc" style="width: 100px; height: 100px;" />
+    </header>
+
+    <div style="
+        margin: 1rem;
+        width: min(80ch, 100%);
+        justify-self: center;"
+        >
+        @RenderBody()
+    </div>
+
+    <footer>
+        <hr style="height: 2em" class="bg-primary"/>
+        
+        <div style="padding-inline: 5ch">
             @if (!string.IsNullOrEmpty(Model.AutoValues.GoToHyperref))
             {
-                <a href="@Model.AutoValues.GoToHyperref">@Model.AutoValues.GoToHyperref</a>
+                <p>@Model.Localizer.Localize("Open ticket"): <a href="@Model.AutoValues.GoToHyperref">@Model.AutoValues.GoToHyperref</a></p>
             }
         </div>
 
-        <img class='logo' src="@Model.AutoValues.LogoSrc" />
-    </header>
-
-    <div class="content">
-        @RenderBody()
-    </div>
+        <hr style="height: 1em" class="bg-primary"/>
+    </footer>
 </div>
 
 <style>
@@ -27,38 +46,12 @@
         padding: 0;
         margin: 0;
         font-family: sans-serif;
+        
+        --primary: #409eff;
     }
 
-    .container {
-        width: 100%;
-        height: 100%;
-    }
-
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        background-color: #409eff;
-        gap: 5ch;
-        padding-inline: 5ch;
-    }
-
-    header > div > h1 {
-        padding: 0;
-        margin: 0;
-    }
-
-    header > .logo {
-        width: 100px;
-        height: 100px;
-    }
-
-    .content {
-        margin: 1rem;
-        width: min(80ch, 100%);
-        justify-self: center;
+    .bg-primary {
+        background-color: var(--primary);
     }
 
     .card-list {

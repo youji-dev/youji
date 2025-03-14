@@ -174,6 +174,8 @@ namespace Application.WebApi.Controllers
         /// <param name="stateRepo">Instance of <see cref="StateRepository"/>.</param>
         /// <param name="priorityRepo">Instance of <see cref="PriorityRepository"/>.</param>
         /// <param name="buildingRepo">Instance of <see cref="BuildingRepository"/>.</param>
+        /// <param name="mailingService">Instance of <see cref="MailingService"/></param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <param name="ticketData">The ticket data that will be added.</param>
         /// <returns>An <see cref="ObjectResult"/> with the added ticket entity.</returns>
         [HttpPost]
@@ -186,6 +188,8 @@ namespace Application.WebApi.Controllers
             [FromServices] StateRepository stateRepo,
             [FromServices] PriorityRepository priorityRepo,
             [FromServices] BuildingRepository buildingRepo,
+            [FromServices] MailingService mailingService,
+            [FromServices] UserRepository userRepository,
             [FromBody] TicketPostDTO ticketData)
         {
             var currentUser = this.User;
@@ -245,6 +249,13 @@ namespace Application.WebApi.Controllers
 
             await ticketRepo.AddAsync(ticket);
 
+            var facilityManagerMailRecipients = MailRecipient.GetCollectionFromUsers(userRepository.Find(u => u.Type == Roles.FacilityManager));
+
+            await mailingService.SendManyLocalized(
+                facilityManagerMailRecipients,
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketMail(ticket, localizer, mailGenConfig),
+                (localizer) => localizer.Localize($"New ticket: '{ticket.Title}'"));
+
             return this.Ok(ticket);
         }
 
@@ -300,7 +311,7 @@ namespace Application.WebApi.Controllers
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketCommentMail(comment, localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketCommentMail(comment, localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New comment on ticket '{ticket.Title}'"));
 
             return this.Ok(comment);
@@ -367,7 +378,7 @@ namespace Application.WebApi.Controllers
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
-                (localizer) => MailGenerator.GenerateNewTicketAttachmentMail(attachment, localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateNewTicketAttachmentMail(attachment, localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"New attachment on ticket '{ticket.Title}'"));
 
             return this.Ok(attachment);
@@ -459,7 +470,7 @@ namespace Application.WebApi.Controllers
 
             await mailingService.SendManyLocalized(
                 mailRecipients,
-                (localizer) => MailGenerator.GenerateTicketChangedMail(ticket, oldTicket, localizer),
+                (localizer, mailGenConfig) => MailGenerator.GenerateTicketChangedMail(ticket, oldTicket, localizer, mailGenConfig),
                 (localizer) => localizer.Localize($"Ticket '{ticket.Title}' was changed"));
 
             return this.Ok(ticket);

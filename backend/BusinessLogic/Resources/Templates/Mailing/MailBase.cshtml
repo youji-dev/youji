@@ -4,15 +4,41 @@
 
 <!-- Begin document -->
 
-<div class="container">
-    <header>
-        <h1>@Model.MailTitle</h1>
-        <img class='logo' src="@Model.LogoSrc" />
+<div style="width: 100%; height: 100%;">
+    <header class="bg-primary" style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        gap: 5ch;
+        padding-inline: 5ch;"
+    >
+        <h1 style="margin: 0">@Model.MailTitle</h1>
+
+        <img src="@Model.AutoValues.LogoSrc" style="width: 100px; height: 100px;" />
     </header>
 
-    <div class="content">
+    <div style="
+        margin: 1rem;
+        width: min(80ch, 100%);
+        justify-self: center;"
+        >
         @RenderBody()
     </div>
+
+    <footer>
+        <hr style="height: 2em" class="bg-primary"/>
+        
+        <div style="padding-inline: 5ch">
+            @if (!string.IsNullOrEmpty(Model.AutoValues.GoToHyperref))
+            {
+                <p>@Model.Localizer.Localize("Open ticket"): <a href="@Model.AutoValues.GoToHyperref">@Model.AutoValues.GoToHyperref</a></p>
+            }
+        </div>
+
+        <hr style="height: 1em" class="bg-primary"/>
+    </footer>
 </div>
 
 <style>
@@ -20,39 +46,12 @@
         padding: 0;
         margin: 0;
         font-family: sans-serif;
+        
+        --primary: #409eff;
     }
 
-    .container {
-        width: 100%;
-        height: 100%;
-    }
-
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-        background-color: #409EFF;
-    }
-
-    header > h1 {
-        padding-inline: 5ch;
-    }
-
-    header > .logo {
-        padding-inline: 5ch;
-    }
-
-    .logo {
-        width: 100px;
-        height: 100px;
-    }
-
-    .content {
-        margin-top: 0.5rem;
-        margin-inline: 10ch;
-        max-width: 80ch;
+    .bg-primary {
+        background-color: var(--primary);
     }
 
     .card-list {
@@ -83,5 +82,12 @@
 
     .icon {
         width: 2ch;
+    }
+
+    span.color-dot {
+        border-radius: 100%;
+        width: 0.8em;
+        height: 0.8em;
+        display: inline-block;
     }
 </style>

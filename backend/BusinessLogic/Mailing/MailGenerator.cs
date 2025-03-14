@@ -23,12 +23,13 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="newTicket">New version of the ticket</param>
         /// <param name="oldTicket">Old version of the ticket</param>
         /// <param name="localizer">Localizer for mail generation</param>
+        /// <param name="mailGenConfiguration">Configuration values used during mail generation</param>
         /// <returns>The generated mail body</returns>
-        public static MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket, Localizer localizer)
+        public static MimeEntity GenerateTicketChangedMail(Ticket newTicket, Ticket oldTicket, Localizer localizer, MailGenConfigurationDto mailGenConfiguration)
         {
             TicketDataChangedModel mailModel = TicketDataChangedModel.FromTickets(newTicket, oldTicket, localizer);
 
-            return GenerateMail(mailModel);
+            return GenerateMail(mailModel, mailGenConfiguration);
         }
 
         /// <summary>
@@ -36,12 +37,13 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// </summary>
         /// <param name="newAttachment">The new attachment</param>
         /// <param name="localizer">Localizer for mail generation</param>
+        /// <param name="mailGenConfiguration">Configuration values used during mail generation</param>
         /// <returns>The generated mail body</returns>
-        public static MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment, Localizer localizer)
+        public static MimeEntity GenerateNewTicketAttachmentMail(TicketAttachment newAttachment, Localizer localizer, MailGenConfigurationDto mailGenConfiguration)
         {
             NewTicketAttachmentModel mailModel = NewTicketAttachmentModel.FromAttachment(newAttachment, localizer);
 
-            return GenerateMail(mailModel);
+            return GenerateMail(mailModel, mailGenConfiguration);
         }
 
         /// <summary>
@@ -49,12 +51,26 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// </summary>
         /// <param name="newComment">The new comment</param>
         /// <param name="localizer">Localizer for mail generation</param>
+        /// <param name="mailGenConfiguration">Configuration values used during mail generation</param>
         /// <returns>The generated mail body</returns>
-        public static MimeEntity GenerateNewTicketCommentMail(TicketComment newComment, Localizer localizer)
+        public static MimeEntity GenerateNewTicketCommentMail(TicketComment newComment, Localizer localizer, MailGenConfigurationDto mailGenConfiguration)
         {
             NewTicketCommentModel mailModel = NewTicketCommentModel.FromComment(newComment, localizer);
 
-            return GenerateMail(mailModel);
+            return GenerateMail(mailModel, mailGenConfiguration);
+        }
+
+        /// <summary>
+        /// Generate a mail body for a new ticket
+        /// </summary>
+        /// <param name="newTicket">The new ticket</param>
+        /// <param name="localizer">Localizer for mail generation</param>
+        /// <param name="mailGenConfiguration">Configuration values used during mail generation</param>
+        /// <returns>The generated mail body</returns>
+        public static MimeEntity GenerateNewTicketMail(Ticket newTicket, Localizer localizer, MailGenConfigurationDto mailGenConfiguration)
+        {
+            NewTicketModel mailModel = NewTicketModel.FromTicket(newTicket, localizer);
+            return GenerateMail(mailModel, mailGenConfiguration);
         }
 
         /// <summary>
@@ -62,11 +78,12 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// </summary>
         /// <param name="mailModel">The model to use as a data provider</param>
         /// <returns>The generated mail body</returns>
-        private static MimeEntity GenerateMail(MailModel mailModel)
+        private static MimeEntity GenerateMail(MailModel mailModel, MailGenConfigurationDto mailGenConfiguration)
         {
             BodyBuilder bodyBuilder = new();
 
             AddResourcesToModel(bodyBuilder, mailModel);
+            AddMiscellaniousValuesToModel(mailModel, mailGenConfiguration);
 
             string layout = GetTemplate("MailBase")
                 ?? throw new InvalidOperationException("Could not find resource file for mail layout");
@@ -88,7 +105,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// </summary>
         /// <param name="templateName">The name of the template</param>
         /// <returns>The template as a plain string or null if it could not be found</returns>
-        public static string? GetTemplate(string templateName)
+        private static string? GetTemplate(string templateName)
         {
             Assembly assembly = Assembly.GetExecutingAssembly()
                 ?? throw new InvalidOperationException("Could not get assembly while loading email template");
@@ -111,7 +128,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// </summary>
         /// <param name="bodyBuilder">The mail body builder to add resources to</param>
         /// <param name="mailModel">The mail model to provide resources in</param>
-        public static void AddResourcesToModel(BodyBuilder bodyBuilder, MailModel mailModel)
+        private static void AddResourcesToModel(BodyBuilder bodyBuilder, MailModel mailModel)
         {
             Assembly assembly = Assembly.GetExecutingAssembly()
                 ?? throw new InvalidOperationException("Could not get assembly while loading logo file");
@@ -131,9 +148,17 @@ namespace DomainLayer.BusinessLogic.Mailing
                 assembly.GetResource("arrow_down.svg"));
             arrowDown.ContentId = MimeUtils.GenerateMessageId();
 
-            mailModel.LogoSrc = $"cid:{logo.ContentId}";
-            mailModel.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
-            mailModel.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
+            mailModel.AutoValues.LogoSrc = $"cid:{logo.ContentId}";
+            mailModel.AutoValues.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
+            mailModel.AutoValues.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
+        }
+
+        private static void AddMiscellaniousValuesToModel(MailModel mailModel, MailGenConfigurationDto mailGenConfiguration)
+        {
+            if (mailModel.RelatedTicketId is Guid relatedTicketId)
+            {
+                mailModel.AutoValues.GoToHyperref = Path.Combine(mailGenConfiguration.FrontendTicketBaseUrl, relatedTicketId.ToString());
+            }
         }
     }
 

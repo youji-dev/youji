@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import type priority from "~/types/api/response/priorityResponse";
-import type state from "~/types/api/response/stateResponse";
-import type ticket from "~/types/api/response/ticketResponse";
-export const useTicketsStore = defineStore("tickets", {
+import { defineStore } from 'pinia';
+import type priority from '~/types/api/response/priorityResponse';
+import type state from '~/types/api/response/stateResponse';
+import type ticket from '~/types/api/response/ticketResponse';
+export const useTicketsStore = defineStore('tickets', {
   state: () => ({
     statusOptions: [] as Array<state>,
     priorityOptions: [] as Array<priority>,
@@ -39,13 +39,7 @@ export const useTicketsStore = defineStore("tickets", {
       orderDesc: boolean
     ) {
       const { $api } = useNuxtApp();
-      const resp = await $api.ticket.search(
-        search,
-        orderByCol,
-        orderDesc,
-        skip,
-        take
-      );
+      const resp = await $api.ticket.search(search, orderByCol, orderDesc, skip, take);
       if (resp.error.value) {
         console.log(resp.error);
         return;

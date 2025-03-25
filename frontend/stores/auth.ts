@@ -1,28 +1,26 @@
-import { jwtDecode } from "jwt-decode";
-import { defineStore } from "pinia";
-import useFetchAuthenticated from "~/composables/useFetchAuthenticated";
-import { Roles } from "~/types/roles";
+import { jwtDecode } from 'jwt-decode';
+import { defineStore } from 'pinia';
+import useFetchAuthenticated from '~/composables/useFetchAuthenticated';
+import { Roles } from '~/types/roles';
 
 interface UserPayloadInterface {
   name: string;
   password: string;
 }
 
-export const useAuthStore = defineStore("auth", {
+export const useAuthStore = defineStore('auth', {
   state: () => ({
     authenticated: false,
-    username: "" as string,
+    username: '' as string,
     userRole: 0 as Roles,
     loading: false,
-    csrfToken: "" as any,
+    csrfToken: '' as any,
     authErrors: [] as string[],
   }),
   getters: {
-    isUserAdmin: (state) => (state.userRole & Roles.Admin) > 0,
-    isUserFacilityManager: (state) =>
-      (state.userRole & Roles.FacilityManager) > 0,
-    isUserTeacher: (state) =>
-      (state.userRole & Roles.Teacher) > 0,
+    isUserAdmin: state => (state.userRole & Roles.Admin) > 0,
+    isUserFacilityManager: state => (state.userRole & Roles.FacilityManager) > 0,
+    isUserTeacher: state => (state.userRole & Roles.Teacher) > 0,
   },
   actions: {
     async authenticateUser({ name, password }: UserPayloadInterface) {
@@ -33,30 +31,25 @@ export const useAuthStore = defineStore("auth", {
       this.authErrors = [];
 
       try {
-        const { data, pending, error }: any = await useFetch(
-          `${BACKEND_URL}/Auth/login`,
-          {
-            body: {
-              username: name,
-              password: password,
-            },
-            method: "post",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
+        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
+          body: {
+            username: name,
+            password: password,
+          },
+          method: 'post',
+          headers: { 'Content-Type': 'application/json' },
+        });
         this.loading = pending;
 
         if (error?.value?.statusCode === 401) {
-          this.authErrors.push("wrong credentials");
+          this.authErrors.push('wrong credentials');
         } else if (error?.value) {
           console.error(error);
           this.authErrors.push(error.value);
         }
 
         if (!data.value.accessToken || !data.value.refreshToken) {
-          this.authErrors.push(
-            "Did not receive expected response with access and refresh token"
-          );
+          this.authErrors.push('Did not receive expected response with access and refresh token');
           return;
         }
 
@@ -80,13 +73,11 @@ export const useAuthStore = defineStore("auth", {
       const token = useCookie(ACCESS_TOKEN_NAME, {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: 'strict',
       });
 
       if (!token.value) return;
-      const { username, role } = jwtDecode<{ username: string; role: number }>(
-        token.value
-      );
+      const { username, role } = jwtDecode<{ username: string; role: number }>(token.value);
       this.username = username;
       this.userRole = role;
     },
@@ -98,7 +89,7 @@ export const useAuthStore = defineStore("auth", {
 
     async checkIfTokenIsValid(): Promise<boolean> {
       try {
-        await useFetchAuthenticated("/Auth/verify-token");
+        await useFetchAuthenticated('/Auth/verify-token');
         return true;
       } catch {
         return false;

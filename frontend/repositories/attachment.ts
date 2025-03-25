@@ -1,5 +1,5 @@
 class AttachmentRepository {
-  private path = "/api/TicketAttachment";
+  private path = '/api/TicketAttachment';
 
   generateAttachmentURL(id: string): string {
     const {
@@ -10,7 +10,7 @@ class AttachmentRepository {
   }
 
   async delete(id: string): Promise<ReturnType<typeof useFetchAuthenticated<string>>> {
-    return useFetchAuthenticated<string>(`${this.path}/${id}`, { method: "DELETE" });
+    return useFetchAuthenticated<string>(`${this.path}/${id}`, { method: 'DELETE' });
   }
 }
 

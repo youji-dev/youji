@@ -1,4 +1,4 @@
-import type ticketResponse from "../response/ticketResponse";
+import type ticketResponse from '../response/ticketResponse';
 
 export default interface EditTicketRequest {
   id: string;

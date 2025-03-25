@@ -1,8 +1,8 @@
-import { defineStore } from "pinia";
-import type EditUserRequest from "~/types/api/request/editUser";
-import type building from "~/types/api/response/buildingResponse";
-import type priority from "~/types/api/response/priorityResponse";
-import type state from "~/types/api/response/stateResponse";
+import { defineStore } from 'pinia';
+import type EditUserRequest from '~/types/api/request/editUser';
+import type building from '~/types/api/response/buildingResponse';
+import type priority from '~/types/api/response/priorityResponse';
+import type state from '~/types/api/response/stateResponse';
 
 export interface EditablePriority {
   id: EditableStringProperty;
@@ -39,11 +39,7 @@ export type EditableProperty =
   | EditableNumberProperty
   | EditableNullableStringProperty;
 
-export type EditableObject =
-  | EditablePriority
-  | EditableState
-  | EditableBuilding
-  | EditableUser;
+export type EditableObject = EditablePriority | EditableState | EditableBuilding | EditableUser;
 
 export interface EditableStringProperty {
   editing: boolean;
@@ -62,7 +58,7 @@ export interface EditableNumberProperty {
 
 export interface AutoPurgeDaysProperty {
   editing: boolean;
-  value: number | "" | null;
+  value: number | '' | null;
 }
 
 export interface EditableNullableStringProperty {
@@ -71,13 +67,13 @@ export interface EditableNullableStringProperty {
 }
 
 export const useSettingsStore = defineStore({
-  id: "settingsStore",
+  id: 'settingsStore',
   state: () => ({
     priorities: [] as EditablePriority[],
     states: [] as EditableState[],
     buildings: [] as EditableBuilding[],
     users: [] as EditableUser[],
-    preferredEmailLanguage: "" as string,
+    preferredEmailLanguage: '' as string,
     prioritiesLoading: false as boolean,
     statesLoading: false as boolean,
     buildingsLoading: false as boolean,
@@ -93,15 +89,17 @@ export const useSettingsStore = defineStore({
         console.log(resp.error);
       }
       if (!!resp.data.value) {
-        this.priorities = resp.data.value.map(
-          (p) =>
-          ({
-            id: { editing: false, value: p.id },
-            color: { editing: false, value: p.color },
-            name: { editing: false, value: p.name },
-            value: { editing: false, value: p.value },
-          } as EditablePriority)
-        ).sort((a, b) => a.value.value - b.value.value);
+        this.priorities = resp.data.value
+          .map(
+            p =>
+              ({
+                id: { editing: false, value: p.id },
+                color: { editing: false, value: p.color },
+                name: { editing: false, value: p.name },
+                value: { editing: false, value: p.value },
+              }) as EditablePriority
+          )
+          .sort((a, b) => a.value.value - b.value.value);
       }
     },
     async fetchStates() {
@@ -112,7 +110,7 @@ export const useSettingsStore = defineStore({
         console.log(resp.error.value);
       }
       if (!!resp.data.value) {
-        this.states = resp.data.value.map((s) => ({
+        this.states = resp.data.value.map(s => ({
           id: { editing: false, value: s.id },
           name: { editing: false, value: s.name },
           color: { editing: false, value: s.color },
@@ -131,7 +129,7 @@ export const useSettingsStore = defineStore({
         console.log(resp.error.value);
       }
       if (!!resp.data.value) {
-        this.buildings = resp.data.value.map((b) => ({
+        this.buildings = resp.data.value.map(b => ({
           id: { editing: false, value: b.id },
           name: { editing: false, value: b.name },
         }));
@@ -146,22 +144,22 @@ export const useSettingsStore = defineStore({
         console.log(resp.error.value);
       }
       if (!!resp.data.value) {
-        this.users = resp.data.value.map((u) => ({
+        this.users = resp.data.value.map(u => ({
           userId: { editing: false, value: u.userId },
           type: { editing: false, value: u.type.toString() },
           email: { editing: false, value: u.email },
           preferredEmailLcid: { editing: false, value: u.preferredEmailLcid },
-          allowsEmailNotifications: { editing: false, value: u.allowsEmailNotifications }
+          allowsEmailNotifications: { editing: false, value: u.allowsEmailNotifications },
         }));
       }
       this.usersLoading = false;
     },
     fetchMyUser() {
       const { username } = useAuthStore();
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         this.myUser = this.users.find(u => u.userId.value === username) ?? null;
         resolve(true);
-      })
+      });
     },
     async updateUsers(updatedUser: EditableUser) {
       this.usersLoading = true;
@@ -176,22 +174,15 @@ export const useSettingsStore = defineStore({
       }
       let resp = await $api.user.edit(userObj);
       if (resp.error.value) {
-        document
-          .getElementById("globalsettings")
-          ?.dispatchEvent(new Event("updateFailed"));
+        document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
       }
       await this.fetchUsers();
       this.usersLoading = false;
       if (username === updatedUser.userId.value) {
-        document
-          .getElementById("globalsettings")
-          ?.dispatchEvent(new Event("ownRoleChanged"));
+        document.getElementById('globalsettings')?.dispatchEvent(new Event('ownRoleChanged'));
       }
     },
-    async updateBuildings(
-      updatedBuilding: EditableBuilding,
-      operation: "C" | "U" | "D"
-    ) {
+    async updateBuildings(updatedBuilding: EditableBuilding, operation: 'C' | 'U' | 'D') {
       this.buildingsLoading = true;
       const { $api } = useNuxtApp();
       const buildingObj = {
@@ -199,71 +190,51 @@ export const useSettingsStore = defineStore({
         name: updatedBuilding.name.value,
       } as building;
       const resp =
-        operation === "C"
+        operation === 'C'
           ? await $api.building.create(buildingObj.name)
-          : operation === "U"
+          : operation === 'U'
             ? await $api.building.edit(buildingObj)
             : await $api.building.delete(buildingObj.id);
       if (resp.error.value) {
-        if (operation === "D") {
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("objectIsReferenced"));
+        if (operation === 'D') {
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('objectIsReferenced'));
         } else {
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("updateFailed"));
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
         }
         console.log(resp.error.value);
       }
-      if (operation !== "C") {
+      if (operation !== 'C') {
         await this.fetchBuildings();
       } else {
         if (!resp.error.value) {
-          this.buildings.forEach((b) => {
+          this.buildings.forEach(b => {
             if (b.id.value === updatedBuilding.id.value) {
               b.id.value = (resp.data.value as building).id;
               b.new = undefined;
             }
-          })
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("saved"));
+          });
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('saved'));
         }
       }
       this.buildingsLoading = false;
     },
-    async updateStates(
-      updatedState: EditableState,
-      operation: "C" | "U" | "D",
-      setDefaultState?: boolean
-    ) {
+    async updateStates(updatedState: EditableState, operation: 'C' | 'U' | 'D', setDefaultState?: boolean) {
       this.statesLoading = true;
       const { $api } = useNuxtApp();
       const stateObj = {
-        autoPurgeDays:
-          updatedState.autoPurgeDays.value !== ""
-            ? Number(updatedState.autoPurgeDays.value)
-            : null,
+        autoPurgeDays: updatedState.autoPurgeDays.value !== '' ? Number(updatedState.autoPurgeDays.value) : null,
         color: updatedState.color.value,
         hasAutoPurge: updatedState.hasAutoPurge.value,
         id: updatedState.id.value,
         isDefault: updatedState.isDefault.value,
         name: updatedState.name.value,
       } as state;
-      const currentState = this.states.filter(
-        (s) => stateObj.id === s.id.value
-      )[0];
+      const currentState = this.states.filter(s => stateObj.id === s.id.value)[0];
       if (
-        (currentState.isDefault.value &&
-          stateObj.isDefault &&
-          operation === "U" &&
-          !setDefaultState) ||
-        (currentState.isDefault.value && operation === "D")
+        (currentState.isDefault.value && stateObj.isDefault && operation === 'U' && !setDefaultState) ||
+        (currentState.isDefault.value && operation === 'D')
       ) {
-        document
-          .getElementById("globalsettings")
-          ?.dispatchEvent(new Event("defaultStateNotUpdatable"));
+        document.getElementById('globalsettings')?.dispatchEvent(new Event('defaultStateNotUpdatable'));
         await this.fetchStates();
         this.statesLoading = false;
         return;
@@ -271,9 +242,7 @@ export const useSettingsStore = defineStore({
       if (updatedState.isDefault.value) {
         for (let s of this.states) {
           if (s.isDefault.value && s.id.value !== updatedState.id.value) {
-            document
-              .getElementById("globalsettings")
-              ?.dispatchEvent(new Event("onlyOneDefaultState"));
+            document.getElementById('globalsettings')?.dispatchEvent(new Event('onlyOneDefaultState'));
             await this.fetchStates();
             this.statesLoading = false;
             return;
@@ -281,45 +250,36 @@ export const useSettingsStore = defineStore({
         }
       }
       let resp =
-        operation === "C"
+        operation === 'C'
           ? await $api.state.create(stateObj)
-          : operation === "U"
+          : operation === 'U'
             ? await $api.state.edit(stateObj)
             : await $api.state.delete(stateObj.id);
       if (resp.error.value) {
-        if (operation === "D") {
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("objectIsReferenced"));
+        if (operation === 'D') {
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('objectIsReferenced'));
         } else {
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("updateFailed"));
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
         }
         console.log(resp.error.value);
       }
-      if (operation !== "C") {
+      if (operation !== 'C') {
         await this.fetchStates();
       } else {
         if (!resp.error.value) {
-          this.states.forEach((s) => {
+          this.states.forEach(s => {
             if (s.id.value === updatedState.id.value) {
               s.id.value = (resp.data.value as state).id;
               s.new = undefined;
             }
-          })
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("saved"));
+          });
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('saved'));
         }
       }
       this.statesLoading = false;
     },
 
-    async updatePriorities(
-      updatedPriority: EditablePriority,
-      operation: "C" | "U" | "D"
-    ) {
+    async updatePriorities(updatedPriority: EditablePriority, operation: 'C' | 'U' | 'D') {
       this.prioritiesLoading = true;
       const { $api } = useNuxtApp();
       const priorityObj = {
@@ -329,36 +289,30 @@ export const useSettingsStore = defineStore({
         value: updatedPriority.value.value,
       } as priority;
       const resp =
-        operation === "C"
+        operation === 'C'
           ? await $api.priority.create(priorityObj)
-          : operation === "U"
+          : operation === 'U'
             ? await $api.priority.edit(priorityObj)
             : await $api.priority.delete(priorityObj.id);
       if (resp.error.value) {
-        if (operation === "D") {
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("objectIsReferenced"));
+        if (operation === 'D') {
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('objectIsReferenced'));
         } else {
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("updateFailed"));
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
         }
         console.log(resp.error.value);
       }
-      if (operation !== "C") {
+      if (operation !== 'C') {
         await this.fetchPriorities();
       } else {
         if (!resp.error.value) {
-          this.priorities.forEach((p) => {
+          this.priorities.forEach(p => {
             if (p.id.value === updatedPriority.id.value) {
               p.id.value = (resp.data.value as priority).id;
               p.new = undefined;
             }
-          })
-          document
-            .getElementById("globalsettings")
-            ?.dispatchEvent(new Event("saved"));
+          });
+          document.getElementById('globalsettings')?.dispatchEvent(new Event('saved'));
         }
       }
       this.prioritiesLoading = false;
@@ -368,11 +322,9 @@ export const useSettingsStore = defineStore({
       const { $api } = useNuxtApp();
       let resp = await $api.user.edit(updatedUser);
       if (resp.error.value) {
-        document
-          .getElementById("usersettings")
-          ?.dispatchEvent(new Event("updateFailed"));
+        document.getElementById('usersettings')?.dispatchEvent(new Event('updateFailed'));
       }
       this.usersLoading = false;
     },
-  }
+  },
 });

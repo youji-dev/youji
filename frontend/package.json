@@ -11,7 +11,8 @@
     "postinstall": "nuxt prepare",
     "lint": "npm run lint:prettier",
     "lint:eslint": "prettier . --check",
-    "lint:prettier": "prettier . --check"
+    "lint:prettier": "prettier . --check",
+    "lintfix:prettier": "prettier . --write"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",

@@ -1,10 +1,10 @@
-import { defineStore } from "pinia";
+import { defineStore } from 'pinia';
 
 export const useImagePreviewDisplayStore = defineStore({
-  id: "ImagePreviewDisplayStore",
+  id: 'ImagePreviewDisplayStore',
   state: () => ({
     imagePreviewDisplay: false,
-    imagePreviewSrc: "",
+    imagePreviewSrc: '',
   }),
   actions: {
     setImagePreviewDisplay(imagePreviewDisplay: boolean) {
@@ -16,7 +16,7 @@ export const useImagePreviewDisplayStore = defineStore({
 
     clearData() {
       this.imagePreviewDisplay = false;
-      this.imagePreviewSrc = "";
+      this.imagePreviewSrc = '';
     },
   },
 });

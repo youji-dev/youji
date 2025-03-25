@@ -1,9 +1,6 @@
-import type { UseFetchOptions } from "#app";
+import type { UseFetchOptions } from '#app';
 
-const useFetchAuthenticated = <T>(
-  url: string | (() => string),
-  providedOptions?: UseFetchOptions<T>
-) => {
+const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?: UseFetchOptions<T>) => {
   const {
     public: { BACKEND_URL, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME },
   } = useRuntimeConfig();
@@ -12,12 +9,12 @@ const useFetchAuthenticated = <T>(
 
   const accessToken = useCookie(ACCESS_TOKEN_NAME, {
     secure: true,
-    sameSite: "strict",
+    sameSite: 'strict',
   });
 
   const refreshToken = useCookie(REFRESH_TOKEN_NAME, {
     secure: true,
-    sameSite: "strict",
+    sameSite: 'strict',
   });
 
   let refreshPromise: Promise<void> | null = null;
@@ -28,8 +25,8 @@ const useFetchAuthenticated = <T>(
         try {
           const { data }: any = await useFetch(`${BACKEND_URL}/Auth/refresh`, {
             body: { refreshToken: refreshToken.value },
-            method: "post",
-            headers: { "Content-Type": "application/json" },
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
           });
 
           accessToken.value = data.value.accessToken;
@@ -51,7 +48,7 @@ const useFetchAuthenticated = <T>(
     retry: 1,
     retryStatusCodes: [401],
     retryDelay: 500,
-    cache: "no-cache",
+    cache: 'no-cache',
 
     onRequest({ options }) {
       options.headers = {
@@ -65,7 +62,7 @@ const useFetchAuthenticated = <T>(
           await refreshAccessToken();
         } catch (error) {
           authStore.logUserOut();
-          navigateTo(localePath("/login")?.fullPath);
+          navigateTo(localePath('/login')?.fullPath);
         }
       }
     },

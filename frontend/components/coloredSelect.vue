@@ -14,14 +14,12 @@
               : selectedOption.option
             : null
         )
-      "
-    >
+      ">
       <option
         v-for="option in options"
         :value="option"
         :key="keyText ? option.option[keyText] : option.option"
-        class="text-neutral-900"
-      >
+        class="text-neutral-900">
         {{ labelText ? option.option[labelText] : option.option }}
       </option>
     </select>
@@ -35,77 +33,77 @@
 </template>
 
 <script lang="ts" setup>
-import { ColoredSelectOption } from "~/types/frontend/ColoredSelectOption";
+  import { ColoredSelectOption } from '~/types/frontend/ColoredSelectOption';
 
-const props = defineProps({
-  id: {
-    type: String,
-    required: false,
-  },
-  options: {
-    type: Array<ColoredSelectOption>,
-    required: true,
-  },
-  current: {
-    type: ColoredSelectOption,
-    required: true,
-  },
-  keyText: {
-    type: String,
-    required: false,
-  },
-  labelText: {
-    type: String,
-    required: true,
-  },
-  changeCallback: {
-    type: Function,
-    required: false,
-    default: () => {},
-  },
-  changeCallbackParams: {
-    type: Array<any>,
-    required: false,
-  },
-  addCurrentValueToCallback: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  valueKeyForCallback: {
-    type: String,
-    required: false,
-    default: null,
-  },
-  readOnly: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-});
-const {
-  id,
-  options,
-  current,
-  changeCallback,
-  changeCallbackParams,
-  addCurrentValueToCallback,
-  keyText,
-  labelText,
-  valueKeyForCallback = null,
-  readOnly,
-} = props;
-
-const selectedOption = ref(current);
-onMounted(() => {
-  document.getElementById(id ?? "")?.addEventListener("error", () => {
-    selectedOption.value = current;
+  const props = defineProps({
+    id: {
+      type: String,
+      required: false,
+    },
+    options: {
+      type: Array<ColoredSelectOption>,
+      required: true,
+    },
+    current: {
+      type: ColoredSelectOption,
+      required: true,
+    },
+    keyText: {
+      type: String,
+      required: false,
+    },
+    labelText: {
+      type: String,
+      required: true,
+    },
+    changeCallback: {
+      type: Function,
+      required: false,
+      default: () => {},
+    },
+    changeCallbackParams: {
+      type: Array<any>,
+      required: false,
+    },
+    addCurrentValueToCallback: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    valueKeyForCallback: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    readOnly: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   });
-});
+  const {
+    id,
+    options,
+    current,
+    changeCallback,
+    changeCallbackParams,
+    addCurrentValueToCallback,
+    keyText,
+    labelText,
+    valueKeyForCallback = null,
+    readOnly,
+  } = props;
+
+  const selectedOption = ref(current);
+  onMounted(() => {
+    document.getElementById(id ?? '')?.addEventListener('error', () => {
+      selectedOption.value = current;
+    });
+  });
 </script>
 
 <style>
-.colored-select {
-  @apply px-2 py-[0.15rem] rounded-md bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)];
-}
+  .colored-select {
+    @apply px-2 py-[0.15rem] rounded-md bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)];
+  }
 </style>

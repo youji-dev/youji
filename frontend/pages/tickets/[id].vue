@@ -6,94 +6,91 @@
     ref="ticketFormInstance"
     :model="ticketModel"
     :rules="ticketFormRules"
-    status-icon
-  >
-    <div v-loading="loading" v-if="!is404 && ticketModel" class="px-5 pb-3">
+    status-icon>
+    <div
+      v-loading="loading"
+      v-if="!is404 && ticketModel"
+      class="px-5 pb-3">
       <TicketHeader
         :ticket="ticketModel"
-        class="lg:col-span-full"
-      ></TicketHeader>
+        class="lg:col-span-full"></TicketHeader>
     </div>
     <div
       class="overflow-y-auto px-5 max-h-[84vh] md:max-h-[88vh]"
-      :style="{ width: width }"
-    >
+      :style="{ width: width }">
       <div
         v-loading="loading"
         v-if="!is404 && ticketModel"
         class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
-        :element-loading-text="loadingText"
-      >
+        :element-loading-text="loadingText">
         <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
-          <el-form-item :label="$t('title')" prop="title">
+          <el-form-item
+            :label="$t('title')"
+            prop="title">
             <el-input
               v-model="ticketModel.title"
               :placeholder="$t('enter')"
-              class="drop-shadow-md dark:base-bg-dark"
-            />
+              class="drop-shadow-md dark:base-bg-dark" />
           </el-form-item>
         </div>
 
         <DropdownGroup
           :ticket="ticketModel"
-          class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start"
-        />
+          class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start" />
 
         <el-form-item
           class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4"
           :label="$t('description')"
-          prop="description"
-        >
+          prop="description">
           <el-input
             v-model="ticketModel.description"
             type="textarea"
             class="drop-shadow-md max-h-full dark:base-bg-dark"
             :rows="13"
             resize="vertical"
-            :placeholder="$t('enter')"
-          />
+            :placeholder="$t('enter')" />
         </el-form-item>
 
         <div
           v-if="!isNew"
-          class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6"
-        >
-          <el-text class="w-1/2 truncate text-center"
-            >{{ $t("createdBy") }}: {{ ticketModel.author }}</el-text
-          >
+          class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
+          <el-text class="w-1/2 truncate text-center">{{ $t('createdBy') }}: {{ ticketModel.author }}</el-text>
           <br />
           <el-text class="w-1/2 text-center"
-            >{{ $t("createdOn") }}:
-            {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text
+            >{{ $t('createdOn') }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text
           >
         </div>
 
         <TicketFiles
           v-if="!isNew"
           class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5"
-          :ticket="ticketModel"
-        />
+          :ticket="ticketModel" />
 
         <TicketCommentCollection
           v-if="!isNew"
           class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3"
-          v-model:ticket="ticketModel"
-        />
+          v-model:ticket="ticketModel" />
 
         <div
           v-if="isNew"
-          class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3"
-        >
-          <el-text>{{ $t("duplicateTickets") }}</el-text>
+          class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3">
+          <el-text>{{ $t('duplicateTickets') }}</el-text>
           <TicketDuplicateTracker :ticket="ticketModel" />
         </div>
       </div>
-      <div v-if="is404" class="h-screen flex justify-center items-center">
-        <el-result class="" icon="error" :title="$t('resourceNotFound')">
+      <div
+        v-if="is404"
+        class="h-screen flex justify-center items-center">
+        <el-result
+          class=""
+          icon="error"
+          :title="$t('resourceNotFound')">
           <template #extra>
-            <el-button @click="router.back()" type="primary">{{
-              $t("back")
-            }}</el-button>
+            <el-button
+              @click="router.back()"
+              type="primary"
+              >{{ $t('back') }}</el-button
+            >
           </template>
         </el-result>
       </div>
@@ -102,20 +99,18 @@
       </div>
     </div>
     <div
-      class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7 sticky bottom-0 page-bg-light dark:page-bg-dark"
-    >
+      class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7 sticky bottom-0 page-bg-light dark:page-bg-dark">
       <el-tooltip
         :disabled="!isNew"
         :content="$t('pdfExportNotOnUnsaved')"
-        placement="top-start"
-      >
+        placement="top-start">
         <el-button
           :disabled="isNew"
           class="text-sm drop-shadow-md"
           type="default"
           :icon="Printer"
           @click="exportToPDF()"
-          >{{ $t("pdfExport") }}</el-button
+          >{{ $t('pdfExport') }}</el-button
         >
       </el-tooltip>
 
@@ -125,27 +120,31 @@
           type="danger"
           @click="deleteDialog = true"
           :hidden="isNew || !isUserAdmin"
-          >{{ $t("delete") }}</el-button
+          >{{ $t('delete') }}</el-button
         >
 
         <el-button
           class="text-sm justify-self-end drop-shadow-md"
           type="default"
           @click="router.back()"
-          >{{ $t("close") }}</el-button
+          >{{ $t('close') }}</el-button
         >
 
         <el-button
           class="text-sm justify-self-end drop-shadow-md"
           type="primary"
           @click="onSaveClick()"
-          >{{ $t("save") }}</el-button
+          >{{ $t('save') }}</el-button
         >
       </div>
     </div>
   </el-form>
   <el-dialog v-model="imagePreviewDisplay">
-    <img w-full :src="imagePreviewSrc" alt="Preview Image" class="w-full" />
+    <img
+      w-full
+      :src="imagePreviewSrc"
+      alt="Preview Image"
+      class="w-full" />
   </el-dialog>
   <TicketDeleteConfirmationDialog
     :ticket="ticketModel"
@@ -155,309 +154,300 @@
         deleteDialog = false;
       }
     "
-    @deleted="() => { router.push(localePath('/tickets')?.fullPath as string) }"
-  />
+    @deleted="
+      () => {
+        router.push(localePath('/tickets')?.fullPath as string);
+      }
+    " />
 </template>
 
 <script lang="ts" setup async>
-import { Printer } from "@element-plus/icons-vue";
-import type { FormInstance, FormRules } from "element-plus";
+  import { Printer } from '@element-plus/icons-vue';
+  import type { FormInstance, FormRules } from 'element-plus';
 
-import type building from "~/types/api/response/buildingResponse";
-import type priority from "~/types/api/response/priorityResponse";
-import type state from "~/types/api/response/stateResponse";
-import type ticket from "~/types/api/response/ticketResponse";
-import type ticketAttachment from "~/types/api/response/ticketAttachmentResponse";
-import type ticketComment from "~/types/api/response/ticketCommentResponse";
+  import type building from '~/types/api/response/buildingResponse';
+  import type priority from '~/types/api/response/priorityResponse';
+  import type state from '~/types/api/response/stateResponse';
+  import type ticket from '~/types/api/response/ticketResponse';
+  import type ticketAttachment from '~/types/api/response/ticketAttachmentResponse';
+  import type ticketComment from '~/types/api/response/ticketCommentResponse';
 
-import { fromTicketResponse as editTicketFromResponse } from "~/types/api/request/editTicket";
-import TicketNotFoundError from "~/types/error/ticketNotFound";
+  import { fromTicketResponse as editTicketFromResponse } from '~/types/api/request/editTicket';
+  import TicketNotFoundError from '~/types/error/ticketNotFound';
 
-import DropdownGroup from "~/components/ticketDetail/ticketDropdown.vue";
-import TicketCommentCollection from "~/components/ticketDetail/ticketCommentCollection.vue";
-import TicketFiles from "~/components/ticketDetail/ticketFiles.vue";
-import TicketHeader from "~/components/ticketDetail/ticketHeader.vue";
-import TicketDuplicateTracker from "~/components/ticketDetail/ticketDuplicateTracker.vue";
+  import DropdownGroup from '~/components/ticketDetail/ticketDropdown.vue';
+  import TicketCommentCollection from '~/components/ticketDetail/ticketCommentCollection.vue';
+  import TicketFiles from '~/components/ticketDetail/ticketFiles.vue';
+  import TicketHeader from '~/components/ticketDetail/ticketHeader.vue';
+  import TicketDuplicateTracker from '~/components/ticketDetail/ticketDuplicateTracker.vue';
 
-const { $api } = useNuxtApp();
-const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
-const i18n = useI18n();
-const localePath = useLocaleRoute();
+  const { $api } = useNuxtApp();
+  const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());
+  const i18n = useI18n();
+  const localePath = useLocaleRoute();
 
-const { imagePreviewDisplay, imagePreviewSrc } = storeToRefs(
-  useImagePreviewDisplayStore()
-);
+  const { imagePreviewDisplay, imagePreviewSrc } = storeToRefs(useImagePreviewDisplayStore());
 
-const router = useRouter();
-const route = useRoute();
+  const router = useRouter();
+  const route = useRoute();
 
-const width = ref("100vw");
-let isNew = ref((route.params.id as string).toLocaleLowerCase() == "new");
-let is404 = ref(false);
-let loading = ref(true);
-let loadingText = ref(i18n.t("loadingData"));
-let deleteDialog = ref(false);
-let availableStates: Ref<state[]> = ref([] as state[]);
-let availablePriorities: Ref<priority[]> = ref([] as priority[]);
-let availableBuildings: Ref<building[]> = ref([] as building[]);
+  const width = ref('100vw');
+  let isNew = ref((route.params.id as string).toLocaleLowerCase() == 'new');
+  let is404 = ref(false);
+  let loading = ref(true);
+  let loadingText = ref(i18n.t('loadingData'));
+  let deleteDialog = ref(false);
+  let availableStates: Ref<state[]> = ref([] as state[]);
+  let availablePriorities: Ref<priority[]> = ref([] as priority[]);
+  let availableBuildings: Ref<building[]> = ref([] as building[]);
 
-let ticketFormInstance = ref<FormInstance>();
-let ticketModel: Ref<ticket | null> = ref(null);
-const ticketFormRules = reactive<FormRules<ticket>>({
-  title: [
-    { required: true, message: i18n.t("titleRequired"), trigger: "blur" },
-  ],
-  state: [
-    { required: true, message: i18n.t("stateRequired"), trigger: "blur" },
-    {
-      validator: (rule: any, value: any, callback: any) => {
-        if (!canUserChangeStateCheck() && !ticketModel.value?.state.isDefault) {
-          callback(new Error(i18n.t("defaultStateForced")));
-        } else {
-          callback();
-        }
+  let ticketFormInstance = ref<FormInstance>();
+  let ticketModel: Ref<ticket | null> = ref(null);
+  const ticketFormRules = reactive<FormRules<ticket>>({
+    title: [{ required: true, message: i18n.t('titleRequired'), trigger: 'blur' }],
+    state: [
+      { required: true, message: i18n.t('stateRequired'), trigger: 'blur' },
+      {
+        validator: (rule: any, value: any, callback: any) => {
+          if (!canUserChangeStateCheck() && !ticketModel.value?.state.isDefault) {
+            callback(new Error(i18n.t('defaultStateForced')));
+          } else {
+            callback();
+          }
+        },
       },
-    },
-  ],
-  priority: [
-    { required: true, message: i18n.t("priorityRequired"), trigger: "blur" },
-  ],
-});
+    ],
+    priority: [{ required: true, message: i18n.t('priorityRequired'), trigger: 'blur' }],
+  });
 
-onNuxtReady(async () => {
-  await Promise.all([
-    $api.state.getAll(),
-    $api.priority.getAll(),
-    $api.building.getAll(),
-    fetchOrInitializeTicket(route.params.id as string),
-  ])
-    .then(([states, priorities, buildings, ticketData]) => {
-      availableStates.value = states.data.value ?? [];
-      availablePriorities.value = priorities.data.value ?? [];
-      availableBuildings.value = buildings.data.value ?? [];
-      ticketModel.value = ticketData;
-      is404.value = false;
+  onNuxtReady(async () => {
+    await Promise.all([
+      $api.state.getAll(),
+      $api.priority.getAll(),
+      $api.building.getAll(),
+      fetchOrInitializeTicket(route.params.id as string),
+    ])
+      .then(([states, priorities, buildings, ticketData]) => {
+        availableStates.value = states.data.value ?? [];
+        availablePriorities.value = priorities.data.value ?? [];
+        availableBuildings.value = buildings.data.value ?? [];
+        ticketModel.value = ticketData;
+        is404.value = false;
 
-      const defaultState = availableStates.value.find(
-        (state) => state.isDefault
-      );
-      const canUserChangeState = canUserChangeStateCheck();
-      if (isNew.value && !canUserChangeState && defaultState) {
-        ticketModel.value!.state = defaultState;
+        const defaultState = availableStates.value.find(state => state.isDefault);
+        const canUserChangeState = canUserChangeStateCheck();
+        if (isNew.value && !canUserChangeState && defaultState) {
+          ticketModel.value!.state = defaultState;
+        }
+      })
+      .catch(error => {
+        if (error instanceof TicketNotFoundError) {
+          is404.value = true;
+        } else {
+          ElNotification({
+            title: i18n.t('error'),
+            message: (error as Error).message,
+            type: 'error',
+            duration: 5000,
+          });
+        }
+      })
+      .finally(() => (loading.value = false));
+
+    determineViewWidth();
+    window.addEventListener('resize', determineViewWidth);
+  });
+
+  const defaultStateValidator = (rule: any, value: any, callback: any) => {
+    if (!canUserChangeStateCheck() && ticketModel.value?.state.isDefault) {
+      callback(new Error(i18n.t('defaultStateForced')));
+    } else {
+      callback();
+    }
+  };
+
+  function canUserChangeStateCheck(): boolean {
+    const defaultState = availableStates.value.find(state => state.isDefault);
+
+    const isUserPrivileged = isUserAdmin.value || isUserFacilityManager.value;
+
+    return isUserPrivileged || !defaultState;
+  }
+
+  async function fetchOrInitializeTicket(id: string): Promise<ticket> {
+    if (id === 'new') {
+      const newTicket = {
+        title: '',
+        description: '',
+        author: '',
+        attachments: [] as ticketAttachment[],
+        comments: [] as ticketComment[],
+      } as ticket;
+
+      return newTicket;
+    }
+
+    const ticketResult = await $api.ticket.get(id);
+
+    if (ticketResult.error.value) {
+      console.log(ticketResult.error);
+      if (ticketResult.error.value.statusCode === 404) {
+        throw new TicketNotFoundError('Ticket not found');
       }
-    })
-    .catch((error) => {
-      if (error instanceof TicketNotFoundError) {
-        is404.value = true;
+      if (ticketResult.error.value.statusCode === 500) {
+        throw new Error('serverError');
+      }
+      if (ticketResult.error.value.message) {
+        throw new Error(ticketResult.error.value.message);
+      }
+      if (ticketResult.error.value.data) {
+        throw new Error(ticketResult.error.value.data);
       } else {
+        throw new Error(i18n.t('error'));
+      }
+    }
+    const ticketData = ticketResult.data.value;
+
+    if (ticketData === null) {
+      return await fetchOrInitializeTicket('new');
+    }
+    return ticketData;
+  }
+
+  async function onSaveClick() {
+    if (!ticketFormInstance.value) return;
+    await ticketFormInstance.value.validate(async isValid => {
+      if (!isValid) {
         ElNotification({
-          title: i18n.t("error"),
-          message: (error as Error).message,
-          type: "error",
+          title: i18n.t('error'),
+          message: i18n.t('formInvalid'),
+          type: 'error',
           duration: 5000,
         });
+        return;
+      } else {
+        if (isNew.value) await createTicket();
+        else await saveTicketChanges();
       }
-    })
-    .finally(() => (loading.value = false));
-
-  determineViewWidth();
-  window.addEventListener("resize", determineViewWidth);
-});
-
-const defaultStateValidator = (rule: any, value: any, callback: any) => {
-  if (!canUserChangeStateCheck() && ticketModel.value?.state.isDefault) {
-    callback(new Error(i18n.t("defaultStateForced")));
-  } else {
-    callback();
-  }
-};
-
-function canUserChangeStateCheck(): boolean {
-  const defaultState = availableStates.value.find((state) => state.isDefault);
-
-  const isUserPrivileged = isUserAdmin.value || isUserFacilityManager.value;
-
-  return isUserPrivileged || !defaultState;
-}
-
-async function fetchOrInitializeTicket(id: string): Promise<ticket> {
-  if (id === "new") {
-    const newTicket = {
-      title: "",
-      description: "",
-      author: "",
-      attachments: [] as ticketAttachment[],
-      comments: [] as ticketComment[],
-    } as ticket;
-
-    return newTicket;
+    });
   }
 
-  const ticketResult = await $api.ticket.get(id);
+  async function saveTicketChanges() {
+    try {
+      loadingText.value = i18n.t('savingTicket');
+      loading.value = true;
+      const ticketResult = await $api.ticket.edit(editTicketFromResponse(ticketModel.value!));
 
-  if (ticketResult.error.value) {
-    console.log(ticketResult.error);
-    if (ticketResult.error.value.statusCode === 404) {
-      throw new TicketNotFoundError("Ticket not found");
-    }
-    if (ticketResult.error.value.statusCode === 500) {
-      throw new Error("serverError");
-    }
-    if (ticketResult.error.value.message) {
-      throw new Error(ticketResult.error.value.message);
-    }
-    if (ticketResult.error.value.data) {
-      throw new Error(ticketResult.error.value.data);
-    } else {
-      throw new Error(i18n.t("error"));
-    }
-  }
-  const ticketData = ticketResult.data.value;
+      if (ticketResult.error.value) {
+        if (ticketResult.error.value.statusCode === 404) {
+          throw new Error(i18n.t('resourceNotFound'));
+        }
+        if (ticketResult.error.value.statusCode === 403) {
+          throw new Error(i18n.t('forbidden'));
+        }
+        if (ticketResult.error.value.statusCode === 500) {
+          throw new Error('serverError');
+        }
+        if (ticketResult.error.value.message) {
+          throw new Error(ticketResult.error.value.message);
+        }
+        if (ticketResult.error.value.data) {
+          throw new Error(ticketResult.error.value.data);
+        } else {
+          throw new Error(i18n.t('error'));
+        }
+      } else {
+        ElMessage({
+          message: i18n.t('saved'),
+          type: 'success',
+          duration: 5000,
+        });
 
-  if (ticketData === null) {
-    return await fetchOrInitializeTicket("new");
-  }
-  return ticketData;
-}
-
-async function onSaveClick() {
-  if (!ticketFormInstance.value) return;
-  await ticketFormInstance.value.validate(async (isValid) => {
-    if (!isValid) {
+        // no data is returned when nothing was changed
+        if (ticketResult.data.value) {
+          ticketModel.value = ticketResult.data.value;
+        }
+      }
+    } catch (error) {
       ElNotification({
-        title: i18n.t("error"),
-        message: i18n.t("formInvalid"),
-        type: "error",
+        title: i18n.t('error'),
+        message: (error as Error).message,
+        type: 'error',
         duration: 5000,
       });
-      return;
-    } else {
-      if (isNew.value) await createTicket();
-      else await saveTicketChanges();
+    } finally {
+      loading.value = false;
     }
-  });
-}
+  }
 
-async function saveTicketChanges() {
-  try {
-    loadingText.value = i18n.t("savingTicket");
-    loading.value = true;
-    const ticketResult = await $api.ticket.edit(
-      editTicketFromResponse(ticketModel.value!)
-    );
-
-    if (ticketResult.error.value) {
-      if (ticketResult.error.value.statusCode === 404) {
-        throw new Error(i18n.t("resourceNotFound"));
-      }
-      if (ticketResult.error.value.statusCode === 403) {
-        throw new Error(i18n.t("forbidden"));
-      }
-      if (ticketResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (ticketResult.error.value.message) {
-        throw new Error(ticketResult.error.value.message);
-      }
-      if (ticketResult.error.value.data) {
-        throw new Error(ticketResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    } else {
-      ElMessage({
-        message: i18n.t("saved"),
-        type: "success",
-        duration: 5000,
+  async function createTicket() {
+    try {
+      loadingText.value = i18n.t('creatingTicket');
+      loading.value = true;
+      const ticketResult = await $api.ticket.create({
+        title: ticketModel.value!.title,
+        description: ticketModel.value!.description ?? null,
+        author: ticketModel.value!.author,
+        stateId: ticketModel.value!.state.id,
+        priorityId: ticketModel.value!.priority.id,
+        buildingId: ticketModel.value!.building?.id ?? null,
+        object: ticketModel.value!.object ?? null,
+        room: ticketModel.value!.room ?? null,
       });
 
-      // no data is returned when nothing was changed
+      if (ticketResult.error.value) {
+        if (ticketResult.error.value.statusCode === 403) {
+          throw new Error(i18n.t('forbidden'));
+        }
+        if (ticketResult.error.value.statusCode === 500) {
+          throw new Error('serverError');
+        }
+        if (ticketResult.error.value.message) {
+          throw new Error(ticketResult.error.value.message);
+        }
+        if (ticketResult.error.value.data) {
+          throw new Error(ticketResult.error.value.data);
+        } else {
+          throw new Error(i18n.t('error'));
+        }
+      }
+
       if (ticketResult.data.value) {
-        ticketModel.value = ticketResult.data.value;
+        ElMessage({
+          message: i18n.t('saved'),
+          type: 'success',
+          duration: 5000,
+        });
+        router.push(localePath('/tickets/' + ticketResult.data.value.id)?.fullPath as string);
       }
-    }
-  } catch (error) {
-    ElNotification({
-      title: i18n.t("error"),
-      message: (error as Error).message,
-      type: "error",
-      duration: 5000,
-    });
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function createTicket() {
-  try {
-    loadingText.value = i18n.t("creatingTicket");
-    loading.value = true;
-    const ticketResult = await $api.ticket.create({
-      title: ticketModel.value!.title,
-      description: ticketModel.value!.description ?? null,
-      author: ticketModel.value!.author,
-      stateId: ticketModel.value!.state.id,
-      priorityId: ticketModel.value!.priority.id,
-      buildingId: ticketModel.value!.building?.id ?? null,
-      object: ticketModel.value!.object ?? null,
-      room: ticketModel.value!.room ?? null,
-    });
-
-    if (ticketResult.error.value) {
-      if (ticketResult.error.value.statusCode === 403) {
-        throw new Error(i18n.t("forbidden"));
-      }
-      if (ticketResult.error.value.statusCode === 500) {
-        throw new Error("serverError");
-      }
-      if (ticketResult.error.value.message) {
-        throw new Error(ticketResult.error.value.message);
-      }
-      if (ticketResult.error.value.data) {
-        throw new Error(ticketResult.error.value.data);
-      } else {
-        throw new Error(i18n.t("error"));
-      }
-    }
-
-    if (ticketResult.data.value) {
-      ElMessage({
-        message: i18n.t("saved"),
-        type: "success",
+    } catch (error) {
+      ElNotification({
+        title: i18n.t('error'),
+        message: (error as Error).message,
+        type: 'error',
         duration: 5000,
       });
-      router.push(
-        localePath("/tickets/" + ticketResult.data.value.id)?.fullPath as string
-      );
+    } finally {
+      loading.value = false;
     }
-  } catch (error) {
-    ElNotification({
-      title: i18n.t("error"),
-      message: (error as Error).message,
-      type: "error",
-      duration: 5000,
-    });
-  } finally {
+  }
+
+  async function exportToPDF() {
+    loadingText.value = i18n.t('creatingPDFExport');
+    loading.value = true;
+    await $api.ticket.exportToPDF(route.params.id as string, i18n.locale.value);
     loading.value = false;
   }
-}
 
-async function exportToPDF() {
-  loadingText.value = i18n.t("creatingPDFExport");
-  loading.value = true;
-  await $api.ticket.exportToPDF(route.params.id as string, i18n.locale.value);
-  loading.value = false;
-}
+  function determineViewWidth() {
+    if (typeof document === 'undefined') return;
+    const navbar = document.getElementById('navbar');
+    if (typeof navbar === 'undefined') return;
+    if (typeof navbar?.offsetWidth === 'undefined') return;
+    width.value = window.innerWidth - navbar?.offsetWidth + 'px';
+    const table = document.querySelector('el-table__inner-wrapper');
+    if (!!!table) return;
 
-function determineViewWidth() {
-  if (typeof document === "undefined") return;
-  const navbar = document.getElementById("navbar");
-  if (typeof navbar === "undefined") return;
-  if (typeof navbar?.offsetWidth === "undefined") return;
-  width.value = window.innerWidth - navbar?.offsetWidth + "px";
-  const table = document.querySelector("el-table__inner-wrapper");
-  if (!!!table) return;
-
-  return;
-}
+    return;
+  }
 </script>

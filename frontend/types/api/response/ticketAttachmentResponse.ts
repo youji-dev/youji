@@ -26,6 +26,6 @@ export default interface ticketAttachment {
    * Blurhash of the attachment. Null if attachment is not an image.
    * This is used to generate the image preview before the image is downloadet
    * @see https://blurha.sh
-  */
+   */
   blurHash?: string;
 }

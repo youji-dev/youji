@@ -8,7 +8,10 @@
     "generate": "nuxt generate",
     "dev:host": "nuxt dev --hostname '172.16.221.51' --host",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "lint": "npm run lint:prettier",
+    "lint:eslint": "prettier . --check",
+    "lint:prettier": "prettier . --check"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
@@ -23,6 +26,7 @@
     "jwt-decode": "^4.0.0",
     "nuxt": "^3.12.4",
     "pinia": "^2.1.7",
+    "prettier": "^3.5.3",
     "vue": "latest"
   },
   "overrides": {

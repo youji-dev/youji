@@ -68,6 +68,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@element-plus/nuxt',
     '@unlazy/nuxt',
+    '@nuxt/eslint',
   ],
   i18n: {
     strategy: 'prefix',

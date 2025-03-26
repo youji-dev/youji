@@ -1,8 +1,8 @@
 <template>
   <div
     v-if="!initialLoading"
-    class="grid grid-cols-1 lg:grid-cols-2"
-    id="usersettings">
+    id="userSettings"
+    class="grid grid-cols-1 lg:grid-cols-2">
     <div class="flex flex-col">
       <div class="flex justify-between lg:justify-between items-center py-2">
         <h1 class="text-lg">{{ $t('theme') }}</h1>
@@ -16,7 +16,7 @@
                   : $t('system')
             }}
           </h1>
-          <Theme />
+          <ThemePicker />
         </div>
       </div>
       <div class="flex justify-between lg:justify-between items-center py-2">
@@ -25,7 +25,7 @@
           <h1 class="text-sm px-3">
             {{ locale }}
           </h1>
-          <Language />
+          <LanguagePicker />
         </div>
       </div>
 
@@ -39,7 +39,7 @@
         <el-switch
           v-if="myUser !== null"
           v-model="myUser.allowsEmailNotifications.value"
-          @change="toggleEmailNotifications()"></el-switch>
+          @change="toggleEmailNotifications()" />
       </div>
       <div class="flex justify-between lg:justify-between items-center py-2">
         <h1 class="text-lg">{{ $t('languageEmail') }}</h1>
@@ -48,7 +48,7 @@
             <span v-if="_emailLocale !== ''">{{ _emailLocale ? _emailLocale : $t('null') }}</span>
             <span v-else><ElIconLoading class="animate-spin w-3" /></span>
           </h1>
-          <LanguageEmail />
+          <LanguageEmailPicker />
         </div>
       </div>
     </div>
@@ -62,9 +62,9 @@
 
 <script lang="ts" setup>
   import type EditUserRequest from '~/types/api/request/editUser';
-  import Language from '../language.vue';
-  import LanguageEmail from '../languageEmail.vue';
-  import Theme from '../theme.vue';
+  import LanguagePicker from '../languagePicker.vue';
+  import LanguageEmailPicker from '../languageEmailPicker.vue';
+  import ThemePicker from '../themePicker.vue';
   const colorMode = useColorMode();
   const i18n = useI18n();
   const { locales } = useI18n();
@@ -87,6 +87,9 @@
     }
   });
 
+  /**
+   * Toggles the email notifications for the current user.
+   */
   async function toggleEmailNotifications() {
     if (myUser.value === null) return;
     const updatedUser = {
@@ -97,7 +100,7 @@
   }
 
   onNuxtReady(() => {
-    document.getElementById('usersettings')?.addEventListener('updateFailed', () => {
+    document.getElementById('userSettings')?.addEventListener('updateFailed', () => {
       ElMessage({
         type: 'warning',
         message: i18n.t('updateFailed'),

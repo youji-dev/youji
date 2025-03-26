@@ -6,8 +6,8 @@
       <Logo />
       <Icon
         name="hugeicons:menu-01"
-        @click="drawer = true"
-        class="text-neutral-700 dark:text-neutral-300 text-3xl py-6 cursor-pointer" />
+        class="text-neutral-700 dark:text-neutral-300 text-3xl py-6 cursor-pointer"
+        @click="drawer = true" />
     </div>
 
     <el-drawer
@@ -16,13 +16,8 @@
       :with-header="false"
       :direction="'ltr'"
       style="min-width: fit-content; max-width: fit-content; height: 100vh">
-      <template
-        #header="{}"
-        style="margin-bottom: 0">
-      </template>
-      <template
-        #body
-        style="overflow-y: hidden"></template>
+      <template #header="{}" />
+      <template #body />
       <el-menu
         :default-active="getPageIndex()"
         class="el-menu-vertical-demo h-full">
@@ -40,7 +35,7 @@
               <Files />
             </el-icon>
             <el-badge
-              v-bind:hidden="!openTicketsCount"
+              :hidden="!openTicketsCount"
               :value="openTicketsCount ?? 0"
               type="primary"
               :offset="[-125, 15]">
@@ -62,7 +57,7 @@
           </el-menu-item>
         </div>
         <div>
-          <el-divider></el-divider>
+          <el-divider />
           <el-menu-item
             class="menu-item"
             @click="
@@ -96,7 +91,7 @@
 
 <script lang="ts" setup>
   import { Files, Plus, Setting, Upload } from '@element-plus/icons-vue';
-  import Logo from './logo.vue';
+  import Logo from './logoContainer.vue';
 
   const drawer = ref(false);
   const router = useRouter();
@@ -105,10 +100,14 @@
   const routeObject = reactive({ route });
   const { locale } = useI18n();
 
-  const props = defineProps<{
+  const _props = defineProps<{
     openTicketsCount: number | null;
   }>();
 
+  /**
+   * Get the current page index
+   * @returns {string} The current page index
+   */
   function getPageIndex() {
     if (routeObject.route.fullPath == localeRoute('/tickets', locale.value)?.fullPath) {
       return '1';

@@ -1,18 +1,18 @@
 <template>
   <div class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll">
-    <Sidebar
+    <SidebarDesktop
       class="flex-none"
-      :openTicketsCount="openTickets" />
+      :open-tickets-count="openTickets" />
     <SidebarMobile
       class="flex-none"
-      :openTicketsCount="openTickets" />
+      :open-tickets-count="openTickets" />
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import SidebarMobile from '~/components/sidebar-mobile.vue';
-  import Sidebar from '~/components/sidebar.vue';
+  import SidebarMobile from '~/components/sidebarMobile.vue';
+  import SidebarDesktop from '~/components/sidebarDesktop.vue';
 
   const { $api } = useNuxtApp();
   const { statusOptions } = storeToRefs(useTicketsStore());

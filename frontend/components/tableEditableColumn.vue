@@ -5,23 +5,23 @@
     :prop="prop + '[value]'">
     <template #default="{ row }">
       <span
-        class="w-full flex items-center justify-between"
-        v-if="row[prop].editing && !disabled">
+        v-if="row[prop].editing && !disabled"
+        class="w-full flex items-center justify-between">
         <el-input
           v-model="row[prop].value"
           :placeholder="$t('empty')"
+          :type="inputType ? inputType : 'text'"
           @blur="
             row[prop].editing = !row[prop].editing;
             !row.new && saveCallback(row, 'U');
           "
-          :type="inputType ? inputType : 'text'"
-          v-on:vue:mounted="focusInput"></el-input>
+          @vue:mounted="focusInput" />
         <el-icon-check
           class="w-4 mx-1"
           @click="
             row[prop].editing = false;
             !row.new && saveCallback(row, 'U');
-          "></el-icon-check>
+          " />
       </span>
       <h1
         v-else
@@ -31,8 +31,8 @@
           ><el-icon-edit-pen
             v-if="!disabled"
             class="w-3"
-            @click="row[prop].editing = true"></el-icon-edit-pen
-        ></span>
+            @click="row[prop].editing = true"
+        /></span>
       </h1>
     </template>
   </el-table-column>
@@ -60,6 +60,7 @@
     inputType: {
       type: String,
       required: false,
+      default: '',
     },
     disabled: {
       type: Boolean,
@@ -68,6 +69,7 @@
     minWidth: {
       type: String,
       required: false,
+      default: '',
     },
   });
 
@@ -87,8 +89,15 @@
   // Every property should be represented by a {editing: boolean, value: any} object.
   // If a row should be recognized as "new" so that it will pass the "C" (Create) operation to the save callback, please set the "new" property on your new row object to "true".
   // If your table data is in this format, this function will determine the corresponding object in your dataset based on the clicked row and column and set its "editing" value.
+
+  /**
+   * Callback function for the el-table element
+   * @param row row that the callback should be executed on
+   * @param col column that t he callback should be executed on
+   * @param data the data array that contains the row object
+   */
   export function handleCellClick(row: any, col: any, data: any) {
-    let cellObj = data.filter((obj: any) => obj.id.value === row.id.value)[0][col.property.split('[')[0]];
+    const cellObj = data.filter((obj: any) => obj.id.value === row.id.value)[0][col.property.split('[')[0]];
     if (cellObj.editing !== 'undefined') {
       cellObj.editing = !cellObj.editing;
     }

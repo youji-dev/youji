@@ -4,20 +4,20 @@
     width="500"
     :before-close="beforeClose"
     :title="i18n.t('deleteTicketTitle')"
-    v-on:closed="beforeClose">
+    @closed="beforeClose">
     <p style="font-weight: bold">{{ ticket?.title }}</p>
     <span>{{ $t('deleteTicketDescription') }}</span>
     <template #footer>
       <div class="dialog-footer">
         <el-button
-          @click="isVisible = false"
           type="default"
+          @click="isVisible = false"
           >{{ $t('close') }}</el-button
         >
         <el-button
           type="danger"
-          @click="deleteTicket()"
-          :loading="loading">
+          :loading="loading"
+          @click="deleteTicket()">
           {{ $t('delete') }}
         </el-button>
       </div>
@@ -34,11 +34,14 @@
 
   const emit = defineEmits(['deleted']);
 
-  let loading = ref(false);
+  const loading = ref(false);
 
   const { $api } = useNuxtApp();
   const i18n = useI18n();
 
+  /**
+   * Deletes the ticket that this dialog is associated with
+   */
   async function deleteTicket() {
     loading.value = true;
     try {

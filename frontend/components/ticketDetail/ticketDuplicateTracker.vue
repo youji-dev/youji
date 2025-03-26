@@ -36,10 +36,10 @@
                   })
                 "
                 :current="new ColoredSelectOption(scope.row.state, scope.row.state.color)"
-                keyText="id"
-                labelText="name"
-                :changeCallback="() => {}"
-                :readOnly="true" />
+                key-text="id"
+                label-text="name"
+                :change-callback="() => {}"
+                :read-only="true" />
             </div>
           </template>
         </el-table-column>
@@ -67,10 +67,10 @@
                   })
                 "
                 :current="new ColoredSelectOption(scope.row.priority, scope.row.priority.color)"
-                keyText="id"
-                labelText="name"
-                :changeCallback="() => {}"
-                :readOnly="true" />
+                key-text="id"
+                label-text="name"
+                :change-callback="() => {}"
+                :read-only="true" />
             </div>
           </template>
         </el-table-column>
@@ -95,7 +95,7 @@
               type="primary"
               size="small"
               @click="openInNewTab(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)">
-              <ElIconEdit class="w-5 mx-2"></ElIconEdit>
+              <ElIconEdit class="w-5 mx-2" />
             </el-button>
           </template>
         </el-table-column>
@@ -109,7 +109,7 @@
   import ColoredSelect from '~/components/coloredSelect.vue';
   import type priority from '~/types/api/response/priorityResponse';
   import type state from '~/types/api/response/stateResponse';
-  import type ticket from '~/types/api/response/ticketResponse';
+  import type ticketType from '~/types/api/response/ticketResponse';
   import { ColoredSelectOption } from '~/types/frontend/ColoredSelectOption';
 
   const { $api } = useNuxtApp();
@@ -118,12 +118,12 @@
   const localeRoute = useLocaleRoute();
 
   const props = defineProps<{
-    ticket: ticket;
+    ticket: ticketType;
   }>();
 
-  let ticketFilter: Record<string, any[]> = {};
+  let ticketFilter: Record<string, string[]> = {};
   const refreshTimeout: Ref<NodeJS.Timeout | null> = ref(null);
-  const ticketSearchResult = ref<ticket[]>([]);
+  const ticketSearchResult = ref<ticketType[]>([]);
 
   const tableDimensions = ref({
     width: 0,
@@ -152,30 +152,47 @@
     { deep: true }
   );
 
+  /**
+   * Adds title filters to the ticketFilter
+   */
   function addTitleFilters(): void {
     if (props.ticket.title.length > 0) {
       ticketFilter.Title = tokenize(props.ticket.title);
     }
   }
 
+  /**
+   * Adds description filters to the ticketFilter
+   */
   function addDescriptionFilters(): void {
     if (props.ticket.description) {
       ticketFilter.Description = tokenize(props.ticket.description);
     }
   }
 
+  /**
+   * Adds room filters to the ticketFilter
+   */
   function addRoomFilters(): void {
     if (props.ticket.room) {
       ticketFilter.Room = tokenize(props.ticket.room);
     }
   }
 
+  /**
+   * Adds object filters to the ticketFilter
+   */
   function addObjectFilters(): void {
     if (props.ticket.object) {
       ticketFilter.Object = tokenize(props.ticket.object);
     }
   }
 
+  /**
+   * Tokenizes the given text and removes stop words for german and english
+   * @param text The text to tokenize
+   * @returns The tokenized text
+   */
   function tokenize(text: string): string[] {
     const stopWords = new Set([
       'der',
@@ -225,6 +242,9 @@
     return tokens.filter(token => token.length > 4);
   }
 
+  /**
+   * Searches for tickets based on the ticketFilter
+   */
   async function searchForTickets(): Promise<void> {
     for (const key in ticketFilter) {
       if (ticketFilter[key].length === 0) {
@@ -237,7 +257,7 @@
       return;
     }
 
-    var response = await $api.ticket.search(ticketFilter, 'CreationDate', true, 0, 15, true);
+    const response = await $api.ticket.search(ticketFilter, 'CreationDate', true, 0, 15, true);
 
     if (response.data.value == null) {
       ticketSearchResult.value = [];
@@ -247,12 +267,20 @@
     ticketSearchResult.value = response.data.value.results;
   }
 
+  /**
+   * Function to handle the resize event
+   * @param entries The entries of the resize observer
+   */
   function onResize(entries: ResizeObserverEntry[]): void {
     const entry = entries[0];
     const { width, height } = entry.contentRect;
     tableDimensions.value = { width: width - 100, height: height - 10 };
   }
 
+  /**
+   * Opens the given url in a new tab
+   * @param url The url to open
+   */
   function openInNewTab(url: string) {
     const win = window.open(url, '_blank');
     if (win) {

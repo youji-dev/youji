@@ -11,8 +11,8 @@
         :loading="loading"
         size="small"
         :icon="Delete"
-        @click="deleteComment()"
-        :hidden="!(userIsAuthor || isUserAdmin)" />
+        :hidden="!(userIsAuthor || isUserAdmin)"
+        @click="deleteComment()" />
     </div>
     <el-text size="default">{{ commentModel.content }}</el-text>
   </el-card>
@@ -33,10 +33,13 @@
   const { username, isUserAdmin } = storeToRefs(useAuthStore());
   const userIsAuthor = username.value === commentModel.value.author;
 
+  /**
+   * Deletes the comment
+   */
   async function deleteComment() {
     try {
       loading.value = true;
-      let commentDeleteResult = await $api.comment.delete(commentModel.value.id);
+      const commentDeleteResult = await $api.comment.delete(commentModel.value.id);
 
       if (commentDeleteResult.error.value) {
         loading.value = false;

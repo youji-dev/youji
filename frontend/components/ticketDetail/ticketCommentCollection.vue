@@ -21,9 +21,9 @@
     <el-timeline>
       <el-timeline-item
         v-for="comment in sortedComments"
+        :key="comment.id"
         class="drop-shadow-xl"
         :timestamp="new Date(comment.creationDate).toLocaleString()"
-        :key="comment.id"
         placement="top">
         <TicketComment
           :comment="comment"
@@ -44,11 +44,14 @@
 
   const ticketModel = defineModel<ticket>('ticket', { required: true });
   const sortedComments = computed(() => {
-    return ticketModel.value.comments?.sort(sortCommentsByDate) ?? [];
+    return [...(ticketModel.value.comments ?? [])].sort(sortCommentsByDate);
   });
-  let newComment = ref('');
-  let loading = ref(false);
+  const newComment = ref('');
+  const loading = ref(false);
 
+  /**
+   * Creates a comment under the ticket
+   */
   async function sendComment() {
     try {
       if (newComment.value === '') {
@@ -62,7 +65,7 @@
       }
 
       loading.value = true;
-      let commentPostResult = await $api.ticket.addComment(route.params.id as string, newComment.value);
+      const commentPostResult = await $api.ticket.addComment(route.params.id as string, newComment.value);
 
       if (commentPostResult.error.value) {
         loading.value = false;
@@ -102,6 +105,12 @@
     }
   }
 
+  /**
+   * Sorting function for comments
+   * @param a First comment
+   * @param b Second comment
+   * @returns The comparison result
+   */
   function sortCommentsByDate(a: ticketComment, b: ticketComment) {
     return new Date(b.creationDate).getTime() - new Date(a.creationDate).getTime();
   }

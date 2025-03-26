@@ -13,17 +13,17 @@
           class="drop-shadow-xl dark:base-bg-dark"
           :placeholder="$t('select')">
           <el-option
-            v-for="state in availableStates"
-            :key="state.id"
-            :label="state.name"
-            :value="state"
+            v-for="availableState in availableStates"
+            :key="availableState.id"
+            :label="availableState.name"
+            :value="availableState"
             :disabled="!canUserChangeState">
             <div class="flex items-center">
               <el-tag
-                :color="state.color"
+                :color="availableState.color"
                 size="small"
                 class="mr-2 aspect-square" />
-              <span class="truncate">{{ state.name }}</span>
+              <span class="truncate">{{ availableState.name }}</span>
             </div>
           </el-option>
           <template #label>
@@ -47,16 +47,16 @@
         class="drop-shadow-xl dark:base-bg-dark"
         :placeholder="$t('select')">
         <el-option
-          v-for="priority in availablePriorities"
-          :key="priority.id"
-          :label="priority.name"
-          :value="priority">
+          v-for="availablePriority in availablePriorities"
+          :key="availablePriority.id"
+          :label="availablePriority.name"
+          :value="availablePriority">
           <div class="flex items-center">
             <el-tag
-              :color="priority.color"
+              :color="availablePriority.color"
               size="small"
               class="mr-2 aspect-square" />
-            <span class="truncate">{{ priority.name }}</span>
+            <span class="truncate">{{ availablePriority.name }}</span>
           </div>
         </el-option>
         <template #label>
@@ -81,10 +81,10 @@
         :clearable="true"
         :placeholder="$t('select')">
         <el-option
-          v-for="building in availableBuildings"
-          :key="building.id"
-          :label="building.name"
-          :value="building" />
+          v-for="availableBuilding in availableBuildings"
+          :key="availableBuilding.id"
+          :label="availableBuilding.name"
+          :value="availableBuilding" />
       </el-select>
     </el-form-item>
     <el-form-item
@@ -114,7 +114,7 @@
   import type priority from '~/types/api/response/priorityResponse';
   import type building from '~/types/api/response/buildingResponse';
 
-  const props = defineProps<{
+  const _props = defineProps<{
     ticket: ticket;
   }>();
 
@@ -122,11 +122,11 @@
   const { $api } = useNuxtApp();
   const i18n = useI18n();
 
-  let availableStates: Ref<state[]> = ref([]);
-  let availablePriorities: Ref<priority[]> = ref([]);
-  let availableBuildings: Ref<building[]> = ref([]);
-  let doesDefaultStateExist: Ref<boolean> = ref(false);
-  let canUserChangeState: Ref<boolean> = computed(() => {
+  const availableStates: Ref<state[]> = ref([]);
+  const availablePriorities: Ref<priority[]> = ref([]);
+  const availableBuildings: Ref<building[]> = ref([]);
+  const doesDefaultStateExist: Ref<boolean> = ref(false);
+  const canUserChangeState: Ref<boolean> = computed(() => {
     return isUserAdmin.value || isUserFacilityManager.value || !doesDefaultStateExist.value;
   });
 

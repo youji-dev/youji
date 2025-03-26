@@ -1,33 +1,32 @@
 <template>
   <div
-    class="flex flex-col xl:grid xl:grid-cols-2 xl:gap-4"
-    v-if="!initialLoading">
+    v-if="!initialLoading"
+    class="flex flex-col xl:grid xl:grid-cols-2 xl:gap-4">
     <div id="priorities">
       <h1 class="text-sm">{{ $t('managePriorities') }}</h1>
       <el-table
+        v-loading="prioritiesLoading"
         :data="priorities"
         border
         class="my-3 lg:my-1"
         max-height="200"
         style="width: 100%"
         :default-sort="{ prop: 'value[value]', order: 'descending' }"
-        v-loading="prioritiesLoading"
         @cell-dblclick="(row, column) => handleCellClick(row, column, priorities)">
         <el-table-column
           prop="value[value]"
           :label="$t('priority')">
-          <template #default="{ row, index }">
+          <template #default="{ row }">
             <div class="flex items-center justify-around">
               <span
                 v-if="!row.new"
                 class="caret-wrapper"
                 ><i
                   class="sort-caret ascending"
-                  @click="increasePriorityValue(row.id.value)"></i
-                ><i
+                  @click="increasePriorityValue(row.id.value)" /><i
                   class="sort-caret descending"
-                  @click="decreasePriorityValue(row.id.value)"></i
-              ></span>
+                  @click="decreasePriorityValue(row.id.value)"
+              /></span>
               <h1 class="text-sm px-3">{{ row.value.value }}</h1>
             </div>
           </template>
@@ -40,19 +39,19 @@
           <template #default="{ row }">
             <div class="w-full flex justify-center items-center">
               <el-color-picker
-                @change="!row.new && updatePriorities(row, 'U')"
-                v-model="row.color.value" />
+                v-model="row.color.value"
+                @change="!row.new && updatePriorities(row, 'U')" />
             </div>
           </template>
         </el-table-column>
         <el-table-column :label="''">
           <template #default="{ row }">
             <el-popconfirm
+              v-if="!row.new"
               :title="$t('confirmDelete')"
               :cancel-button-text="$t('no')"
               :confirm-button-text="$t('yes')"
-              @confirm="updatePriorities(row, 'D')"
-              v-if="!row.new">
+              @confirm="updatePriorities(row, 'D')">
               <template #reference>
                 <div class="flex items-center justify-center w-full">
                   <el-button
@@ -65,11 +64,11 @@
               </template>
             </el-popconfirm>
             <el-popconfirm
+              v-else
               :title="$t('confirmSave')"
               :cancel-button-text="$t('no')"
               :confirm-button-text="$t('yes')"
-              @confirm="updatePriorities(row, 'C')"
-              v-else>
+              @confirm="updatePriorities(row, 'C')">
               <template #reference>
                 <div class="flex items-center justify-center w-full">
                   <el-button
@@ -101,12 +100,12 @@
     <div id="buildings">
       <h1 class="text-sm">{{ $t('manageBuildings') }}</h1>
       <el-table
+        v-loading="buildingsLoading"
         :data="buildings"
         border
         class="my-3 lg:my-1"
         style="width: 100%"
         max-height="200"
-        v-loading="buildingsLoading"
         :default-sort="{ prop: 'name[value]', order: 'descending' }"
         @cell-dblclick="(row, column) => handleCellClick(row, column, buildings)">
         <TableEditableColumn
@@ -118,11 +117,11 @@
           width="70">
           <template #default="{ row }">
             <el-popconfirm
+              v-if="!row.new"
               :title="$t('confirmDelete')"
               :cancel-button-text="$t('no')"
               :confirm-button-text="$t('yes')"
-              @confirm="updateBuildings(row, 'D')"
-              v-if="!row.new">
+              @confirm="updateBuildings(row, 'D')">
               <template #reference>
                 <div class="flex items-center justify-center w-full">
                   <el-button
@@ -135,11 +134,11 @@
               </template>
             </el-popconfirm>
             <el-popconfirm
+              v-else
               :title="$t('confirmSave')"
               :cancel-button-text="$t('no')"
               :confirm-button-text="$t('yes')"
-              @confirm="updateBuildings(row, 'C')"
-              v-else>
+              @confirm="updateBuildings(row, 'C')">
               <template #reference>
                 <div class="flex items-center justify-center w-full">
                   <el-button
@@ -171,12 +170,12 @@
     <div class="">
       <h1 class="text-sm">{{ $t('manageUsers') }}</h1>
       <el-table
+        v-loading="usersLoading"
         :data="users"
         border
         class="my-3 lg:my-1"
         max-height="300"
         style="width: 100%"
-        v-loading="usersLoading"
         :default-sort="{ prop: 'userId[value]', order: 'descending' }">
         <el-table-column
           :label="$t('userId')"
@@ -240,18 +239,18 @@
       </el-table>
     </div>
     <div
-      class="mt-6 xl:mt-0"
-      id="states">
+      id="states"
+      class="mt-6 xl:mt-0">
       <h1 class="text-sm">{{ $t('manageStatus') }}</h1>
       <el-table
+        v-loading="statesLoading"
         :data="states"
         border
         class="my-3 lg:my-1"
         style="width: 100%"
         max-height="300"
-        v-loading="statesLoading"
-        @cell-dblclick="(row, column) => handleCellClick(row, column, states)"
-        :default-sort="{ prop: 'name[value]', order: 'descending' }">
+        :default-sort="{ prop: 'name[value]', order: 'descending' }"
+        @cell-dblclick="(row, column) => handleCellClick(row, column, states)">
         <TableEditableColumn
           prop="name"
           :label="$t('status')"
@@ -260,8 +259,8 @@
           <template #default="{ row }">
             <div class="w-full flex justify-center items-center">
               <el-color-picker
-                @change="!row.new && updateStates(row, 'U')"
-                v-model="row.color.value" />
+                v-model="row.color.value"
+                @change="!row.new && updateStates(row, 'U')" />
             </div>
           </template>
         </el-table-column>
@@ -292,11 +291,11 @@
           width="70">
           <template #default="{ row }">
             <el-popconfirm
+              v-if="!row.new"
               :title="$t('confirmDelete')"
               :cancel-button-text="$t('no')"
               :confirm-button-text="$t('yes')"
-              @confirm="updateStates(row, 'D')"
-              v-if="!row.new">
+              @confirm="updateStates(row, 'D')">
               <template #reference>
                 <div class="flex items-center justify-center w-full">
                   <el-button
@@ -309,11 +308,11 @@
               </template>
             </el-popconfirm>
             <el-popconfirm
+              v-else
               :title="$t('confirmSave')"
               :cancel-button-text="$t('no')"
               :confirm-button-text="$t('yes')"
-              @confirm="updateStates(row, 'C')"
-              v-else>
+              @confirm="updateStates(row, 'C')">
               <template #reference>
                 <div class="flex items-center justify-center w-full">
                   <el-button
@@ -349,15 +348,15 @@
     <ElIconLoading class="animate-spin w-5" />
   </div>
   <el-dialog
-    v-model="isAdminPermissionRemovalWarningVisable"
+    v-model="isAdminPermissionRemovalWarningVisible"
     width="500"
-    :title="i18n.t('ownPermissingChangeWarningTitle')">
-    <span>{{ $t('ownPermissingChangeWarningDescription') }}</span>
+    :title="i18n.t('ownPermissionChangeWarningTitle')">
+    <span>{{ $t('ownPermissionChangeWarningDescription') }}</span>
     <template #footer>
       <div class="dialog-footer">
         <el-button
-          @click="isAdminPermissionRemovalWarningVisable = false"
           type="default"
+          @click="isAdminPermissionRemovalWarningVisible = false"
           >{{ $t('close') }}</el-button
         >
       </div>
@@ -380,51 +379,53 @@
     initialLoading,
   } = storeToRefs(useSettingsStore());
   const { updateBuildings, updatePriorities, fetchPriorities, updateStates, updateUsers } = useSettingsStore();
-  const loading = ref(usersLoading || prioritiesLoading || buildingsLoading || statesLoading);
-  let isAdminPermissionRemovalWarningVisable = ref(false);
+  const isAdminPermissionRemovalWarningVisible = ref(false);
   onNuxtReady(async () => {
-    document.getElementById('globalsettings')?.addEventListener('defaultStateNotUpdatable', () => {
+    document.getElementById('globalSettings')?.addEventListener('defaultStateNotUpdatable', () => {
       ElMessage({
         type: 'warning',
         message: i18n.t('defaultStateNotUpdatable'),
       });
     });
-    document.getElementById('globalsettings')?.addEventListener('objectIsReferenced', () => {
+    document.getElementById('globalSettings')?.addEventListener('objectIsReferenced', () => {
       ElMessage({
         type: 'error',
         message: i18n.t('objectIsReferenced'),
       });
     });
-    document.getElementById('globalsettings')?.addEventListener('onlyOneDefaultState', () => {
+    document.getElementById('globalSettings')?.addEventListener('onlyOneDefaultState', () => {
       ElMessage({
         type: 'warning',
         message: i18n.t('onlyOneDefaultState'),
       });
     });
-    document.getElementById('globalsettings')?.addEventListener('updateFailed', () => {
+    document.getElementById('globalSettings')?.addEventListener('updateFailed', () => {
       ElMessage({
         type: 'warning',
         message: i18n.t('updateFailed'),
       });
     });
-    document.getElementById('globalsettings')?.addEventListener('saved', () => {
+    document.getElementById('globalSettings')?.addEventListener('saved', () => {
       ElMessage({
         type: 'success',
         message: i18n.t('saved'),
       });
     });
-    document.getElementById('globalsettings')?.addEventListener('ownRoleChanged', () => {
-      isAdminPermissionRemovalWarningVisable.value = true;
+    document.getElementById('globalSettings')?.addEventListener('ownRoleChanged', () => {
+      isAdminPermissionRemovalWarningVisible.value = true;
     });
   });
 
+  /**
+   * Add an empty priority to the list of priorities
+   */
   function addEmptyPriority() {
     priorities.value.push({
       color: { editing: false, value: '' },
       // We initialize the id with a date in order to identify multiple new objects in the frontend before it's saved. Will be overwritten later.
       id: { editing: false, value: new Date().toString() },
       name: { editing: false, value: '' },
-      value: { editing: false, value: findNewPriorityNo() },
+      value: { editing: false, value: findNewPriorityNumber() },
       new: true,
     });
     // setTimeout(() => {
@@ -432,6 +433,9 @@
     // }, 250);
   }
 
+  /**
+   * Add an empty building to the list of buildings
+   */
   function addEmptyBuilding() {
     buildings.value.push({
       id: { editing: false, value: new Date().toString() },
@@ -443,6 +447,9 @@
     }, 250);
   }
 
+  /**
+   * Add an empty state to the list of states
+   */
   function addEmptyState() {
     states.value.push({
       autoPurgeDays: { editing: false, value: null },
@@ -473,57 +480,75 @@
     });
   };
 
+  /**
+   * Changes the order of the priorities by decreasing the value of the priority with the given id therefore increasing the value of the priority below
+   * @param priorityId The id of the priority to decrease the value of
+   */
   async function decreasePriorityValue(priorityId: string) {
-    const { thisPrioIndex, lowerPrioIndex } = findPriorityAndAround(priorityId);
-    if (lowerPrioIndex === null) return;
-    if (thisPrioIndex !== null) {
-      let updatedThisPrio = priorities.value[thisPrioIndex];
-      let updatedLowerPrio = priorities.value[lowerPrioIndex];
-      updatedThisPrio.value.value--;
-      updatedLowerPrio.value.value++;
-      await updatePriorities(updatedThisPrio, 'U');
-      await updatePriorities(updatedLowerPrio, 'U');
+    const { thisPriorityIndex, lowerPriorityIndex } = findPriorityAndAround(priorityId);
+    if (lowerPriorityIndex === null) return;
+    if (thisPriorityIndex !== null) {
+      const updatedThisPriority = priorities.value[thisPriorityIndex];
+      const updatedLowerPriority = priorities.value[lowerPriorityIndex];
+      updatedThisPriority.value.value--;
+      updatedLowerPriority.value.value++;
+      await updatePriorities(updatedThisPriority, 'U');
+      await updatePriorities(updatedLowerPriority, 'U');
       await fetchPriorities();
     }
   }
 
+  /**
+   * Changes the order of the priorities by increasing the value of the priority with the given id therefore decreasing the value of the priority above
+   * @param priorityId The id of the priority to increase the value of
+   */
   async function increasePriorityValue(priorityId: string) {
-    const { thisPrioIndex, higherPrioIndex } = findPriorityAndAround(priorityId);
-    if (higherPrioIndex === null) return;
-    if (thisPrioIndex !== null) {
-      let updatedThisPrio = priorities.value[thisPrioIndex];
-      let updatedHigherPrio = priorities.value[higherPrioIndex];
-      updatedThisPrio.value.value++;
-      updatedHigherPrio.value.value--;
-      await updatePriorities(updatedThisPrio, 'U');
-      await updatePriorities(updatedHigherPrio, 'U');
+    const { thisPriorityIndex, higherPriorityIndex } = findPriorityAndAround(priorityId);
+    if (higherPriorityIndex === null) return;
+    if (thisPriorityIndex !== null) {
+      const updatedThisPriority = priorities.value[thisPriorityIndex];
+      const updatedHigherPriority = priorities.value[higherPriorityIndex];
+      updatedThisPriority.value.value++;
+      updatedHigherPriority.value.value--;
+      await updatePriorities(updatedThisPriority, 'U');
+      await updatePriorities(updatedHigherPriority, 'U');
       await fetchPriorities();
     }
   }
 
+  /**
+   *  Finds the priority with the given id and the priorities above and below it
+   * @param priorityId The id of the priority to find
+   * @returns The index of the priority with the given id and the indexes of the priorities above and below it
+   */
   function findPriorityAndAround(priorityId: string): {
-    thisPrioIndex: number | null;
-    lowerPrioIndex: number | null;
-    higherPrioIndex: number | null;
+    thisPriorityIndex: number | null;
+    lowerPriorityIndex: number | null;
+    higherPriorityIndex: number | null;
   } {
-    let higherPrio = null;
-    let lowerPrio = null;
-    let thisPrio = null;
+    let higherPriority = null;
+    let lowerPriority = null;
+    let thisPriority = null;
     priorities.value.forEach((p, index) => {
       if (p.id.value === priorityId) {
-        thisPrio = index;
-        lowerPrio = typeof priorities.value[index - 1] !== 'undefined' ? index - 1 : null;
-        higherPrio = typeof priorities.value[index + 1] !== 'undefined' ? index + 1 : null;
+        thisPriority = index;
+        lowerPriority = typeof priorities.value[index - 1] !== 'undefined' ? index - 1 : null;
+        higherPriority = typeof priorities.value[index + 1] !== 'undefined' ? index + 1 : null;
         return;
       }
     });
     return {
-      thisPrioIndex: thisPrio,
-      higherPrioIndex: higherPrio,
-      lowerPrioIndex: lowerPrio,
+      thisPriorityIndex: thisPriority,
+      higherPriorityIndex: higherPriority,
+      lowerPriorityIndex: lowerPriority,
     };
   }
-  function findNewPriorityNo() {
+
+  /**
+   * Returns the highest priority value + 1. Used to find the next priority value when adding a new priority^
+   * @returns The highest priority value + 1
+   */
+  function findNewPriorityNumber() {
     let highest = 0;
     priorities.value.forEach(p => {
       if (p.value.value > highest) highest = p.value.value;

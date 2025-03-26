@@ -1,13 +1,14 @@
 <template>
   <el-popover
+    ref="popover"
     placement="top"
     :width="100"
-    trigger="click"
-    ref="popover">
+    trigger="click">
     <div
       v-for="availLocale in availableLocales"
-      @click="switchLocale(availLocale.code)"
-      class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400">
+      :key="availLocale.code"
+      class="flex items-center justify-between px-6 py-1 cursor-pointer hover:text-blue-400"
+      @click="switchLocale(availLocale.code)">
       <div class="flex items-center w-1/3">
         <Icon :name="availLocale.icon" />
       </div>
@@ -33,23 +34,28 @@
 
 <script lang="ts" setup>
   const { locales } = useI18n();
-  const router = useRouter();
-  const switchLocalePath = useSwitchLocalePath();
   const colorMode = useColorMode();
-
-  const popover = ref();
-
   const {
     public: { TEXT_LIGHT, TEXT_DARK },
   } = useRuntimeConfig();
+
   const availableLocales = computed(() => {
     return locales.value;
   });
-
-  const switchLocale = (localeKey: string) => {
+  const { myUser } = storeToRefs(useSettingsStore());
+  const { updateMyUser, fetchUsers, fetchMyUser } = useSettingsStore();
+  const popover = ref();
+  const switchLocale = async (localeKey: string) => {
     if (popover.value) {
       popover.value.hide();
     }
-    router.push(switchLocalePath(localeKey));
+
+    if (myUser.value === null) return;
+    await updateMyUser({
+      userId: myUser.value.userId.value,
+      newPreferredEmailLcid: localeKey,
+    });
+    await fetchUsers();
+    fetchMyUser();
   };
 </script>

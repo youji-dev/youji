@@ -1,16 +1,16 @@
 <template>
   <div class="page-bg-light dark:page-bg-dark min-h-lvh">
     <div class="fixed right-5 bottom-5 z-50">
-      <Theme />
-      <Language />
+      <ThemePicker />
+      <LanguagePicker />
     </div>
     <slot />
   </div>
 </template>
 
 <script lang="ts" setup>
-  import Language from '~/components/language.vue';
-  import Theme from '~/components/theme.vue';
+  import LanguagePicker from '~/components/languagePicker.vue';
+  import ThemePicker from '~/components/themePicker.vue';
 </script>
 
 <style>

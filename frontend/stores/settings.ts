@@ -312,7 +312,7 @@ export const useSettingsStore = defineStore({
               p.new = undefined;
             }
           });
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('saved'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('saved'));
         }
       }
       this.prioritiesLoading = false;
@@ -322,7 +322,7 @@ export const useSettingsStore = defineStore({
       const { $api } = useNuxtApp();
       let resp = await $api.user.edit(updatedUser);
       if (resp.error.value) {
-        document.getElementById('usersettings')?.dispatchEvent(new Event('updateFailed'));
+        document.getElementById('userSettings')?.dispatchEvent(new Event('updateFailed'));
       }
       this.usersLoading = false;
     },

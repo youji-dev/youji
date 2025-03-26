@@ -11,7 +11,7 @@
       <el-divider
         content-position="left"
         border-style="transparent">
-        <Logo></Logo>
+        <Logo />
         <!-- <el-text size="large">{{ $t("ticketSystem") }}</el-text> -->
       </el-divider>
       <el-form-item class="w-full px-10 mt-3">
@@ -55,7 +55,7 @@
   import { storeToRefs } from 'pinia';
   import { useAuthStore } from '~/stores/auth';
   import { ElNotification } from 'element-plus';
-  import Logo from '~/components/logo.vue';
+  import Logo from '~/components/logoContainer.vue';
   const { authenticateUser } = useAuthStore();
   const { authenticated, authErrors } = storeToRefs(useAuthStore());
   const i18n = useI18n();

@@ -1,11 +1,11 @@
 <template>
   <el-button
-    @click="toggleTheme"
     :size="'default'"
     circle
     plain
     type="primary"
-    :icon="determineIcon()"></el-button>
+    :icon="determineIcon()"
+    @click="toggleTheme" />
 </template>
 
 <script lang="ts" setup>
@@ -26,6 +26,10 @@
     }
   };
 
+  /**
+   * Determine the icon to be displayed based on the current color mode
+   * @returns The icon to be displayed
+   */
   function determineIcon() {
     if (colorMode.preference === 'light') {
       return Sunny;

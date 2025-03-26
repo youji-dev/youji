@@ -1,7 +1,7 @@
 <template>
   <div
-    class="max-h-[100vh] px-6 py-3 max-w-fit min-w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height"
-    id="navbar">
+    id="navbar"
+    class="max-h-[100vh] px-6 py-3 max-w-fit min-w-fit base-bg-light dark:base-bg-dark hidden lg:block overflow-x-hidden overflow-y-scroll z-10 nav-height">
     <div class="flex items-center justify-between">
       <Logo />
     </div>
@@ -16,7 +16,7 @@
             <Files />
           </el-icon>
           <el-badge
-            v-bind:hidden="!openTicketsCount"
+            :hidden="!openTicketsCount"
             :value="openTicketsCount ?? 0"
             type="primary"
             :offset="[-125, 15]">
@@ -35,7 +35,7 @@
         </el-menu-item>
       </div>
       <div>
-        <el-divider></el-divider>
+        <el-divider />
         <el-menu-item
           class="menu-item"
           @click="router.push(localeRoute('/logout')?.fullPath as string)">
@@ -61,6 +61,7 @@
 </template>
 
 <script lang="ts" setup>
+  import Logo from './logoContainer.vue';
   import { Files, Plus, Setting, Upload } from '@element-plus/icons-vue';
 
   const localeRoute = useLocaleRoute();
@@ -69,10 +70,18 @@
   const { locale } = useI18n();
   const router = useRouter();
 
-  const props = defineProps<{
+  /**
+   * Get the current page index
+   * @returns {string} The current page index
+   */
+  const _props = defineProps<{
     openTicketsCount: number | null;
   }>();
 
+  /**
+   * Get the current page index
+   * @returns {string} The current page index
+   */
   function getPageIndex() {
     if (routeObject.route.fullPath == localeRoute('/tickets', locale.value)?.fullPath) {
       return '1';

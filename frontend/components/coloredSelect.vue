@@ -1,9 +1,9 @@
 <template>
   <div class="flex flex-row justify-center items-center">
     <select
-      v-model="selectedOption"
       v-if="!readOnly"
       :id="id"
+      v-model="selectedOption"
       class="colored-select bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]"
       @change="
         changeCallback(
@@ -17,8 +17,8 @@
       ">
       <option
         v-for="option in options"
-        :value="option"
         :key="keyText ? option.option[keyText] : option.option"
+        :value="option"
         class="text-neutral-900">
         {{ labelText ? option.option[labelText] : option.option }}
       </option>
@@ -39,6 +39,7 @@
     id: {
       type: String,
       required: false,
+      default: '',
     },
     options: {
       type: Array<ColoredSelectOption>,
@@ -51,6 +52,7 @@
     keyText: {
       type: String,
       required: false,
+      default: '',
     },
     labelText: {
       type: String,
@@ -62,8 +64,9 @@
       default: () => {},
     },
     changeCallbackParams: {
-      type: Array<any>,
+      type: Array<unknown>,
       required: false,
+      default: () => [],
     },
     addCurrentValueToCallback: {
       type: Boolean,

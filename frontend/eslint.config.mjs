@@ -1,5 +1,6 @@
-// @ts-check
 import withNuxt from './.nuxt/eslint.config.mjs';
+import jsdoc from 'eslint-plugin-jsdoc';
 
-export default withNuxt();
-// Your custom configs here
+export default withNuxt({
+  plugins: { jsdoc },
+}).prepend(jsdoc.configs['flat/recommended']);

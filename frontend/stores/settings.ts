@@ -88,7 +88,7 @@ export const useSettingsStore = defineStore({
       if (resp.error.value) {
         console.log(resp.error);
       }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.priorities = resp.data.value
           .map(
             p =>
@@ -109,7 +109,7 @@ export const useSettingsStore = defineStore({
       if (resp.error.value) {
         console.log(resp.error.value);
       }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.states = resp.data.value.map(s => ({
           id: { editing: false, value: s.id },
           name: { editing: false, value: s.name },
@@ -128,7 +128,7 @@ export const useSettingsStore = defineStore({
       if (resp.error.value) {
         console.log(resp.error.value);
       }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.buildings = resp.data.value.map(b => ({
           id: { editing: false, value: b.id },
           name: { editing: false, value: b.name },
@@ -143,7 +143,7 @@ export const useSettingsStore = defineStore({
       if (resp.error.value) {
         console.log(resp.error.value);
       }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.users = resp.data.value.map(u => ({
           userId: { editing: false, value: u.userId },
           type: { editing: false, value: u.type.toString() },
@@ -165,21 +165,21 @@ export const useSettingsStore = defineStore({
       this.usersLoading = true;
       const { $api } = useNuxtApp();
       const { isUserAdmin, username } = useAuthStore();
-      let userObj = {
+      const userObj = {
         userId: updatedUser.userId.value,
         newPreferredEmailLcid: updatedUser.preferredEmailLcid.value,
       } as EditUserRequest;
       if (isUserAdmin) {
         userObj.newRole = Number(updatedUser.type.value);
       }
-      let resp = await $api.user.edit(userObj);
+      const resp = await $api.user.edit(userObj);
       if (resp.error.value) {
-        document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
+        document.getElementById('globalSettings')?.dispatchEvent(new Event('updateFailed'));
       }
       await this.fetchUsers();
       this.usersLoading = false;
       if (username === updatedUser.userId.value) {
-        document.getElementById('globalsettings')?.dispatchEvent(new Event('ownRoleChanged'));
+        document.getElementById('globalSettings')?.dispatchEvent(new Event('ownRoleChanged'));
       }
     },
     async updateBuildings(updatedBuilding: EditableBuilding, operation: 'C' | 'U' | 'D') {
@@ -197,9 +197,9 @@ export const useSettingsStore = defineStore({
             : await $api.building.delete(buildingObj.id);
       if (resp.error.value) {
         if (operation === 'D') {
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('objectIsReferenced'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('objectIsReferenced'));
         } else {
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('updateFailed'));
         }
         console.log(resp.error.value);
       }
@@ -213,7 +213,7 @@ export const useSettingsStore = defineStore({
               b.new = undefined;
             }
           });
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('saved'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('saved'));
         }
       }
       this.buildingsLoading = false;
@@ -234,22 +234,22 @@ export const useSettingsStore = defineStore({
         (currentState.isDefault.value && stateObj.isDefault && operation === 'U' && !setDefaultState) ||
         (currentState.isDefault.value && operation === 'D')
       ) {
-        document.getElementById('globalsettings')?.dispatchEvent(new Event('defaultStateNotUpdatable'));
+        document.getElementById('globalSettings')?.dispatchEvent(new Event('defaultStateNotUpdatable'));
         await this.fetchStates();
         this.statesLoading = false;
         return;
       }
       if (updatedState.isDefault.value) {
-        for (let s of this.states) {
+        for (const s of this.states) {
           if (s.isDefault.value && s.id.value !== updatedState.id.value) {
-            document.getElementById('globalsettings')?.dispatchEvent(new Event('onlyOneDefaultState'));
+            document.getElementById('globalSettings')?.dispatchEvent(new Event('onlyOneDefaultState'));
             await this.fetchStates();
             this.statesLoading = false;
             return;
           }
         }
       }
-      let resp =
+      const resp =
         operation === 'C'
           ? await $api.state.create(stateObj)
           : operation === 'U'
@@ -257,9 +257,9 @@ export const useSettingsStore = defineStore({
             : await $api.state.delete(stateObj.id);
       if (resp.error.value) {
         if (operation === 'D') {
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('objectIsReferenced'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('objectIsReferenced'));
         } else {
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('updateFailed'));
         }
         console.log(resp.error.value);
       }
@@ -273,7 +273,7 @@ export const useSettingsStore = defineStore({
               s.new = undefined;
             }
           });
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('saved'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('saved'));
         }
       }
       this.statesLoading = false;
@@ -296,9 +296,9 @@ export const useSettingsStore = defineStore({
             : await $api.priority.delete(priorityObj.id);
       if (resp.error.value) {
         if (operation === 'D') {
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('objectIsReferenced'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('objectIsReferenced'));
         } else {
-          document.getElementById('globalsettings')?.dispatchEvent(new Event('updateFailed'));
+          document.getElementById('globalSettings')?.dispatchEvent(new Event('updateFailed'));
         }
         console.log(resp.error.value);
       }
@@ -320,7 +320,7 @@ export const useSettingsStore = defineStore({
     async updateMyUser(updatedUser: EditUserRequest) {
       this.usersLoading = true;
       const { $api } = useNuxtApp();
-      let resp = await $api.user.edit(updatedUser);
+      const resp = await $api.user.edit(updatedUser);
       if (resp.error.value) {
         document.getElementById('userSettings')?.dispatchEvent(new Event('updateFailed'));
       }

@@ -1,15 +1,15 @@
 <template>
   <div
-    class="w-full h-[calc(100vh - 74px)] p-6 mt-9 lg:mt-0"
-    id="globalSettings">
+    id="globalSettings"
+    class="w-full h-[calc(100vh - 74px)] p-6 mt-9 lg:mt-0">
     <div
-      class="w-full h-full overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md"
-      id="table_container">
+      id="table_container"
+      class="w-full h-full overflow-y-scroll flex flex-col justify-center items-center base-bg-light dark:base-bg-dark rounded-md">
       <div class="w-full h-full p-3">
         <el-tabs
+          v-model="activeName"
           type="card"
-          class="demo-tabs"
-          v-model="activeName">
+          class="demo-tabs">
           <el-tab-pane
             :label="$t('user')"
             name="user">

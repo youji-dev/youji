@@ -3,7 +3,18 @@ import jsdoc from 'eslint-plugin-jsdoc';
 
 export default withNuxt({
   plugins: { jsdoc },
-  rules: {},
+  rules: {
+    'vue/html-self-closing': [
+      'warn',
+      {
+        html: {
+          void: 'any',
+          normal: 'any',
+          component: 'always',
+        },
+      },
+    ],
+  },
 })
   .prepend(jsdoc.configs['flat/recommended'])
   .overrideRules({

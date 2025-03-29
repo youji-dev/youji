@@ -25,14 +25,18 @@
     openTickets.value = await getOpenTicketCount();
   });
 
+  /**
+   * Determines the number of open tickets. Used fot the bubble in the sidebar.
+   * @returns The number of open tickets.
+   */
   async function getOpenTicketCount(): Promise<number | null> {
-    const filter: Record<string, any[]> = {};
+    const filter: Record<string, string[]> = {};
 
     if (statusOptions.value.some(state => state.hasAutoPurge)) {
       filter.State = statusOptions.value.filter(x => !x.hasAutoPurge).map(x => x.id);
     }
 
-    var result = await $api.ticket.search(filter, 'CreationDate', false, 0, 0, true);
+    const result = await $api.ticket.search(filter, 'CreationDate', false, 0, 0, true);
 
     if (result.data.value == null) return null;
 

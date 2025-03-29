@@ -1,3 +1,4 @@
+/* eslint-disable no-async-promise-executor */
 import type { UseFetchOptions } from '#app';
 
 const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?: UseFetchOptions<T>) => {
@@ -60,7 +61,7 @@ const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?
       if (response?.status === 401) {
         try {
           await refreshAccessToken();
-        } catch (error) {
+        } catch {
           authStore.logUserOut();
           navigateTo(localePath('/login')?.fullPath);
         }

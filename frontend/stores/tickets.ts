@@ -13,9 +13,7 @@ export const useTicketsStore = defineStore('tickets', {
     async fetchStatusOptions() {
       const { $api } = useNuxtApp();
       const resp = await $api.state.getAll();
-      if (resp.error) {
-      }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.statusOptions = resp.data.value;
       }
     },
@@ -26,13 +24,13 @@ export const useTicketsStore = defineStore('tickets', {
       if (resp.error) {
         console.log(resp.error);
       }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.priorityOptions = resp.data.value;
       }
     },
 
     async fetchTickets(
-      search: Record<string, any[]>,
+      search: Record<string, string[]>,
       skip: number,
       take: number,
       orderByCol: string,
@@ -44,14 +42,10 @@ export const useTicketsStore = defineStore('tickets', {
         console.log(resp.error);
         return;
       }
-      if (!!resp.data.value) {
+      if (resp.data.value) {
         this.totalCount = resp.data.value.total;
         this.tickets = resp.data.value.results;
       }
-    },
-    async fetchNewTickets() {
-      const { $api } = useNuxtApp();
-      // Fetch all tickets with status new
     },
   },
 });

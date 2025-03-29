@@ -6,8 +6,8 @@
           <el-button
             class="text-sm"
             link
-            @click="router.back()"
             :icon="ArrowLeft"
+            @click="router.back()"
             >{{ $t('back') }}</el-button
           >
           <el-divider
@@ -74,8 +74,8 @@
           <el-timeline>
             <el-timeline-item
               v-for="i in 2"
-              class="drop-shadow-xl"
               :key="i"
+              class="drop-shadow-xl"
               placement="top">
               <el-skeleton-item class="h-16 mt-2" />
             </el-timeline-item>

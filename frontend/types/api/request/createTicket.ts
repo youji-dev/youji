@@ -11,6 +11,11 @@ export default interface CreateTicketRequest {
   object: string | null;
 }
 
+/**
+ * Parses a ticket response to a create ticket type
+ * @param ticket the ticket response to parse
+ * @returns Parsed create ticket request
+ */
 export function fromTicketResponse(ticket: ticketResponse): CreateTicketRequest {
   return {
     title: ticket.title,

@@ -18,18 +18,15 @@
         <el-input
           v-model="form.username"
           :placeholder="$t('username')"
-          :prefix-icon="User"
-          Text />
+          :prefix-icon="User" />
       </el-form-item>
       <el-form-item class="w-full px-10">
         <el-input
           v-model="form.password"
           :placeholder="$t('password')"
           :prefix-icon="Lock"
-          Password
           type="password"
-          show-password>
-        </el-input>
+          show-password />
       </el-form-item>
       <div class="flex items-center justify-between w-full">
         <el-button
@@ -38,8 +35,8 @@
           type="primary"
           plain
           round
-          @click="loginUser()"
           class="ml-auto mr-10"
+          @click="loginUser()"
           >{{ $t('login') }}</el-button
         >
       </div>
@@ -48,26 +45,31 @@
 </template>
 
 <script lang="ts" setup>
-  definePageMeta({
-    layout: 'base',
-  });
   import { Loading, Lock, User } from '@element-plus/icons-vue';
   import { storeToRefs } from 'pinia';
   import { useAuthStore } from '~/stores/auth';
   import { ElNotification } from 'element-plus';
   import Logo from '~/components/logoContainer.vue';
+
+  definePageMeta({
+    layout: 'base',
+  });
+
   const { authenticateUser } = useAuthStore();
   const { authenticated, authErrors } = storeToRefs(useAuthStore());
   const i18n = useI18n();
   const localePath = useLocaleRoute();
   const router = useRouter();
 
-  let form = ref({
+  const form = ref({
     username: '',
     password: '',
   });
   const loading = ref(false);
 
+  /**
+   * Starts authentication flow for the provided login credentials.
+   */
   async function loginUser() {
     loading.value = true;
     try {
@@ -97,6 +99,10 @@
     }
   }
 
+  /**
+   * Displays a success notification.
+   * @param message The message to display.
+   */
   function notifySuccess(message: string) {
     ElNotification({
       title: i18n.t('success'),
@@ -106,6 +112,10 @@
     });
   }
 
+  /**
+   * Displays an error notification.
+   * @param message The message to display.
+   */
   function notifyError(message: string) {
     ElNotification({
       title: i18n.t('error'),

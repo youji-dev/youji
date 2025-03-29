@@ -45,7 +45,10 @@
   async function deleteTicket() {
     loading.value = true;
     try {
-      const deleteResult = await $api.ticket.delete(ticketModel.value?.id!);
+      if (!ticketModel.value?.id) {
+        throw new Error(i18n.t('error'));
+      }
+      const deleteResult = await $api.ticket.delete(ticketModel.value.id);
 
       if (deleteResult.error.value) {
         if (deleteResult.error.value.statusCode === 403) {

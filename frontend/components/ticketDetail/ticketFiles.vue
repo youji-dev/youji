@@ -82,6 +82,10 @@
     public: { BACKEND_URL, ACCESS_TOKEN_NAME },
   } = useRuntimeConfig();
 
+  /**
+   * Get Authentication headers for upload request
+   * @returns Headers for upload request
+   */
   function getUploadRequestHeaders(): Record<string, any> {
     const token = useCookie(ACCESS_TOKEN_NAME, {
       secure: true,
@@ -93,11 +97,21 @@
     };
   }
 
+  /**
+   * Handle successful upload
+   * @param response Response from the server
+   * @param uploadFile File that was uploaded
+   */
   async function onUploadSuccess(response: any, uploadFile: UploadFile) {
     props.ticket.attachments.pop();
     props.ticket.attachments = [...props.ticket.attachments, response];
   }
 
+  /**
+   * Handle upload error
+   * @param error Error that occurred during upload
+   * @param file File that was being uploaded
+   */
   function onUploadError(error: Error, file: UploadFile) {
     ElNotification({
       title: `${i18n.t('attachmentUploadError')}: ${file.name}`,
@@ -106,17 +120,29 @@
     });
   }
 
+  /**
+   * Get the upload URL for the ticket
+   * @returns Upload URL
+   */
   function getUploadUrl(): string {
     return `${BACKEND_URL}/api/Ticket/${props.ticket.id}/attachment`;
   }
 
-  let loading = ref(false);
+  const loading = ref(false);
 
+  /**
+   * Open the image preview
+   * @param file File to preview
+   */
   function openPreview(file: ticketAttachment) {
     setImagePreviewSrc($api.attachment.generateAttachmentURL(file.id));
     setImagePreviewDisplay(true);
   }
 
+  /**
+   * Instruct the browser to download an attachment
+   * @param file File to download
+   */
   function downloadFile(file: ticketAttachment) {
     const link = document.createElement('a');
     link.href = $api.attachment.generateAttachmentURL(file.id);
@@ -127,10 +153,14 @@
     document.body.removeChild(link);
   }
 
+  /**
+   * Sends a request to delete the file
+   * @param file File to delete
+   */
   async function deleteFile(file: ticketAttachment) {
     loading.value = true;
     try {
-      var attachmentDeleteResult = await $api.attachment.delete(file.id);
+      const attachmentDeleteResult = await $api.attachment.delete(file.id);
 
       if (attachmentDeleteResult.error.value) {
         if (attachmentDeleteResult.error.value.statusCode === 403) {

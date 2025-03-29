@@ -3,8 +3,8 @@
     <el-button
       class="text-sm"
       link
-      @click="router.back()"
       :icon="ArrowLeft"
+      @click="router.back()"
       >{{ $t('back') }}</el-button
     >
     <el-divider
@@ -19,12 +19,12 @@
 </template>
 
 <script lang="ts" setup>
-  import type ticket from '~/types/api/response/ticketResponse';
+  import type ticketType from '~/types/api/response/ticketResponse';
   import { ArrowLeft } from '@element-plus/icons-vue';
 
   defineProps<{
-    ticket: ticket;
+    ticket: ticketType;
   }>();
 
-  var router = useRouter();
+  const router = useRouter();
 </script>

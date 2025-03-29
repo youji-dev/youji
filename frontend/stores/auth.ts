@@ -14,7 +14,7 @@ export const useAuthStore = defineStore('auth', {
     username: '' as string,
     userRole: 0 as Roles,
     loading: false,
-    csrfToken: '' as any,
+    csrfToken: '' as string,
     authErrors: [] as string[],
   }),
   getters: {

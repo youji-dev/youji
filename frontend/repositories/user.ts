@@ -14,7 +14,6 @@ class UserRepository {
   }
 
   async edit(state: EditUserRequest): Promise<ReturnType<typeof useFetchAuthenticated<user>>> {
-    const { isUserAdmin } = useAuthStore();
     return useFetchAuthenticated<user>(this.path + '/' + state.userId, {
       method: 'PATCH',
       body: state,

@@ -84,16 +84,10 @@
   const { prop, label, saveCallback, inputType, disabled, minWidth } = props;
 </script>
 <script lang="ts">
-  // Use this function as a callback in your table element.
-  // Every row (dataset) should have an "id" property.
-  // Every property should be represented by a {editing: boolean, value: any} object.
-  // If a row should be recognized as "new" so that it will pass the "C" (Create) operation to the save callback, please set the "new" property on your new row object to "true".
-  // If your table data is in this format, this function will determine the corresponding object in your dataset based on the clicked row and column and set its "editing" value.
-
   /**
    * Callback function for the el-table element
    * @param row row that the callback should be executed on
-   * @param col column that t he callback should be executed on
+   * @param col column that the callback should be executed on
    * @param data the data array that contains the row object
    */
   export function handleCellClick(row: any, col: any, data: any) {

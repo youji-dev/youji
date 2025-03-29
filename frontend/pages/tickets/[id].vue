@@ -1,26 +1,26 @@
 <template>
   <el-form
+    ref="ticketFormInstance"
     class="mt-20 lg:mt-5 max-h-full overflow-y-clip"
     :style="{ width: width }"
     label-position="top"
-    ref="ticketFormInstance"
     :model="ticketModel"
     :rules="ticketFormRules"
     status-icon>
     <div
-      v-loading="loading"
       v-if="!is404 && ticketModel"
+      v-loading="loading"
       class="px-5 pb-3">
       <TicketHeader
         :ticket="ticketModel"
-        class="lg:col-span-full"></TicketHeader>
+        class="lg:col-span-full" />
     </div>
     <div
       class="overflow-y-auto px-5 max-h-[84vh] md:max-h-[88vh]"
       :style="{ width: width }">
       <div
-        v-loading="loading"
         v-if="!is404 && ticketModel"
+        v-loading="loading"
         class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
         :element-loading-text="loadingText">
         <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
@@ -68,8 +68,8 @@
 
         <TicketCommentCollection
           v-if="!isNew"
-          class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3"
-          v-model:ticket="ticketModel" />
+          v-model:ticket="ticketModel"
+          class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3" />
 
         <div
           v-if="isNew"
@@ -87,8 +87,8 @@
           :title="$t('resourceNotFound')">
           <template #extra>
             <el-button
-              @click="router.back()"
               type="primary"
+              @click="router.back()"
               >{{ $t('back') }}</el-button
             >
           </template>
@@ -118,8 +118,8 @@
         <el-button
           class="text-sm justify-self-end drop-shadow-md"
           type="danger"
-          @click="deleteDialog = true"
           :hidden="isNew || !isUserAdmin"
+          @click="deleteDialog = true"
           >{{ $t('delete') }}</el-button
         >
 
@@ -149,7 +149,7 @@
   <TicketDeleteConfirmationDialog
     :ticket="ticketModel"
     :visible="deleteDialog"
-    :beforeClose="
+    :before-close="
       () => {
         deleteDialog = false;
       }
@@ -192,17 +192,17 @@
   const route = useRoute();
 
   const width = ref('100vw');
-  let isNew = ref((route.params.id as string).toLocaleLowerCase() == 'new');
-  let is404 = ref(false);
-  let loading = ref(true);
-  let loadingText = ref(i18n.t('loadingData'));
-  let deleteDialog = ref(false);
-  let availableStates: Ref<state[]> = ref([] as state[]);
-  let availablePriorities: Ref<priority[]> = ref([] as priority[]);
-  let availableBuildings: Ref<building[]> = ref([] as building[]);
+  const isNew = ref((route.params.id as string).toLocaleLowerCase() == 'new');
+  const is404 = ref(false);
+  const loading = ref(true);
+  const loadingText = ref(i18n.t('loadingData'));
+  const deleteDialog = ref(false);
+  const availableStates: Ref<state[]> = ref([] as state[]);
+  const availablePriorities: Ref<priority[]> = ref([] as priority[]);
+  const availableBuildings: Ref<building[]> = ref([] as building[]);
 
-  let ticketFormInstance = ref<FormInstance>();
-  let ticketModel: Ref<ticket | null> = ref(null);
+  const ticketFormInstance = ref<FormInstance>();
+  const ticketModel: Ref<ticket | null> = ref(null);
   const ticketFormRules = reactive<FormRules<ticket>>({
     title: [{ required: true, message: i18n.t('titleRequired'), trigger: 'blur' }],
     state: [
@@ -258,14 +258,12 @@
     window.addEventListener('resize', determineViewWidth);
   });
 
-  const defaultStateValidator = (rule: any, value: any, callback: any) => {
-    if (!canUserChangeStateCheck() && ticketModel.value?.state.isDefault) {
-      callback(new Error(i18n.t('defaultStateForced')));
-    } else {
-      callback();
-    }
-  };
-
+  /**
+   * Checks if the user can change the state of the ticket.
+   * @returns True if the user can change the state, false otherwise.
+   * @description The user can change the state if they are an admin or facility manager, or if the state is not a default state.
+   * If the state is a default state, the user cannot change it.
+   */
   function canUserChangeStateCheck(): boolean {
     const defaultState = availableStates.value.find(state => state.isDefault);
 
@@ -274,6 +272,12 @@
     return isUserPrivileged || !defaultState;
   }
 
+  /**
+   * Fetches the ticket with the given ID or initializes a new ticket if the ID is 'new'.
+   * @param id The ID of the ticket to fetch.
+   * @returns The fetched or initialized ticket.
+   * @throws TicketNotFoundError if the ticket is not found.
+   */
   async function fetchOrInitializeTicket(id: string): Promise<ticket> {
     if (id === 'new') {
       const newTicket = {
@@ -314,6 +318,10 @@
     return ticketData;
   }
 
+  /**
+   * Handles the click event of the save button.
+   * Validates the form and either creates a new ticket or saves changes to an existing ticket.
+   */
   async function onSaveClick() {
     if (!ticketFormInstance.value) return;
     await ticketFormInstance.value.validate(async isValid => {
@@ -332,6 +340,9 @@
     });
   }
 
+  /**
+   * Saves changes to an existing ticket.
+   */
   async function saveTicketChanges() {
     try {
       loadingText.value = i18n.t('savingTicket');
@@ -380,6 +391,9 @@
     }
   }
 
+  /**
+   * Creates a new ticket.
+   */
   async function createTicket() {
     try {
       loadingText.value = i18n.t('creatingTicket');
@@ -432,6 +446,9 @@
     }
   }
 
+  /**
+   * Exports the ticket to a PDF file.
+   */
   async function exportToPDF() {
     loadingText.value = i18n.t('creatingPDFExport');
     loading.value = true;
@@ -439,6 +456,9 @@
     loading.value = false;
   }
 
+  /**
+   * Determines the width of the view based on the navbar width.
+   */
   function determineViewWidth() {
     if (typeof document === 'undefined') return;
     const navbar = document.getElementById('navbar');
@@ -446,7 +466,7 @@
     if (typeof navbar?.offsetWidth === 'undefined') return;
     width.value = window.innerWidth - navbar?.offsetWidth + 'px';
     const table = document.querySelector('el-table__inner-wrapper');
-    if (!!!table) return;
+    if (!table) return;
 
     return;
   }

@@ -15,7 +15,7 @@ class TicketRepository {
   }
 
   async search(
-    filters: Record<string, any[]>,
+    filters: Record<string, string[]>,
     orderByColumn?: string,
     orderDesc?: boolean,
     skip?: number,

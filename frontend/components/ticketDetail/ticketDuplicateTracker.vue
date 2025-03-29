@@ -1,9 +1,9 @@
 <template>
   <div>
     <el-card
+      v-resize-observer="onResize"
       style="height: 275px"
-      class="block drop-shadow-xl base-bg-light dark:base-bg-dark"
-      v-resize-observer="onResize">
+      class="block drop-shadow-xl base-bg-light dark:base-bg-dark">
       <el-empty
         v-if="ticketSearchResult.length === 0"
         style="height: 250px"
@@ -248,7 +248,7 @@
   async function searchForTickets(): Promise<void> {
     for (const key in ticketFilter) {
       if (ticketFilter[key].length === 0) {
-        delete ticketFilter[key];
+        ticketFilter = Object.fromEntries(Object.entries(ticketFilter).filter(([k]) => k !== key));
       }
     }
 

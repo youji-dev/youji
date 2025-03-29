@@ -16,9 +16,9 @@
           class="ml-1"
           type="primary"
           :icon="ElIconSearch"
-          @click="fetchTicketsFromStart(true)"
           :loading="searchLoading"
-          round></el-button>
+          round
+          @click="fetchTicketsFromStart(true)" />
       </div>
     </div>
     <div
@@ -33,13 +33,13 @@
       <div
         v-if="pageLoading"
         class="w-full h-full p-10 flex justify-center items-center">
-        <ElIconLoading class="animate-spin w-5"></ElIconLoading>
+        <ElIconLoading class="animate-spin w-5" />
       </div>
       <!-- TODO : Somehow change the default element-plus sorting to comply with pagination. When any of the possible sorting arrows are clicked, the data has to be fetched again completely.
        The page should stay the same. -->
       <div
-        class="h-full w-full flex items-center justify-center"
-        v-if="tickets.length === 0 && !loading && !pageLoading">
+        v-if="tickets.length === 0 && !loading && !pageLoading"
+        class="h-full w-full flex items-center justify-center">
         <el-empty :description="$t('nothingFound')" />
       </div>
       <el-table
@@ -51,8 +51,8 @@
           prop: sortColProp,
           order: sortDesc ? 'descending' : 'ascending',
         }"
-        @sort-change="changeSort"
         :sort-by="sortCol"
+        @sort-change="changeSort"
         @row-dblclick="(row: any, column: any, event: Event) => {
           router.push(localeRoute(`/tickets/${row.id}`)?.fullPath as string)
         }">
@@ -80,7 +80,8 @@
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
-                :change-callback="updateTicketStatus"
+                :id="scope.row.id"
+                :change-callback="updateTicketState"
                 :change-callback-params="[scope.row.id]"
                 :add-current-value-to-callback="true"
                 :current="new ColoredSelectOption(scope.row.state, scope.row.state.color)"
@@ -89,10 +90,9 @@
                     return new ColoredSelectOption(opt, opt.color);
                   })
                 "
-                :keyText="'id'"
-                :labelText="'name'"
-                :id="scope.row.id"
-                :read-only="!canEditState(scope.row)"></ColoredSelect>
+                :key-text="'id'"
+                :label-text="'name'"
+                :read-only="!canEditState(scope.row)" />
             </div>
           </template>
         </el-table-column>
@@ -121,6 +121,7 @@
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
+                :id="scope.row.id"
                 :change-callback="updateTicketPriority"
                 :change-callback-params="[scope.row.id]"
                 :add-current-value-to-callback="true"
@@ -130,10 +131,9 @@
                     return new ColoredSelectOption(opt, opt.color);
                   })
                 "
-                :keyText="'id'"
-                :labelText="'name'"
-                :id="scope.row.id"
-                :read-only="!canEditPriority(scope.row)"></ColoredSelect>
+                :key-text="'id'"
+                :label-text="'name'"
+                :read-only="!canEditPriority(scope.row)" />
             </div>
           </template>
         </el-table-column>
@@ -158,7 +158,7 @@
                 type="primary"
                 size="small"
                 @click="router.push(localeRoute(`/tickets/${scope.row.id}`)?.fullPath as string)">
-                <ElIconEdit class="w-5 mx-2"></ElIconEdit>
+                <ElIconEdit class="w-5 mx-2" />
               </el-button>
             </el-tooltip>
             <el-tooltip
@@ -176,15 +176,15 @@
                     displayDeleteDialog = true;
                   }
                 ">
-                <ElIconDelete class="w-5 mx-2"></ElIconDelete>
+                <ElIconDelete class="w-5 mx-2" />
               </el-button>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
       <el-pagination
-        class="mr-auto"
         v-if="!loading && tickets.length > 0"
+        class="mr-auto"
         layout="prev, pager, next"
         :total="totalCount"
         :page-size="25"
@@ -195,7 +195,7 @@
   <TicketDeleteConfirmationDialog
     :ticket="deleteTicket"
     :visible="displayDeleteDialog"
-    :beforeClose="
+    :before-close="
       () => {
         displayDeleteDialog = false;
       }
@@ -210,12 +210,12 @@
 <script lang="tsx" setup>
   import { Search } from '@element-plus/icons-vue';
   import { ref } from 'vue';
-  const search = ref('');
   import ColoredSelect from '~/components/coloredSelect.vue';
   import type priority from '~/types/api/response/priorityResponse';
   import type state from '~/types/api/response/stateResponse';
   import type ticket from '~/types/api/response/ticketResponse';
   import { ColoredSelectOption } from '~/types/frontend/ColoredSelectOption';
+  const search = ref('');
   const { statusOptions, priorityOptions, tickets, totalCount } = storeToRefs(useTicketsStore());
   const { isUserAdmin, isUserFacilityManager, username } = storeToRefs(useAuthStore());
   const { fetchStatusOptions, fetchPriorityOptions, fetchTickets } = useTicketsStore();
@@ -242,14 +242,14 @@
     create_date: string;
   }
 
-  let displayDeleteDialog = ref(false);
-  let deleteTicket: Ref<ticket | null> = ref(null);
+  const displayDeleteDialog = ref(false);
+  const deleteTicket: Ref<ticket | null> = ref(null);
   const tableDimensions = ref({
     width: 0,
     height: 0,
   });
-  let priorityOptionsSorted = computed(() =>
-    priorityOptions.value.sort((prioA: priority, prioB: priority) => prioB.value - prioA.value)
+  const priorityOptionsSorted = computed(() =>
+    [...priorityOptions.value].sort((prioA: priority, prioB: priority) => prioB.value - prioA.value)
   );
 
   onMounted(async () => {
@@ -264,6 +264,10 @@
     window.addEventListener('resize', determineViewWidth);
   });
 
+  /**
+   * Fetches the tickets from the API.
+   * @param fromSearch Indicates if the tickets are fetched from a search.
+   */
   async function fetchTicketsFromStart(fromSearch: boolean) {
     pageLoading.value = fromSearch;
     searchLoading.value = fromSearch;
@@ -274,6 +278,9 @@
     searchLoading.value = false;
   }
 
+  /**
+   * Determines the view width of the table.
+   */
   function determineViewWidth() {
     if (typeof document === 'undefined') return;
     const navbar = document.getElementById('navbar');
@@ -281,13 +288,9 @@
     if (typeof navbar?.offsetWidth === 'undefined') return;
     width.value = window.innerWidth - navbar?.offsetWidth + 'px';
     const table = document.querySelector('el-table__inner-wrapper');
-    if (!!!table) return;
+    if (!table) return;
     return;
   }
-
-  const filterTag = (value: string, row: Ticket) => {
-    return row.status.text === value;
-  };
 
   const parsedTickets = computed(() => {
     return tickets.value.map(ticket => {
@@ -308,6 +311,9 @@
     });
   });
 
+  /**
+   * Fetches the dimensions of the table.
+   */
   function getTableDimensions() {
     const element = document.getElementById('table_container');
     if (element) {
@@ -320,10 +326,15 @@
     }
   }
 
-  function updateTicketStatus(ticketId: string, newStatus: state) {
-    let ticket: ticket[] = tickets.value.filter(ticket => ticket.id === ticketId);
-    if (!!ticket[0]) {
-      let foundTicket: ticket = ticket[0];
+  /**
+   * Updated the state of a ticket.
+   * @param ticketId Id of the ticket to update.
+   * @param newStatus New status of the ticket.
+   */
+  function updateTicketState(ticketId: string, newStatus: state) {
+    const ticket: ticket[] = tickets.value.filter(ticket => ticket.id === ticketId);
+    if (!ticket[0]) {
+      const foundTicket: ticket = ticket[0];
       $api.ticket
         .edit({
           id: foundTicket.id,
@@ -338,7 +349,7 @@
         .then(resp => {
           if (resp.error.value) {
             console.error(resp.error.value);
-            let selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
+            const selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
             selectEl.dispatchEvent(
               new Event('error', {
                 bubbles: false,
@@ -364,8 +375,8 @@
             type: 'success',
           });
         })
-        .catch(e => {
-          let selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
+        .catch(() => {
+          const selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
           selectEl.dispatchEvent(
             new Event('error', {
               bubbles: false,
@@ -381,16 +392,21 @@
     return;
   }
 
-  function updateTicketPriority(ticketId: string, newPrio: priority) {
-    let ticket: ticket[] = tickets.value.filter(ticket => ticket.id === ticketId);
-    if (!!ticket[0]) {
-      let foundTicket: ticket = ticket[0];
+  /**
+   * Updated the priority of a ticket.
+   * @param ticketId Id of the ticket to update.
+   * @param newPriority New priority of the ticket.
+   */
+  function updateTicketPriority(ticketId: string, newPriority: priority) {
+    const ticket: ticket[] = tickets.value.filter(ticket => ticket.id === ticketId);
+    if (!ticket[0]) {
+      const foundTicket: ticket = ticket[0];
       $api.ticket
         .edit({
           id: foundTicket.id,
           title: foundTicket.title,
           description: foundTicket.description,
-          priorityId: newPrio.id,
+          priorityId: newPriority.id,
           stateId: foundTicket.state.id,
           buildingId: foundTicket.building?.id,
           room: foundTicket.room,
@@ -399,7 +415,7 @@
         .then(resp => {
           if (resp.error.value) {
             console.error(resp.error.value);
-            let selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
+            const selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
             selectEl.dispatchEvent(
               new Event('error', {
                 bubbles: false,
@@ -425,8 +441,8 @@
             type: 'success',
           });
         })
-        .catch(e => {
-          let selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
+        .catch(() => {
+          const selectEl: HTMLSelectElement | null = document.getElementById(ticketId) as HTMLSelectElement;
           selectEl.dispatchEvent(
             new Event('error', {
               bubbles: false,
@@ -442,6 +458,12 @@
     return;
   }
 
+  /**
+   * Sorts the tickets by the given column.
+   * @param sortData Instructions for sorting the tickets.
+   * @param sortData.prop Property of the ticketDTO to sort by.
+   * @param sortData.order Ordering of the results.
+   */
   function changeSort(sortData: { column: any; prop: string; order: any }) {
     sortCol.value = sortData.column.filterClassName;
     sortColProp.value = sortData.prop;
@@ -458,6 +480,10 @@
       });
   }
 
+  /**
+   * Paginates to a new page.
+   * @param page The number of the page to paginate to.
+   */
   async function fetchNewPage(page: number) {
     pageNumber.value = page;
     pageLoading.value = true;
@@ -465,6 +491,13 @@
     pageLoading.value = false;
   }
 
+  /**
+   * Verifies if the user can edit the state of a ticket.
+   * @param ticket The ticket to check.
+   * @returns True if the user can edit the state of the ticket, false otherwise.
+   * @description A user can edit the state of a ticket if they are an admin, a facility manager,
+   * or the author of the ticket. If hes is only the author, there must not be a state set as default.
+   */
   function canEditState(ticket: ticket) {
     return (
       isUserAdmin.value ||
@@ -473,6 +506,13 @@
     );
   }
 
+  /**
+   * Verifies if the user can edit the priority of a ticket.
+   * @param ticket The ticket to check.
+   * @returns True if the user can edit the priority of the ticket, false otherwise.
+   * @description A user can edit the priority of a ticket if they are an admin, a facility manager,
+   * or the author of the ticket.
+   */
   function canEditPriority(ticket: ticket) {
     return isUserAdmin.value || isUserFacilityManager.value || ticket.author === username.value;
   }

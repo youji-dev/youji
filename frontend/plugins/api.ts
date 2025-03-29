@@ -1,10 +1,10 @@
-import TicketRepository from "~/repositories/ticket";
-import StateRepository from "~/repositories/state";
-import PriorityRepository from "~/repositories/priority";
-import BuildingRepository from "~/repositories/building";
-import CommentRepository from "~/repositories/comment";
-import AttachmentRepository from "~/repositories/attachment";
-import UserRepository from "~/repositories/user";
+import TicketRepository from '~/repositories/ticket';
+import StateRepository from '~/repositories/state';
+import PriorityRepository from '~/repositories/priority';
+import BuildingRepository from '~/repositories/building';
+import CommentRepository from '~/repositories/comment';
+import AttachmentRepository from '~/repositories/attachment';
+import UserRepository from '~/repositories/user';
 
 interface IApiInstance {
   ticket: TicketRepository;

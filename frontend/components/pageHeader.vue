@@ -7,13 +7,13 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps({
-  text: {
-    type: String,
-    required: true
-  }
-});
-const { text } = props;
+  const props = defineProps({
+    text: {
+      type: String,
+      required: true,
+    },
+  });
+  const { text } = props;
 </script>
 
 <style></style>

@@ -7,25 +7,26 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const token = useCookie(ACCESS_TOKEN_NAME, {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: 'strict',
   });
   const localeRoute = useLocaleRoute();
   const { logUserOut } = useAuthStore();
   const { checkIfTokenIsValid } = useAuthStore();
-  const currentFullFromPath = from.fullPath.endsWith("/") ? from.fullPath.slice(from.fullPath.length, from.fullPath.length) : from.fullPath;
-  const currentFullToPath = to.fullPath.endsWith("/") ? to.fullPath.slice(to.fullPath.length, to.fullPath.length) : to.fullPath;
-  if (to.fullPath === localeRoute("/login")?.fullPath) {
+  const currentFullFromPath = from.fullPath.endsWith('/')
+    ? from.fullPath.slice(from.fullPath.length, from.fullPath.length)
+    : from.fullPath;
+  const currentFullToPath = to.fullPath.endsWith('/')
+    ? to.fullPath.slice(to.fullPath.length, to.fullPath.length)
+    : to.fullPath;
+  if (to.fullPath === localeRoute('/login')?.fullPath) {
     return;
   }
-  if (to.fullPath === "/logout") {
+  if (to.fullPath === '/logout') {
     logUserOut();
-    return navigateTo(localeRoute("/login")?.fullPath);
+    return navigateTo(localeRoute('/login')?.fullPath);
   }
-  if (
-    to.fullPath === localeRoute("/")?.fullPath + "/" ||
-    to.fullPath === localeRoute("/")?.fullPath
-  ) {
-    return navigateTo(localeRoute("/tickets")?.fullPath);
+  if (to.fullPath === localeRoute('/')?.fullPath + '/' || to.fullPath === localeRoute('/')?.fullPath) {
+    return navigateTo(localeRoute('/tickets')?.fullPath);
   }
 
   if (token.value) {
@@ -38,12 +39,16 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }
   }
 
-  if (!token.value && !to?.name?.toString().startsWith("login")) {
+  if (!token.value && !to?.name?.toString().startsWith('login')) {
     abortNavigation();
-    return navigateTo(localeRoute("/login")?.fullPath);
+    return navigateTo(localeRoute('/login')?.fullPath);
   }
-  if (currentFullFromPath === localeRoute("/login")?.fullPath && isUserTeacher.value && currentFullToPath !== localeRoute("/tickets/new")?.fullPath) {
+  if (
+    currentFullFromPath === localeRoute('/login')?.fullPath &&
+    isUserTeacher.value &&
+    currentFullToPath !== localeRoute('/tickets/new')?.fullPath
+  ) {
     abortNavigation();
-    return navigateTo(localeRoute("/tickets/new")?.fullPath);
+    return navigateTo(localeRoute('/tickets/new')?.fullPath);
   }
 });

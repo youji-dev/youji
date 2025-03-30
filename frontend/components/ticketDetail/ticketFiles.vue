@@ -63,14 +63,14 @@
 </template>
 
 <script lang="ts" setup>
-  import type ticket from '~/types/api/response/ticketResponse';
+  import type ticketType from '~/types/api/response/ticketResponse';
   import { Upload, ZoomIn, Download, Delete } from '@element-plus/icons-vue';
   import FileIcons from 'file-icons-vue';
   import type ticketAttachment from '~/types/api/response/ticketAttachmentResponse';
   import type { UploadFile } from 'element-plus';
 
   const props = defineProps<{
-    ticket: ticket;
+    ticket: ticketType;
   }>();
 
   const { $api } = useNuxtApp();
@@ -86,7 +86,7 @@
    * Get Authentication headers for upload request
    * @returns Headers for upload request
    */
-  function getUploadRequestHeaders(): Record<string, any> {
+  function getUploadRequestHeaders(): Record<string, string> {
     const token = useCookie(ACCESS_TOKEN_NAME, {
       secure: true,
       sameSite: 'strict',
@@ -100,9 +100,9 @@
   /**
    * Handle successful upload
    * @param response Response from the server
-   * @param uploadFile File that was uploaded
+   * @param _uploadFile File that was uploaded
    */
-  async function onUploadSuccess(response: any, uploadFile: UploadFile) {
+  async function onUploadSuccess(response: any, _uploadFile: UploadFile) {
     props.ticket.attachments.pop();
     props.ticket.attachments = [...props.ticket.attachments, response];
   }

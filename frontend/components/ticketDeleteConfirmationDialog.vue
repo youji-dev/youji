@@ -2,9 +2,8 @@
   <el-dialog
     v-model="isVisible"
     width="500"
-    :before-close="beforeClose"
     :title="i18n.t('deleteTicketTitle')"
-    @closed="beforeClose">
+    @closed="() => emit('closed')">
     <p style="font-weight: bold">{{ ticket?.title }}</p>
     <span>{{ $t('deleteTicketDescription') }}</span>
     <template #footer>
@@ -30,9 +29,8 @@
 
   const ticketModel = defineModel<ticket | null>('ticket', { required: true });
   const isVisible = defineModel<boolean>('visible', { required: true });
-  const beforeClose = defineModel<void>('beforeClose', { required: true });
 
-  const emit = defineEmits(['deleted']);
+  const emit = defineEmits(['deleted', 'closed']);
 
   const loading = ref(false);
 

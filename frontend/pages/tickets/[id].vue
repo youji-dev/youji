@@ -1,164 +1,166 @@
 <template>
-  <el-form
-    ref="ticketFormInstance"
-    class="mt-20 lg:mt-5 max-h-full overflow-y-clip"
-    :style="{ width: width }"
-    label-position="top"
-    :model="ticketModel"
-    :rules="ticketFormRules"
-    status-icon>
-    <div
-      v-if="!is404 && ticketModel"
-      v-loading="loading"
-      class="px-5 pb-3">
-      <TicketHeader
-        :ticket="ticketModel"
-        class="lg:col-span-full" />
-    </div>
-    <div
-      class="overflow-y-auto px-5 max-h-[84vh] md:max-h-[88vh]"
-      :style="{ width: width }">
+  <div>
+    <el-form
+      ref="ticketFormInstance"
+      class="mt-20 lg:mt-5 max-h-full overflow-y-clip"
+      :style="{ width: width }"
+      label-position="top"
+      :model="ticketModel"
+      :rules="ticketFormRules"
+      status-icon>
       <div
         v-if="!is404 && ticketModel"
         v-loading="loading"
-        class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
-        :element-loading-text="loadingText">
-        <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
-          <el-form-item
-            :label="$t('title')"
-            prop="title">
-            <el-input
-              v-model="ticketModel.title"
-              :placeholder="$t('enter')"
-              class="drop-shadow-md dark:base-bg-dark" />
-          </el-form-item>
-        </div>
-
-        <DropdownGroup
+        class="px-5 pb-3">
+        <TicketHeader
           :ticket="ticketModel"
-          class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start" />
-
-        <el-form-item
-          class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4"
-          :label="$t('description')"
-          prop="description">
-          <el-input
-            v-model="ticketModel.description"
-            type="textarea"
-            class="drop-shadow-md max-h-full dark:base-bg-dark"
-            :rows="13"
-            resize="vertical"
-            :placeholder="$t('enter')" />
-        </el-form-item>
-
+          class="lg:col-span-full" />
+      </div>
+      <div
+        class="overflow-y-auto px-5 max-h-[84vh] md:max-h-[88vh]"
+        :style="{ width: width }">
         <div
-          v-if="!isNew"
-          class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
-          <el-text class="w-1/2 truncate text-center">{{ $t('createdBy') }}: {{ ticketModel.author }}</el-text>
-          <br />
-          <el-text class="w-1/2 text-center"
-            >{{ $t('createdOn') }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text
-          >
+          v-if="!is404 && ticketModel"
+          v-loading="loading"
+          class="grid grid-cols-1 gap-3 auto-rows-min lg:grid-cols-[7fr_4fr]"
+          :element-loading-text="loadingText">
+          <div class="lg:col-start-1 lg:col-end-3 lg:row-start-2 lg:row-end-3">
+            <el-form-item
+              :label="$t('title')"
+              prop="title">
+              <el-input
+                v-model="ticketModel.title"
+                :placeholder="$t('enter')"
+                class="drop-shadow-md dark:base-bg-dark" />
+            </el-form-item>
+          </div>
+
+          <DropdownGroup
+            :ticket="ticketModel"
+            class="lg:col-start-2 lg:col-end-3 lg:row-start-3 lg:row-end-4 self-start" />
+
+          <el-form-item
+            class="lg:col-start-1 lg:col-end-2 lg:row-start-3 lg:row-end-4"
+            :label="$t('description')"
+            prop="description">
+            <el-input
+              v-model="ticketModel.description"
+              type="textarea"
+              class="drop-shadow-md max-h-full dark:base-bg-dark"
+              :rows="13"
+              resize="vertical"
+              :placeholder="$t('enter')" />
+          </el-form-item>
+
+          <div
+            v-if="!isNew"
+            class="flex justify-around self-start lg:block lg:text-right lg:col-start-2 lg:col-end-3 lg:row-start-5 lg:row-end-6">
+            <el-text class="w-1/2 truncate text-center">{{ $t('createdBy') }}: {{ ticketModel.author }}</el-text>
+            <br />
+            <el-text class="w-1/2 text-center"
+              >{{ $t('createdOn') }}: {{ new Date(ticketModel.creationDate).toLocaleString() }}</el-text
+            >
+          </div>
+
+          <TicketFiles
+            v-if="!isNew"
+            class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5"
+            :ticket="ticketModel" />
+
+          <TicketCommentCollection
+            v-if="!isNew"
+            v-model:ticket="ticketModel"
+            class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3" />
+
+          <div
+            v-if="isNew"
+            class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3">
+            <el-text>{{ $t('duplicateTickets') }}</el-text>
+            <TicketDuplicateTracker :ticket="ticketModel" />
+          </div>
         </div>
-
-        <TicketFiles
-          v-if="!isNew"
-          class="lg:col-start-2 lg:col-end-3 lg:row-start-4 lg:row-end-5"
-          :ticket="ticketModel" />
-
-        <TicketCommentCollection
-          v-if="!isNew"
-          v-model:ticket="ticketModel"
-          class="self-start lg:col-start-1 lg:col-end-2 lg:row-start-4 lg:row-end-6 mb-3" />
-
         <div
-          v-if="isNew"
-          class="self-start lg:col-start-1 lg:col-end-3 lg:row-start-4 lg:row-end-6 mb-3">
-          <el-text>{{ $t('duplicateTickets') }}</el-text>
-          <TicketDuplicateTracker :ticket="ticketModel" />
+          v-if="is404"
+          class="h-screen flex justify-center items-center">
+          <el-result
+            class=""
+            icon="error"
+            :title="$t('resourceNotFound')">
+            <template #extra>
+              <el-button
+                type="primary"
+                @click="router.back()"
+                >{{ $t('back') }}</el-button
+              >
+            </template>
+          </el-result>
+        </div>
+        <div v-else-if="ticketModel == null">
+          <TicketDetailTicketLoadingSkeleton />
         </div>
       </div>
       <div
-        v-if="is404"
-        class="h-screen flex justify-center items-center">
-        <el-result
-          class=""
-          icon="error"
-          :title="$t('resourceNotFound')">
-          <template #extra>
-            <el-button
-              type="primary"
-              @click="router.back()"
-              >{{ $t('back') }}</el-button
-            >
-          </template>
-        </el-result>
-      </div>
-      <div v-else-if="ticketModel == null">
-        <TicketDetailTicketLoadingSkeleton />
-      </div>
-    </div>
-    <div
-      class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7 sticky bottom-0 page-bg-light dark:page-bg-dark">
-      <el-tooltip
-        :disabled="!isNew"
-        :content="$t('pdfExportNotOnUnsaved')"
-        placement="top-start">
-        <el-button
-          :disabled="isNew"
-          class="text-sm drop-shadow-md"
-          type="default"
-          :icon="Printer"
-          @click="exportToPDF()"
-          >{{ $t('pdfExport') }}</el-button
-        >
-      </el-tooltip>
+        class="flex justify-between px-5 py-3 lg:col-span-full lg:row-start-6 lg:row-end-7 sticky bottom-0 page-bg-light dark:page-bg-dark">
+        <el-tooltip
+          :disabled="!isNew"
+          :content="$t('pdfExportNotOnUnsaved')"
+          placement="top-start">
+          <el-button
+            :disabled="isNew"
+            class="text-sm drop-shadow-md"
+            type="default"
+            :icon="Printer"
+            @click="exportToPDF()"
+            >{{ $t('pdfExport') }}</el-button
+          >
+        </el-tooltip>
 
-      <div class="flex">
-        <el-button
-          class="text-sm justify-self-end drop-shadow-md"
-          type="danger"
-          :hidden="isNew || !isUserAdmin"
-          @click="deleteDialog = true"
-          >{{ $t('delete') }}</el-button
-        >
+        <div class="flex">
+          <el-button
+            class="text-sm justify-self-end drop-shadow-md"
+            type="danger"
+            :hidden="isNew || !isUserAdmin"
+            @click="deleteDialogVisible = true"
+            >{{ $t('delete') }}</el-button
+          >
 
-        <el-button
-          class="text-sm justify-self-end drop-shadow-md"
-          type="default"
-          @click="router.back()"
-          >{{ $t('close') }}</el-button
-        >
+          <el-button
+            class="text-sm justify-self-end drop-shadow-md"
+            type="default"
+            @click="router.back()"
+            >{{ $t('close') }}</el-button
+          >
 
-        <el-button
-          class="text-sm justify-self-end drop-shadow-md"
-          type="primary"
-          @click="onSaveClick()"
-          >{{ $t('save') }}</el-button
-        >
+          <el-button
+            class="text-sm justify-self-end drop-shadow-md"
+            type="primary"
+            @click="onSaveClick()"
+            >{{ $t('save') }}</el-button
+          >
+        </div>
       </div>
-    </div>
-  </el-form>
-  <el-dialog v-model="imagePreviewDisplay">
-    <img
-      w-full
-      :src="imagePreviewSrc"
-      alt="Preview Image"
-      class="w-full" />
-  </el-dialog>
-  <TicketDeleteConfirmationDialog
-    :ticket="ticketModel"
-    :visible="deleteDialog"
-    :before-close="
-      () => {
-        deleteDialog = false;
-      }
-    "
-    @deleted="
-      () => {
-        router.push(localePath('/tickets')?.fullPath as string);
-      }
-    " />
+    </el-form>
+    <el-dialog v-model="imagePreviewDisplay">
+      <img
+        w-full
+        :src="imagePreviewSrc"
+        alt="Preview Image"
+        class="w-full" />
+    </el-dialog>
+    <TicketDeleteConfirmationDialog
+      :ticket="ticketModel"
+      :visible="deleteDialogVisible"
+      @closed="
+        () => {
+          deleteDialogVisible = false;
+        }
+      "
+      @deleted="
+        () => {
+          router.push(localePath('/tickets')?.fullPath as string);
+        }
+      " />
+  </div>
 </template>
 
 <script lang="ts" setup async>
@@ -196,7 +198,7 @@
   const is404 = ref(false);
   const loading = ref(true);
   const loadingText = ref(i18n.t('loadingData'));
-  const deleteDialog = ref(false);
+  const deleteDialogVisible = ref(false);
   const availableStates: Ref<state[]> = ref([] as state[]);
   const availablePriorities: Ref<priority[]> = ref([] as priority[]);
   const availableBuildings: Ref<building[]> = ref([] as building[]);

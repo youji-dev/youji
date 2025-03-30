@@ -191,20 +191,20 @@
         :current-page="pageNumber"
         @current-change="fetchNewPage" />
     </div>
+    <TicketDeleteConfirmationDialog
+      :ticket="deleteTicket"
+      :visible="displayDeleteDialog"
+      @closed="
+        () => {
+          displayDeleteDialog = false;
+        }
+      "
+      @deleted="
+        () => {
+          fetchTicketsFromStart(true);
+        }
+      " />
   </div>
-  <TicketDeleteConfirmationDialog
-    :ticket="deleteTicket"
-    :visible="displayDeleteDialog"
-    :before-close="
-      () => {
-        displayDeleteDialog = false;
-      }
-    "
-    @deleted="
-      () => {
-        fetchTicketsFromStart(true);
-      }
-    " />
 </template>
 
 <script lang="tsx" setup>
@@ -231,16 +231,6 @@
   const i18n = useI18n();
   const width = ref('100vw');
   const { $api } = useNuxtApp();
-  interface Ticket {
-    id: number;
-    name: string;
-    title: { title: string; id: number };
-    status: { text: string; color: string };
-    building: string;
-    room: string;
-    priority: string;
-    create_date: string;
-  }
 
   const displayDeleteDialog = ref(false);
   const deleteTicket: Ref<ticket | null> = ref(null);
@@ -460,9 +450,10 @@
 
   /**
    * Sorts the tickets by the given column.
-   * @param sortData Instructions for sorting the tickets.
-   * @param sortData.prop Property of the ticketDTO to sort by.
-   * @param sortData.order Ordering of the results.
+   * @param sortData - Instructions for sorting the tickets.
+   * @param sortData.column - The column object containing sorting details.
+   * @param sortData.prop - The property name of the column to sort by.
+   * @param sortData.order - The order of sorting, either 'ascending' or 'descending'.
    */
   function changeSort(sortData: { column: any; prop: string; order: any }) {
     sortCol.value = sortData.column.filterClassName;

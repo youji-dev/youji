@@ -109,13 +109,13 @@
 </template>
 
 <script lang="ts" setup>
-  import type ticket from '~/types/api/response/ticketResponse';
+  import type ticketType from '~/types/api/response/ticketResponse';
   import type state from '~/types/api/response/stateResponse';
   import type priority from '~/types/api/response/priorityResponse';
   import type building from '~/types/api/response/buildingResponse';
 
   const _props = defineProps<{
-    ticket: ticket;
+    ticket: ticketType;
   }>();
 
   const { isUserAdmin, isUserFacilityManager } = storeToRefs(useAuthStore());

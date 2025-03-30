@@ -77,10 +77,6 @@
     (event['el'] as HTMLElement).querySelector('input')?.focus();
   };
 
-  const toggleEdit = (row: any) => {
-    row;
-  };
-
   const { prop, label, saveCallback, inputType, disabled, minWidth } = props;
 </script>
 <script lang="ts">
@@ -90,6 +86,7 @@
    * @param col column that the callback should be executed on
    * @param data the data array that contains the row object
    */
+  // eslint-disable-next-line jsdoc/require-jsdoc
   export function handleCellClick(row: any, col: any, data: any) {
     const cellObj = data.filter((obj: any) => obj.id.value === row.id.value)[0][col.property.split('[')[0]];
     if (cellObj.editing !== 'undefined') {

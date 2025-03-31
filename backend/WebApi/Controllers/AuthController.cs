@@ -1,8 +1,10 @@
+using Common.Enums;
 using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Authentication.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
+using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi.Controllers
 {
@@ -18,12 +20,14 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="loginRequestDto">Credentials provided by user</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <returns>A token pair if authentication succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("login")]
         public async Task<ActionResult<LoginResponseDto>> Login(
             [FromBody] LoginRequestDto loginRequestDto,
-            [FromServices] AuthenticationService authenticationService)
+            [FromServices] AuthenticationService authenticationService,
+            [FromServices] UserRepository userRepository)
         {
             try
             {
@@ -32,10 +36,12 @@ namespace Application.WebApi.Controllers
                     loginRequestDto.Password);
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
+                var doesAdminUserExist = userRepository.GetAll().Any(user => user.Type.HasFlag(Roles.Admin));
                 return this.Ok(new LoginResponseDto()
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
+                    IsSystemReady = doesAdminUserExist,
                 });
             }
             catch (UnauthorizedAccessException)
@@ -49,12 +55,14 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="refreshRequestDto">Refresh token provided by client</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
+        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <returns>A token pair if refresh token validation succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("refresh")]
         public async Task<ActionResult<LoginResponseDto>> Refresh(
             [FromBody] RefreshRequestDto refreshRequestDto,
-            [FromServices] AuthenticationService authenticationService)
+            [FromServices] AuthenticationService authenticationService,
+            [FromServices] UserRepository userRepository)
         {
             try
             {
@@ -67,6 +75,7 @@ namespace Application.WebApi.Controllers
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
+                    IsSystemReady = true,
                 });
             }
             catch (UnauthorizedAccessException)

@@ -14,5 +14,10 @@ namespace DomainLayer.BusinessLogic.Authentication.DTO
         /// A RefreshToken
         /// </summary>
         public required string RefreshToken { get; set; }
+
+        /// <summary>
+        /// Indicates if the deployment has a registered admin user
+        /// </summary>
+        public required bool IsSystemReady { get; set; }
     }
 }

@@ -44,11 +44,46 @@ jobs:
       - name: Build
         run: dotnet build "backend/Backend.sln" --no-restore -warnaserror
 
-  build-frontend:
-    name: Frontend build
+  prettier-lint:
+    name: "Frontend lint: prettier"
     runs-on: ubuntu-latest
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.16.x"
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm i
+      - name: Prettier lint
+        working-directory: ./frontend
+        run: npm run lint:prettier
+
+  eslint-lint:
+    name: "Frontend lint: eslint"
+    runs-on: ubuntu-latest
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.16.x"
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm i
+      - name: Eslint lint
+        working-directory: ./frontend
+        run: npm run lint:eslint
+
+  build-frontend:
+    name: Frontend build
+    runs-on: ubuntu-latest
+    needs: [prettier-lint, eslint-lint]
 
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +91,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20.16.x"
-      - name: Install dependecies
+      - name: Install dependencies
         working-directory: ./frontend
         run: npm i
       - name: Build

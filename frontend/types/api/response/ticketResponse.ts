@@ -1,8 +1,8 @@
-import type building from "./buildingResponse";
-import type priority from "./priorityResponse";
-import type state from "./stateResponse";
-import type ticketAttachment from "./ticketAttachmentResponse";
-import type ticketComment from "./ticketCommentResponse";
+import type building from './buildingResponse';
+import type priority from './priorityResponse';
+import type state from './stateResponse';
+import type ticketAttachment from './ticketAttachmentResponse';
+import type ticketComment from './ticketCommentResponse';
 
 /**
  * Represents a ticket

@@ -1,4 +1,4 @@
-import type ticketResponse from "../response/ticketResponse";
+import type ticketResponse from '../response/ticketResponse';
 
 export default interface EditTicketRequest {
   id: string;
@@ -11,6 +11,11 @@ export default interface EditTicketRequest {
   object: string | undefined;
 }
 
+/**
+ * Parses a ticket response to a edit ticket type
+ * @param ticket The ticket response to parse
+ * @returns Parsed edit ticket request
+ */
 export function fromTicketResponse(ticket: ticketResponse): EditTicketRequest {
   return {
     id: ticket.id,

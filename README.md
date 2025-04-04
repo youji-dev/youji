@@ -1,18 +1,46 @@
 <!-- Für eine angenehmere Darstellung dieser Datei kann https://github.com/youji-dev/youji aufgerufen werden -->
 
-![Youji Banner Dark](./resources/ReadmeBannerDark.png#gh-dark-mode-only)
-![Youji Banner Light](./resources/ReadmeBannerLight.png#gh-light-mode-only)
+![Youji Banner](./resources/ReadmeBanner.png)
 
 # Youji
 
 Youji ist das das Hausmeister Ticketsystem der Industrieschule Chemnitz
 
+## Features
+
+- Ticketverwaltung mit anpassbaren Prioritäten, Gebäuden, Status
+- Kommentarfunktion
+- Datei und Bilderupload
+- Ticketexport via PDF
+- Berechtigungssystem
+  - Admin
+  - Hausmeister
+  - Lehrer
+- Email Benachrichtigungen
+- Konfigurierbare automatische Ticketlöschung
+- Duplikat Vermeidung bei Anlegen von Tickets
+- Mehrsprachigkeit in Deutsch und Englisch
+- Dark und White Mode
+
+## Screenshots
+
+### Ticketübersicht
+
+![Ticketübersicht](./resources/youji-ticketübersicht.png#gh-dark-mode-only)
+![Ticketübersicht](./resources/youji-ticketübersicht-light.png#gh-light-mode-only)
+
+### Ticketansicht
+
+![Ticketansicht](./resources/youji-ticketansicht.png#gh-dark-mode-only)
+![Ticketansicht](./resources/youji-ticketansicht-light.png#gh-light-mode-only)
+
 ## Deploy als Produktumgebung
 
 Das Deployment von Youji erfolgt mithilfe von Docker. Im Verzeichnis deployment befinden sich:
 
-Eine docker-compose.yml-Datei, die alle notwendigen Container definiert.
-Zusätzliche Konfigurationsdateien, z. B. für die Backend-Einstellungen.
+- Eine docker-compose.yml-Datei, die alle notwendigen Container definiert.
+- Zusätzliche Konfigurationsdateien, z. B. für die Backend-Einstellungen.
+
 Um Youji zu starten, navigiere in das deployment-Verzeichnis und führe den folgenden Befehl aus:
 
 ```sh
@@ -98,3 +126,7 @@ In den folgenden Dateien des `deployment` Verzeichnisses müssen folgende Konfig
 
 > [!TIP]
 > Wenn `Mail.SmtpUser` und `Mail.SmtpPassword` beide `null` sind, wird sich ohne Authentifizierung an dem SMTP Server angemeldet
+
+## Maintainer & Contributors
+
+## [![Maintainer & Contributors Display](https://badges.pufler.dev/contributors/youji-dev/youji?size=70&bots=true)](https://github.com/youji-dev/youji/graphs/contributors)

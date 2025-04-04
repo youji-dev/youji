@@ -41,7 +41,8 @@
     "UseSsl": <VERWENDET SMPT SERVER SSL>,
     "SubjectFormat": "<FORMAT DER EMAIL SUBJEKT>",
     "SmtpUser": "<SMTP LOGIN USER>",
-    "SmtpPassword": "<SMTP LOGIN PASSWORT>"
+    "SmtpPassword": "<SMTP LOGIN PASSWORT>",
+    "FrontendTicketBaseUri": "<URI zu Basis-Route der Ticket-Detailansicht>"
   },
   "Images": {
     "UnrenderableMimeTypes": "image/svg+xml"

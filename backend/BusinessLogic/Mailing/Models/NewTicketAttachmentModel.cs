@@ -6,7 +6,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
     /// <summary>
     /// Model for new attachment email
     /// </summary>
-    public record NewTicketAttachmentModel : MailModel
+    public class NewTicketAttachmentModel : MailModel
     {
         /// <inheritdoc/>
         public override string TemplateName { get; } = "NewTicketAttachment";
@@ -29,6 +29,7 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                 MailTitle = localizer.Localize($"New attachment on ticket '{attachment.Ticket?.Title ?? "unbekannt"}'"),
                 Name = attachment.Name,
                 Localizer = localizer,
+                RelatedTicketId = attachment.TicketId,
             };
         }
     }

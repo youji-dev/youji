@@ -1,0 +1,64 @@
+﻿@page
+@using DomainLayer.BusinessLogic.Mailing.Models
+@model NewTicketModel
+
+<!-- Begin document -->
+
+@{
+    Layout = "mailLayout";
+}
+
+<div class="meta-data">
+    <p>@Model.Localizer.Localize("Author")</p>
+    <p>@Model.NewTicket.Author</p>
+
+    <p>@Model.Localizer.Localize("Creation date")</p>
+    <p>@Model.FormattedCreationDate</p>
+
+    <p>@Model.Localizer.Localize("Priority")</p>
+    <p>
+        <span class="color-dot" style="background-color: @Model.NewTicket.Priority.Color"></span>
+        @Model.NewTicket.Priority.Name
+    </p>
+
+    <p>@Model.Localizer.Localize("State")</p>
+    <p>
+        <span class="color-dot" style="background-color: @Model.NewTicket.State.Color"></span>
+        @Model.NewTicket.State.Name
+    </p>
+
+    @if (!string.IsNullOrEmpty(Model.NewTicket.Building?.Name))
+    {
+        <p>@Model.Localizer.Localize("Building")</p>
+        <p>@Model.NewTicket.Building?.Name</p>
+    }
+    
+    @if (!string.IsNullOrEmpty(Model.NewTicket.Room))
+    {
+        <p>@Model.Localizer.Localize("Room")</p>
+        <p>@Model.NewTicket.Room</p>
+    }
+    
+    @if (!string.IsNullOrEmpty(Model.NewTicket.Object))
+    {
+        <p>@Model.Localizer.Localize("Affected object")</p>
+        <p>@Model.NewTicket.Object</p>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(Model.NewTicket.Description)) {
+    <p>@Model.NewTicket.Description</p>
+}
+
+<style>
+    .meta-data {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 100%;
+        gap: 0.5rem;
+    }
+
+    .meta-data > p {
+        margin: 0;
+    }
+</style>

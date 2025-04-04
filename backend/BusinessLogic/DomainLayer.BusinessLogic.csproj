@@ -13,6 +13,7 @@
     <None Remove="Resources\Templates\arrow_down.svg" />
     <None Remove="Resources\Templates\arrow_right.svg" />
     <None Remove="Resources\Templates\Mailing\MailBase.cshtml" />
+    <None Remove="Resources\Templates\Mailing\NewTicket.cshtml" />
     <None Remove="Resources\Templates\Mailing\NewTicketAttachment.cshtml" />
     <None Remove="Resources\Templates\Mailing\NewTicketComment.cshtml" />
     <None Remove="Resources\Templates\TicketChanged.cshtml" />
@@ -57,6 +58,9 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	  <EmbeddedResource Include="Resources\Templates\Mailing\MailBase.cshtml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+	  <EmbeddedResource Include="Resources\Templates\Mailing\NewTicket.cshtml">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </EmbeddedResource>
 	  <EmbeddedResource Include="Resources\Templates\Mailing\NewTicketAttachment.cshtml">

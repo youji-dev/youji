@@ -35,7 +35,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <param name="mailGenerator">A generator function that produces the mail body</param>
         /// <param name="subjectGenerator">A generator function that produces the mail subject</param>
         /// <returns>A Task representing the asynchronous operation</returns>
-        public async Task<bool> SendManyLocalized(
+        public async Task SendManyLocalized(
             IEnumerable<MailRecipient> recipients,
             Func<Localizer, MailGenConfigurationDto, MimeEntity> mailGenerator,
             Func<Localizer, string> subjectGenerator)
@@ -56,7 +56,7 @@ namespace DomainLayer.BusinessLogic.Mailing
             catch (Exception ex)
             {
                 logger.LogError(ex, "Could not connect to SMTP server while trying to send e-mails");
-                return false;
+                return;
             }
 
             var senderMail = new MailboxAddress(this.mailSenderName, this.mailSenderAddress);
@@ -99,8 +99,6 @@ namespace DomainLayer.BusinessLogic.Mailing
             }
 
             await client.DisconnectAsync(true);
-
-            return true;
         }
     }
 }

@@ -85,6 +85,7 @@ In den folgenden Dateien des `deployment` Verzeichnisses müssen folgende Konfig
 | Mail.SubjectFormat                    | Format des E-Mail-Betreffs                                                                                                     | string   | "[Youji] {0}"                                                            |
 | Mail.SmtpUser                         | Benutzername für SMTP-Login                                                                                                    | string?  | "youji-smtp-user"                                                        |
 | Mail.SmtpPassword                     | Passwort für SMTP-Login                                                                                                        | string?  | "supersecretpassword"                                                    |
+| Mail.FrontendTicketBaseUri             | Uri zur Basis-Route der Ticket-Detailansicht, welche für die Generierung eines Links in E-Mails verwendet wird                 | string?  | "https://localhost:3000/tickets/"                                             |
 | Images.UnrenderableMimeTypes          | Nicht darstellbare Bildformate. Für diese Formate wird kein BlurHash generiert und im Frontend keine Bilddarstellung angezeigt | string   | "image/svg+xml"                                                          |
 
 > [!CAUTION]

@@ -120,6 +120,8 @@ export default defineI18nConfig(() => ({
       ownPermissionChangeWarningTitle: 'Change your own permission?',
       ownPermissionChangeWarningDescription:
         'Warning! You have just changed your own role. Until you log out or your session is extended in the background, you will retain the access rights you had at login. You can revert this change.',
+      promotionBanner: 'This system has no admin user. You can promote yourself.',
+      promotionBannerButton: 'Promote yourself',
     },
     'de-DE': {
       username: 'Benutzername',
@@ -239,6 +241,8 @@ export default defineI18nConfig(() => ({
       ownPermissionChangeWarningTitle: 'Die eigenen Berechtigungen ändern?',
       ownPermissionChangeWarningDescription:
         'Warnung! Sie haben soeben Ihre eigene Rolle geändert. Bis Sie sich abmelden oder Ihre Sitzung im Hintergrund verlängert wird, behalten Sie die Zugriffsrechte, die Sie beim Anmelden hatten. Sie können diese Änderung rückgängig machen.',
+      promotionBanner: 'Dieses System hat noch keinen Admin Nutzer. Du kannst dich zum Admin befördern lassen.',
+      promotionBannerButton: 'Zum Admin befördern',
     },
   },
 }));

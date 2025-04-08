@@ -1,22 +1,27 @@
 <template>
-  <div class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll">
-    <SidebarDesktop
-      class="flex-none"
-      :open-tickets-count="openTickets" />
-    <SidebarMobile
-      class="flex-none"
-      :open-tickets-count="openTickets" />
-    <slot />
+  <div>
+    <userPromotionBanner v-if="isSystemReady" />
+    <div class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll">
+      <SidebarDesktop
+        class="flex-none"
+        :open-tickets-count="openTickets" />
+      <SidebarMobile
+        class="flex-none"
+        :open-tickets-count="openTickets" />
+      <slot />
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
   import SidebarMobile from '~/components/sidebarMobile.vue';
   import SidebarDesktop from '~/components/sidebarDesktop.vue';
+  import userPromotionBanner from '~/components/userPromotionBanner.vue';
 
   const { $api } = useNuxtApp();
   const { statusOptions } = storeToRefs(useTicketsStore());
   const { fetchStatusOptions } = useTicketsStore();
+  const { isSystemReady } = useAuthStore();
 
   const openTickets = ref<number | null>(null);
 

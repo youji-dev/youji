@@ -16,6 +16,7 @@ export const useAuthStore = defineStore('auth', {
     loading: false,
     csrfToken: '' as string,
     authErrors: [] as string[],
+    isSystemReady: true,
   }),
   getters: {
     isUserAdmin: state => (state.userRole & Roles.Admin) > 0,
@@ -57,6 +58,7 @@ export const useAuthStore = defineStore('auth', {
         const refreshToken = useCookie(REFRESH_TOKEN_NAME);
         accessToken.value = data.value.accessToken;
         refreshToken.value = data.value.refreshToken;
+        this.isSystemReady = data.value.isSystemReady;
 
         this.authenticated = true;
 

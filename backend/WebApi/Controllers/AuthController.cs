@@ -1,3 +1,4 @@
+using Application.WebApi.Contracts.Request;
 using Common.Enums;
 using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Authentication.DTO;
@@ -23,7 +24,7 @@ namespace Application.WebApi.Controllers
         /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <returns>A token pair if authentication succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<LoginResponseDto>> Login(
             [FromBody] LoginRequestDto loginRequestDto,
             [FromServices] AuthenticationService authenticationService,
@@ -55,14 +56,12 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="refreshRequestDto">Refresh token provided by client</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
-        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
         /// <returns>A token pair if refresh token validation succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPost("refresh")]
+        [HttpPost("Refresh")]
         public async Task<ActionResult<LoginResponseDto>> Refresh(
             [FromBody] RefreshRequestDto refreshRequestDto,
-            [FromServices] AuthenticationService authenticationService,
-            [FromServices] UserRepository userRepository)
+            [FromServices] AuthenticationService authenticationService)
         {
             try
             {
@@ -89,9 +88,36 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <returns>204 no content</returns>
         [Authorize]
-        [HttpGet("verify-token")]
+        [HttpGet("VerifyToken")]
         public ActionResult VerifyToken()
         {
+            return this.NoContent();
+        }
+
+        /// <summary>
+        /// Route used to promote a user to admin if there is no admin user
+        /// </summary>
+        /// <param name="promotionUserRequestDto">Instance of <see cref="PromotionUserRequestDto"/></param>
+        /// <param name="systemSetupService">Instance of <see cref="SystemSetupService"/></param>
+        /// <returns>204 no content if promotion is successful</returns>
+        [Authorize]
+        [HttpPost("PromoteToAdmin")]
+        public async Task<ActionResult> PromoteUser(
+            [FromBody] PromotionUserRequestDto promotionUserRequestDto,
+            [FromServices] SystemSetupService systemSetupService)
+        {
+            var userClaim = this.User.FindFirst("username")?.Value;
+            if (string.IsNullOrEmpty(userClaim))
+            {
+                return this.Unauthorized();
+            }
+
+            if (string.IsNullOrEmpty(promotionUserRequestDto.PromotionToken))
+            {
+                return this.BadRequest("Promotion token is required");
+            }
+
+            await systemSetupService.PromoteToAdmin(userClaim, promotionUserRequestDto.PromotionToken);
             return this.NoContent();
         }
     }

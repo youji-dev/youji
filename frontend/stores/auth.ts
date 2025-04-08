@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
       this.authErrors = [];
 
       try {
-        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/login`, {
+        const { data, pending, error }: any = await useFetch(`${BACKEND_URL}/Auth/Login`, {
           body: {
             username: name,
             password: password,
@@ -89,7 +89,7 @@ export const useAuthStore = defineStore('auth', {
 
     async checkIfTokenIsValid(): Promise<boolean> {
       try {
-        await useFetchAuthenticated('/Auth/verify-token');
+        await useFetchAuthenticated('/Auth/VerifyToken');
         return true;
       } catch {
         return false;

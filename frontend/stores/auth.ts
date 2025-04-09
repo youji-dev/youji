@@ -16,7 +16,7 @@ export const useAuthStore = defineStore('auth', {
     loading: false,
     csrfToken: '' as string,
     authErrors: [] as string[],
-    isSystemReady: true,
+    isAdminPromotionPossible: false,
   }),
   getters: {
     isUserAdmin: state => (state.userRole & Roles.Admin) > 0,
@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', {
         const refreshToken = useCookie(REFRESH_TOKEN_NAME);
         accessToken.value = data.value.accessToken;
         refreshToken.value = data.value.refreshToken;
-        this.isSystemReady = data.value.isSystemReady;
+        this.isAdminPromotionPossible = data.value.isPromotionPossible;
 
         this.authenticated = true;
 
@@ -88,10 +88,24 @@ export const useAuthStore = defineStore('auth', {
       useCookie(useRuntimeConfig().public.ACCESS_TOKEN_NAME).value = null;
       useCookie(useRuntimeConfig().public.REFRESH_TOKEN_NAME).value = null;
     },
-
     async checkIfTokenIsValid(): Promise<boolean> {
       try {
         await useFetchAuthenticated('/Auth/VerifyToken');
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    async promoteUser(promotionToken: string): Promise<boolean> {
+      try {
+        const result = await useFetchAuthenticated('/Auth/PromoteToAdmin', {
+          method: 'post',
+          body: { promotionToken: promotionToken },
+        });
+
+        if (result.error.value) {
+          return false;
+        }
         return true;
       } catch {
         return false;

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <userPromotionBanner v-if="isSystemReady" />
+    <userPromotionBanner v-if="isAdminPromotionPossible" />
     <div class="page-bg-light dark:page-bg-dark w-full h-lvh max-h-lvh flex overflow-x-hidden overflow-y-scroll">
       <SidebarDesktop
         class="flex-none"
@@ -21,7 +21,7 @@
   const { $api } = useNuxtApp();
   const { statusOptions } = storeToRefs(useTicketsStore());
   const { fetchStatusOptions } = useTicketsStore();
-  const { isSystemReady } = useAuthStore();
+  const { isAdminPromotionPossible } = useAuthStore();
 
   const openTickets = ref<number | null>(null);
 

@@ -62,7 +62,7 @@ namespace Application.WebApi
             services.AddScoped<ExportService>();
             services.AddScoped<AuthenticationService>();
             services.AddScoped<MailingService>();
-            services.AddScoped<SystemSetupService>();
+            services.AddScoped<PromotionService>();
 
             services.AddSingleton<PromotionTokenRepository>();
         }

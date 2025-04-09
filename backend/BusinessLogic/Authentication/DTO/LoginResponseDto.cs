@@ -16,8 +16,8 @@ namespace DomainLayer.BusinessLogic.Authentication.DTO
         public required string RefreshToken { get; set; }
 
         /// <summary>
-        /// Indicates if the deployment has a registered admin user
+        /// Indicates if the deployment currently accepts admin promotion requests
         /// </summary>
-        public required bool IsSystemReady { get; set; }
+        public required bool IsPromotionPossible { get; set; }
     }
 }

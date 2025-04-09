@@ -21,14 +21,14 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="loginRequestDto">Credentials provided by user</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
-        /// <param name="userRepository">Instance of <see cref="UserRepository"/></param>
+        /// <param name="promotionTokenRepository">Instance of <see cref="PromotionTokenRepository"/></param>
         /// <returns>A token pair if authentication succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpPost("Login")]
         public async Task<ActionResult<LoginResponseDto>> Login(
             [FromBody] LoginRequestDto loginRequestDto,
             [FromServices] AuthenticationService authenticationService,
-            [FromServices] UserRepository userRepository)
+            [FromServices] PromotionTokenRepository promotionTokenRepository)
         {
             try
             {
@@ -37,12 +37,12 @@ namespace Application.WebApi.Controllers
                     loginRequestDto.Password);
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
-                var doesAdminUserExist = userRepository.GetAll().Any(user => user.Type.HasFlag(Roles.Admin));
+                var doesPromotionTokenExist = promotionTokenRepository.Get().PromotionToken != null;
                 return this.Ok(new LoginResponseDto()
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
-                    IsSystemReady = doesAdminUserExist,
+                    IsPromotionPossible = doesPromotionTokenExist,
                 });
             }
             catch (UnauthorizedAccessException)
@@ -74,7 +74,7 @@ namespace Application.WebApi.Controllers
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
-                    IsSystemReady = true,
+                    IsPromotionPossible = false,
                 });
             }
             catch (UnauthorizedAccessException)
@@ -98,13 +98,13 @@ namespace Application.WebApi.Controllers
         /// Route used to promote a user to admin if there is no admin user
         /// </summary>
         /// <param name="promotionUserRequestDto">Instance of <see cref="PromotionUserRequestDto"/></param>
-        /// <param name="systemSetupService">Instance of <see cref="SystemSetupService"/></param>
+        /// <param name="promotionService">Instance of <see cref="PromotionService"/></param>
         /// <returns>204 no content if promotion is successful</returns>
         [Authorize]
         [HttpPost("PromoteToAdmin")]
         public async Task<ActionResult> PromoteUser(
             [FromBody] PromotionUserRequestDto promotionUserRequestDto,
-            [FromServices] SystemSetupService systemSetupService)
+            [FromServices] PromotionService promotionService)
         {
             var userClaim = this.User.FindFirst("username")?.Value;
             if (string.IsNullOrEmpty(userClaim))
@@ -117,7 +117,7 @@ namespace Application.WebApi.Controllers
                 return this.BadRequest("Promotion token is required");
             }
 
-            await systemSetupService.PromoteToAdmin(userClaim, promotionUserRequestDto.PromotionToken);
+            await promotionService.PromoteToAdmin(userClaim, promotionUserRequestDto.PromotionToken);
             return this.NoContent();
         }
     }

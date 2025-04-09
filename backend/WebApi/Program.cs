@@ -30,7 +30,7 @@ if (app.Environment.IsDevelopment())
 
 using (var scope = app.Services.CreateScope())
 {
-    var systemSetupService = scope.ServiceProvider.GetRequiredService<SystemSetupService>();
+    var systemSetupService = scope.ServiceProvider.GetRequiredService<PromotionService>();
     systemSetupService.AdminBootUpCheck();
 }
 

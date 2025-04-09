@@ -8,17 +8,17 @@ namespace DomainLayer.BusinessLogic.Authentication
     /// <summary>
     /// Service used for system setup and configuration
     /// </summary>
-    public class SystemSetupService
+    public class PromotionService
     {
         private readonly PromotionTokenRepository promotionTokenRepository;
         private readonly UserRepository userRepository;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SystemSetupService"/> class.
+        /// Initializes a new instance of the <see cref="PromotionService"/> class.
         /// </summary>
         /// <param name="userRepository">Instance of <see cref="userRepository"/></param>
         /// <param name="promotionTokenRepository">Singleton instance of <see cref="PromotionTokenRepository"/></param>
-        public SystemSetupService(UserRepository userRepository, PromotionTokenRepository promotionTokenRepository)
+        public PromotionService(UserRepository userRepository, PromotionTokenRepository promotionTokenRepository)
         {
             this.userRepository = userRepository;
             this.promotionTokenRepository = promotionTokenRepository;

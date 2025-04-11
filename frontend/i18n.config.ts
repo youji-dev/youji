@@ -249,15 +249,15 @@ export default defineI18nConfig(() => ({
       ownPermissionChangeWarningTitle: 'Die eigenen Berechtigungen ändern?',
       ownPermissionChangeWarningDescription:
         'Warnung! Sie haben soeben Ihre eigene Rolle geändert. Bis Sie sich abmelden oder Ihre Sitzung im Hintergrund verlängert wird, behalten Sie die Zugriffsrechte, die Sie beim Anmelden hatten. Sie können diese Änderung rückgängig machen.',
-      promotionBanner: 'Dieses System hat noch keinen Admin Nutzer. Du kannst dich zum Admin befördern lassen.',
+      promotionBanner: 'Dieses System hat noch keinen Admin Nutzer. Sie können sich zum Admin befördern lassen.',
       promotionBannerButton: 'Zum Admin befördern',
       promotionTokenExplanationTitle: 'Was ist ein Promotion Token?',
       promotionTokenExplanationDescription:
-        'Der Promotion Token ist ein einmalig gültiger Code, mit dem du dich zum ersten Administrator des Systems ernennen kannst. Dieser Token wird automatisch vom Backend erzeugt – aber nur, wenn es noch keinen Administrator im System gibt.',
+        'Der Promotion Token ist ein einmalig gültiger Code, mit dem sie sich zum ersten Administrator des Systems ernennen lassen können. Dieser Token wird automatisch vom Backend erzeugt – aber nur, wenn es noch keinen Administrator im System gibt.',
       promotionTokenWhereTitle: 'Wo finde ich den Token?',
       promotionTokenWhereDescription:
-        'Nach dem Start des Backends wird der Token in der Konsole ausgegeben. Achte darauf, die Konsole direkt nach dem Start zu überprüfen, da der Token nur für kurze Zeit gültig ist.',
-      promotionSuccess: 'Erfolgreich admin rolle zugewiesen. Du wirst nun automatisch abgemeldet.',
+        'Nach dem Start des Backends wird der Token in der Konsole ausgegeben. Achten sie darauf, die Konsole direkt nach dem Start zu überprüfen, da der Token nur für kurze Zeit gültig ist.',
+      promotionSuccess: 'Erfolgreich admin rolle zugewiesen. Sie werden nun automatisch abgemeldet.',
       promotionFailed: 'Fehler beim Zuweisen der admin rolle.',
     },
   },

@@ -47,6 +47,7 @@
         :data="parsedTickets"
         :height="tableDimensions['height']"
         class="h-full w-full overflow-x-scroll"
+        sortable="custom"
         :default-sort="{
           prop: sortColProp,
           order: sortDesc ? 'descending' : 'ascending',

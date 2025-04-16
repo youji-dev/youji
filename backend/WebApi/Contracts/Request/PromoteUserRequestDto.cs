@@ -1,9 +1,9 @@
 namespace Application.WebApi.Contracts.Request
 {
     /// <summary>
-    /// Data transfer object for user promotiopn requests
+    /// Data transfer object for user promotion requests
     /// </summary>
-    public class PromotionUserRequestDto
+    public class PromoteUserRequestDto
     {
         /// <summary>
         /// Token used to verify the promotion request

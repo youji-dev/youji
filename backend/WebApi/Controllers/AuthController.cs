@@ -97,13 +97,13 @@ namespace Application.WebApi.Controllers
         /// <summary>
         /// Route used to promote a user to admin if there is no admin user
         /// </summary>
-        /// <param name="promotionUserRequestDto">Instance of <see cref="PromotionUserRequestDto"/></param>
+        /// <param name="promoteUserRequestDto">Instance of <see cref="PromoteUserRequestDto"/></param>
         /// <param name="promotionService">Instance of <see cref="PromotionService"/></param>
         /// <returns>204 no content if promotion is successful</returns>
         [Authorize]
         [HttpPost("PromoteToAdmin")]
         public async Task<ActionResult> PromoteUser(
-            [FromBody] PromotionUserRequestDto promotionUserRequestDto,
+            [FromBody] PromoteUserRequestDto promoteUserRequestDto,
             [FromServices] PromotionService promotionService)
         {
             var userClaim = this.User.FindFirst("username")?.Value;
@@ -112,12 +112,12 @@ namespace Application.WebApi.Controllers
                 return this.Unauthorized();
             }
 
-            if (string.IsNullOrEmpty(promotionUserRequestDto.PromotionToken))
+            if (string.IsNullOrEmpty(promoteUserRequestDto.PromotionToken))
             {
                 return this.BadRequest("Promotion token is required");
             }
 
-            await promotionService.PromoteToAdmin(userClaim, promotionUserRequestDto.PromotionToken);
+            await promotionService.PromoteToAdmin(userClaim, promoteUserRequestDto.PromotionToken);
             return this.NoContent();
         }
     }

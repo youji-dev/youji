@@ -6,7 +6,7 @@ using Spectre.Console;
 namespace DomainLayer.BusinessLogic.Authentication
 {
     /// <summary>
-    /// Service used for system setup and configuration
+    /// Service used to manage the promotion flow for users.
     /// </summary>
     public class PromotionService
     {

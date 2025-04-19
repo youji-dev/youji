@@ -9,11 +9,12 @@ using DomainLayer.BusinessLogic.Authentication;
 using Quartz;
 using DomainLayer.BusinessLogic.Jobs;
 using DomainLayer.BusinessLogic.Mailing;
+using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi
 {
     /// <summary>
-    /// Provides costum add functions for <see cref="IServiceCollection"/>.
+    /// Provides custom setup functions for <see cref="IServiceCollection"/>.
     /// </summary>
     public static class Startup
     {
@@ -61,6 +62,9 @@ namespace Application.WebApi
             services.AddScoped<ExportService>();
             services.AddScoped<AuthenticationService>();
             services.AddScoped<MailingService>();
+            services.AddScoped<PromotionService>();
+
+            services.AddSingleton<PromotionTokenRepository>();
         }
 
         /// <summary>
@@ -139,7 +143,7 @@ namespace Application.WebApi
         /// <typeparam name="T">Instance of <see cref="IJob"/></typeparam>
         /// <param name="quartzConfig">Instance of <see cref="IServiceCollectionQuartzConfigurator"/></param>
         /// <param name="jobKey">Unique key of the job as a string.</param>
-        /// <param name="cronExpression">The cron expression in which schedule the job will executed.</param>
+        /// <param name="cronExpression">The cron expression in which schedule the job will execute.</param>
         /// <returns>A quartz job configurator.</returns>
         private static IServiceCollectionQuartzConfigurator AddQuartzJob<T>(
             this IServiceCollectionQuartzConfigurator quartzConfig,

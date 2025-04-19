@@ -1,8 +1,11 @@
+using Application.WebApi.Contracts.Request;
+using Common.Enums;
 using DomainLayer.BusinessLogic.Authentication;
 using DomainLayer.BusinessLogic.Authentication.DTO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Entities;
+using PersistenceLayer.DataAccess.Repositories;
 
 namespace Application.WebApi.Controllers
 {
@@ -18,12 +21,14 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <param name="loginRequestDto">Credentials provided by user</param>
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
+        /// <param name="promotionTokenRepository">Instance of <see cref="PromotionTokenRepository"/></param>
         /// <returns>A token pair if authentication succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPost("login")]
+        [HttpPost("Login")]
         public async Task<ActionResult<LoginResponseDto>> Login(
             [FromBody] LoginRequestDto loginRequestDto,
-            [FromServices] AuthenticationService authenticationService)
+            [FromServices] AuthenticationService authenticationService,
+            [FromServices] PromotionTokenRepository promotionTokenRepository)
         {
             try
             {
@@ -32,10 +37,12 @@ namespace Application.WebApi.Controllers
                     loginRequestDto.Password);
                 var accessToken = authenticationService.CreateAccessToken(roleAssignment);
                 var refreshToken = await authenticationService.CreateRefreshToken(roleAssignment);
+                var doesPromotionTokenExist = promotionTokenRepository.Get().PromotionToken != null;
                 return this.Ok(new LoginResponseDto()
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
+                    IsPromotionPossible = doesPromotionTokenExist,
                 });
             }
             catch (UnauthorizedAccessException)
@@ -51,7 +58,7 @@ namespace Application.WebApi.Controllers
         /// <param name="authenticationService">Instance of <see cref="AuthenticationService"/></param>
         /// <returns>A token pair if refresh token validation succeeds</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpPost("refresh")]
+        [HttpPost("Refresh")]
         public async Task<ActionResult<LoginResponseDto>> Refresh(
             [FromBody] RefreshRequestDto refreshRequestDto,
             [FromServices] AuthenticationService authenticationService)
@@ -67,6 +74,7 @@ namespace Application.WebApi.Controllers
                 {
                     AccessToken = accessToken,
                     RefreshToken = refreshToken,
+                    IsPromotionPossible = false,
                 });
             }
             catch (UnauthorizedAccessException)
@@ -80,9 +88,36 @@ namespace Application.WebApi.Controllers
         /// </summary>
         /// <returns>204 no content</returns>
         [Authorize]
-        [HttpGet("verify-token")]
+        [HttpGet("VerifyToken")]
         public ActionResult VerifyToken()
         {
+            return this.NoContent();
+        }
+
+        /// <summary>
+        /// Route used to promote a user to admin if there is no admin user
+        /// </summary>
+        /// <param name="promoteUserRequestDto">Instance of <see cref="PromoteUserRequestDto"/></param>
+        /// <param name="promotionService">Instance of <see cref="PromotionService"/></param>
+        /// <returns>204 no content if promotion is successful</returns>
+        [Authorize]
+        [HttpPost("PromoteToAdmin")]
+        public async Task<ActionResult> PromoteUser(
+            [FromBody] PromoteUserRequestDto promoteUserRequestDto,
+            [FromServices] PromotionService promotionService)
+        {
+            var userClaim = this.User.FindFirst("username")?.Value;
+            if (string.IsNullOrEmpty(userClaim))
+            {
+                return this.Unauthorized();
+            }
+
+            if (string.IsNullOrEmpty(promoteUserRequestDto.PromotionToken))
+            {
+                return this.BadRequest("Promotion token is required");
+            }
+
+            await promotionService.PromoteToAdmin(userClaim, promoteUserRequestDto.PromotionToken);
             return this.NoContent();
         }
     }

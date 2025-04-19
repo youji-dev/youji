@@ -1,5 +1,6 @@
 using Application.WebApi;
 using Application.WebApi.Formatters;
+using DomainLayer.BusinessLogic.Authentication;
 using PersistenceLayer.DataAccess;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var systemSetupService = scope.ServiceProvider.GetRequiredService<PromotionService>();
+    systemSetupService.AdminBootUpCheck();
 }
 
 app.UseHttpsRedirection();

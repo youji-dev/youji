@@ -24,7 +24,7 @@ const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?
     if (!refreshPromise) {
       refreshPromise = new Promise(async (resolve, reject) => {
         try {
-          const { data }: any = await useFetch(`${BACKEND_URL}/Auth/refresh`, {
+          const { data }: any = await useFetch(`${BACKEND_URL}/Auth/Refresh`, {
             body: { refreshToken: refreshToken.value },
             method: 'post',
             headers: { 'Content-Type': 'application/json' },

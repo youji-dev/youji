@@ -64,20 +64,20 @@
           :label="$t('createdBy')"
           width="150"
           show-overflow-tooltip
-          sortable />
+          sortable="custom" />
         <el-table-column
           prop="title"
           filter-class-name="Title"
           :label="$t('title')"
           min-width="250"
           show-overflow-tooltip
-          sortable />
+          sortable="custom" />
         <el-table-column
           prop="state.name"
           filter-class-name="State"
           :label="$t('status')"
           width="200"
-          sortable>
+          sortable="custom">
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
@@ -104,7 +104,7 @@
           :label="$t('building')"
           width="150"
           show-overflow-tooltip
-          sortable />
+          sortable="custom" />
         <el-table-column
           prop="room"
           filter-class-name="Room"
@@ -112,13 +112,13 @@
           :label="$t('room')"
           width="100"
           show-overflow-tooltip
-          sortable />
+          sortable="custom" />
         <el-table-column
           prop="priority.name"
           filter-class-name="Priority"
           :label="$t('priority')"
           width="200"
-          sortable>
+          sortable="custom">
           <template #default="scope">
             <div class="flex justify-start items-center">
               <ColoredSelect
@@ -145,7 +145,7 @@
           :label="$t('createDate')"
           width="200"
           show-overflow-tooltip
-          sortable />
+          sortable="custom" />
         <el-table-column
           fixed="right"
           :min-width="isUserAdmin ? 120 : 70">

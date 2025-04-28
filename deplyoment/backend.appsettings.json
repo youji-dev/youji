@@ -18,27 +18,16 @@
     "EMailAttributeName": "<EMAIL ATTRIBUTE userPrincipalName>"
   },
   "CORS": {
-    "AllowedOrigins": [
-      "<LISTE AUS ALLE ZULASSIGEN ORIGINEN>"
-    ],
-    "AllowedHeaders": [
-      "Authorization",
-      "content-type"
-    ],
-    "AllowedMethods": [
-      "GET",
-      "POST",
-      "PUT",
-      "PATCH",
-      "DELETE"
-    ]
+    "AllowedOrigins": ["<LISTE AUS ALLE ZULASSIGEN ORIGINEN>"],
+    "AllowedHeaders": ["Authorization", "content-type"],
+    "AllowedMethods": ["GET", "POST", "PUT", "PATCH", "DELETE"]
   },
   "Mail": {
     "SenderName": "<Email Absender Anzeigename>",
     "SenderAddress": "<Email Absender Adresse>",
     "SmtpAddress": "<SMTP SERVER ADRESSE>",
-    "SmtpPort": <SMTP PORT HIER>,
-    "UseSsl": <VERWENDET SMPT SERVER SSL>,
+    "SmtpPort": "<SMTP PORT HIER>",
+    "UseSsl": "<VERWENDET SMPT SERVER SSL>",
     "SubjectFormat": "<FORMAT DER EMAIL SUBJEKT>",
     "SmtpUser": "<SMTP LOGIN USER>",
     "SmtpPassword": "<SMTP LOGIN PASSWORT>",

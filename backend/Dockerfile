@@ -20,7 +20,19 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 ENV ASPNETCORE_HTTP_PORTS=80
 
-RUN apt-get update && apt-get install -y jq
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    jq \
+    libldap-2.5-0 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN if [ ! -e /usr/lib/libldap.so.2 ]; then \
+        ln -s /usr/lib/x86_64-linux-gnu/libldap-2.5.so.0 /usr/lib/libldap.so.2; \
+    fi && \
+    if [ ! -e /usr/lib/liblber.so.2 ]; then \
+        ln -s /usr/lib/x86_64-linux-gnu/liblber-2.5.so.0 /usr/lib/liblber.so.2; \
+    fi
 
 COPY --from=build-env /App/out .
 COPY --from=build-env /App/updateDatabase /App/updateDatabase

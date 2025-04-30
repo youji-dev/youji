@@ -138,19 +138,27 @@ namespace DomainLayer.BusinessLogic.Mailing
                 assembly.GetResource("Logo.svg"));
             logo.ContentId = MimeUtils.GenerateMessageId();
 
-            var arrowRight = bodyBuilder.LinkedResources.Add(
-                "arrow_right.svg",
-                assembly.GetResource("arrow_right.svg"));
-            arrowRight.ContentId = MimeUtils.GenerateMessageId();
-
-            var arrowDown = bodyBuilder.LinkedResources.Add(
-                "arrow_down.svg",
-                assembly.GetResource("arrow_down.svg"));
-            arrowDown.ContentId = MimeUtils.GenerateMessageId();
-
             mailModel.AutoValues.LogoSrc = $"cid:{logo.ContentId}";
-            mailModel.AutoValues.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
-            mailModel.AutoValues.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
+
+            if (mailModel.AutoValues.ArrowRightIconSrc is null)
+            {
+                var arrowRight = bodyBuilder.LinkedResources.Add(
+                    "arrow_right.svg",
+                    assembly.GetResource("arrow_right.svg"));
+                arrowRight.ContentId = MimeUtils.GenerateMessageId();
+
+                mailModel.AutoValues.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
+            }
+
+            if (mailModel.AutoValues.ArrowDownIconSrc is null)
+            {
+                var arrowDown = bodyBuilder.LinkedResources.Add(
+                    "arrow_down.svg",
+                    assembly.GetResource("arrow_down.svg"));
+                arrowDown.ContentId = MimeUtils.GenerateMessageId();
+
+                mailModel.AutoValues.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";
+            }
         }
 
         private static void AddMiscellaniousValuesToModel(MailModel mailModel, MailGenConfigurationDto mailGenConfiguration)

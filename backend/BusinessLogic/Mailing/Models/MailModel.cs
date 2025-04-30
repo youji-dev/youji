@@ -45,12 +45,18 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
             /// <summary>
             /// src for an 'arrow-right' icon
             /// </summary>
-            public string ArrowRightIconSrc { get; set; } = string.Empty;
+            /// <remarks>
+            /// Must be set to `null` to be added to mail by generator
+            /// </remarks>
+            public string? ArrowRightIconSrc { get; set; } = string.Empty;
 
             /// <summary>
             /// src for an 'arrow-down' icon
             /// </summary>
-            public string ArrowDownIconSrc { get; set; } = string.Empty;
+            /// <remarks>
+            /// Must be set to `null` to be added to mail by generator
+            /// </remarks>
+            public string? ArrowDownIconSrc { get; set; } = string.Empty;
 
             /// <summary>
             /// Hyperref for a "Take me there" function

@@ -69,6 +69,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = newTicket.Title,
                     OldValue = oldTicket.Title,
                 };
+
+                result.AutoValues.ArrowRightIconSrc = null;
             }
 
             if (newTicket.Description != oldTicket.Description)
@@ -78,6 +80,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = newTicket.Description ?? "-",
                     OldValue = oldTicket.Description ?? "-",
                 };
+
+                result.AutoValues.ArrowDownIconSrc = null;
             }
 
             if (newTicket.Priority != oldTicket.Priority)
@@ -87,6 +91,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = (newTicket.Priority?.Name ?? "-", newTicket.Priority?.Color ?? string.Empty),
                     OldValue = (oldTicket.Priority?.Name ?? "-", oldTicket.Priority?.Color ?? string.Empty),
                 };
+
+                result.AutoValues.ArrowRightIconSrc = null;
             }
 
             if (newTicket.State != oldTicket.State)
@@ -96,6 +102,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = (newTicket.State?.Name ?? "-", newTicket.State?.Color ?? string.Empty),
                     OldValue = (oldTicket.State?.Name ?? "-", oldTicket.State?.Color ?? string.Empty),
                 };
+
+                result.AutoValues.ArrowRightIconSrc = null;
             }
 
             if (newTicket.Building != oldTicket.Building)
@@ -105,6 +113,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = newTicket.Building?.Name ?? "-",
                     OldValue = oldTicket.Building?.Name ?? "-",
                 };
+
+                result.AutoValues.ArrowRightIconSrc = null;
             }
 
             if (newTicket.Room != oldTicket.Room)
@@ -114,6 +124,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = newTicket.Room ?? "-",
                     OldValue = oldTicket.Room ?? "-",
                 };
+
+                result.AutoValues.ArrowRightIconSrc = null;
             }
 
             if (newTicket.Object != oldTicket.Object)
@@ -123,6 +135,8 @@ namespace DomainLayer.BusinessLogic.Mailing.Models
                     NewValue = newTicket.Object ?? "-",
                     OldValue = oldTicket.Object ?? "-",
                 };
+
+                result.AutoValues.ArrowRightIconSrc = null;
             }
 
             return result;

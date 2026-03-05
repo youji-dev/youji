@@ -77,6 +77,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+  	<PackageReference Include="MimeKit" Version="4.15.1" />
 	  <ProjectReference Include="..\Common\Common.csproj" />
 	  <ProjectReference Include="..\DataAccessLayer\PersistenceLayer.DataAccess.csproj" />
 	</ItemGroup>

@@ -11,12 +11,12 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// <summary>
         /// The mail address of the recipient
         /// </summary>
-        public MailboxAddress Address { get; init;  }
+        public required MailboxAddress Address { get; init;  }
 
         /// <summary>
         /// The preferred language of the recipient
         /// </summary>
-        public string? PreferredLcid { get; init; }
+        public string? PreferredLcid { get; private init; }
 
         /// <summary>
         /// Filter and map a collection of users to a collection of mail recipients
@@ -30,7 +30,7 @@ namespace DomainLayer.BusinessLogic.Mailing
                     && u.AllowsEmailNotifications)
                 .Select(u => new MailRecipient()
                 {
-                    Address = new MailboxAddress(u.UserId, u.Email),
+                    Address = new MailboxAddress(u.UserId, u.Email!),
                     PreferredLcid = u.PreferredEmailLcid,
                 });
         }

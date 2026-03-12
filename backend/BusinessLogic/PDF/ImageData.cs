@@ -8,11 +8,11 @@
         /// <summary>
         /// The images filename
         /// </summary>
-        public string FileName { get; set; }
+        public required string FileName { get; init; }
 
         /// <summary>
         /// The image data in binary
         /// </summary>
-        public byte[] Data { get; set; }
+        public required byte[] Data { get; init; }
     }
 }

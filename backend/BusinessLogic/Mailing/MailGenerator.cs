@@ -77,6 +77,7 @@ namespace DomainLayer.BusinessLogic.Mailing
         /// Generate the mail body for a model
         /// </summary>
         /// <param name="mailModel">The model to use as a data provider</param>
+        /// <param name="mailGenConfiguration">Configuration for mail generation</param>
         /// <returns>The generated mail body</returns>
         private static MimeEntity GenerateMail(MailModel mailModel, MailGenConfigurationDto mailGenConfiguration)
         {
@@ -135,7 +136,7 @@ namespace DomainLayer.BusinessLogic.Mailing
 
             var logo = bodyBuilder.LinkedResources.Add(
                 "Logo.svg",
-                assembly.GetResource("Logo.svg"));
+                assembly.GetResource("Logo.svg") ?? throw new InvalidOperationException());
             logo.ContentId = MimeUtils.GenerateMessageId();
 
             mailModel.AutoValues.LogoSrc = $"cid:{logo.ContentId}";
@@ -144,7 +145,7 @@ namespace DomainLayer.BusinessLogic.Mailing
             {
                 var arrowRight = bodyBuilder.LinkedResources.Add(
                     "arrow_right.svg",
-                    assembly.GetResource("arrow_right.svg"));
+                    assembly.GetResource("arrow_right.svg") ?? throw new InvalidOperationException());
                 arrowRight.ContentId = MimeUtils.GenerateMessageId();
 
                 mailModel.AutoValues.ArrowRightIconSrc = $"cid:{arrowRight.ContentId}";
@@ -154,7 +155,7 @@ namespace DomainLayer.BusinessLogic.Mailing
             {
                 var arrowDown = bodyBuilder.LinkedResources.Add(
                     "arrow_down.svg",
-                    assembly.GetResource("arrow_down.svg"));
+                    assembly.GetResource("arrow_down.svg") ?? throw new InvalidOperationException());
                 arrowDown.ContentId = MimeUtils.GenerateMessageId();
 
                 mailModel.AutoValues.ArrowDownIconSrc = $"cid:{arrowDown.ContentId}";

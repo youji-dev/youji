@@ -51,10 +51,8 @@ jobs:
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.16.x"
+      - name: Setup Volta node version manager
+        uses: volta-cli/action@v4
       - name: Install dependencies
         working-directory: ./frontend
         run: npm i
@@ -69,10 +67,8 @@ jobs:
     if: ${{ needs.changes.outputs.frontend == 'true' }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup NodeJS
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20.16.x"
+      - name: Setup Volta node version manager
+        uses: volta-cli/action@v4
       - name: Install dependencies
         working-directory: ./frontend
         run: npm i

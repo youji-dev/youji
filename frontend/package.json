@@ -31,10 +31,7 @@
     "nuxt": "^3.12.4",
     "pinia": "^2.1.7",
     "prettier": "^3.5.3",
-    "vue": "latest"
-  },
-  "overrides": {
-    "vue": "latest"
+    "vue": "^3.5"
   },
   "devDependencies": {
     "@iconify-json/flag": "^1.1.54",
@@ -45,5 +42,8 @@
     "eslint-plugin-jsdoc": "^50.6.9",
     "sass-embedded": "^1.77.8",
     "typescript": "^5.8.2"
+  },
+  "volta": {
+    "node": "20.16.0"
   }
 }

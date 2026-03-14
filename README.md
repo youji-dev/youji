@@ -4,23 +4,23 @@
 
 # Youji
 
-Youji ist das das Hausmeister Ticketsystem der Industrieschule Chemnitz
+Youji ist das Hausmeister-Ticketsystem der Industrieschule Chemnitz
 
 ## Features
 
 - Ticketverwaltung mit anpassbaren Prioritäten, Gebäuden, Status
 - Kommentarfunktion
-- Datei und Bilderupload
+- Datei- und Bildupload
 - Ticketexport via PDF
 - Berechtigungssystem
   - Admin
   - Hausmeister
   - Lehrer
-- Email Benachrichtigungen
+- E-Mail-Benachrichtigungen
 - Konfigurierbare automatische Ticketlöschung
-- Duplikat Vermeidung bei Anlegen von Tickets
+- Duplikatvermeidung beim Anlegen von Tickets
 - Mehrsprachigkeit in Deutsch und Englisch
-- Dark und White Mode
+- Dark- und White-Mode
 
 ## Screenshots
 
@@ -34,14 +34,14 @@ Youji ist das das Hausmeister Ticketsystem der Industrieschule Chemnitz
 ![Ticketansicht](./resources/youji-ticketansicht.png#gh-dark-mode-only)
 ![Ticketansicht](./resources/youji-ticketansicht-light.png#gh-light-mode-only)
 
-## Deploy als Produktumgebung
+## Deployment in Produktivumgebungen
 
 Das Deployment von Youji erfolgt mithilfe von Docker. Im Verzeichnis deployment befinden sich:
 
 - Eine docker-compose.yml-Datei, die alle notwendigen Container definiert.
 - Zusätzliche Konfigurationsdateien, z. B. für die Backend-Einstellungen.
 
-Um Youji zu starten, navigiere in das deployment-Verzeichnis und führe den folgenden Befehl aus:
+Um Youji zu starten, navigiere in das `deployment`-Verzeichnis und führe den folgenden Befehl aus:
 
 ```sh
 docker compose up -d
@@ -55,22 +55,22 @@ docker compose up -d
 
 - PostgreSQL-Datenbank
 - Speichert persistente Daten in einem Docker-Volume
-- Bei Bedarf kann eine eigene PostgresSQL Datenbank verwendet werden. Dafür muss dieser Service aus der docker-compose.yml entfernt werden und der Datenbank Connection String in der
+- Bei Bedarf kann eine eigene PostgreSQL-Datenbank verwendet werden. Dafür muss dieser Service aus der `docker-compose.yml` entfernt werden und der Datenbank-Connection-String in der Konfiguration angepasst werden.
 
 2. Backend (Youji-Backend)
 
 - Backend-Anwendung von Youji
-- Abhängig von der Datenbank. Startet erst sobald die Datenbank bereit und initialisiert ist.
-  - Erstellt eigenständig die vollständige Datenbankstruktur oder updated diese bei bedarf
+- Abhängig von der Datenbank. Startet erst, sobald die Datenbank bereit und initialisiert ist.
+  - Erstellt eigenständig die vollständige Datenbankstruktur oder aktualisiert diese bei Bedarf
 - Läuft unter Port 3001
 - Konfigurationsdatei (appsettings.json) wird per Volume eingebunden
 
 3. Frontend (Youji-Frontend)
 
 - Web-Oberfläche von Youji
-- Abhängig vom Backend. Startet erst sobald das Backend startet
+- Abhängig vom Backend. Startet erst, sobald das Backend startet
 - Läuft unter Port 3000
-- Über die Umgebungsvariable NUXT_PUBLIC_BACKEND_URL(.env) wird bestimmt, über welche öffentlich Domain das Backend erreichbar ist.
+- Über die Umgebungsvariable `NUXT_PUBLIC_BACKEND_URL` (`.env`) wird bestimmt, über welche öffentliche Domain das Backend erreichbar ist.
 
 ### Konfigurationen
 
@@ -97,7 +97,7 @@ In den folgenden Dateien des `deployment` Verzeichnisses müssen folgende Konfig
 | ConnectionStrings.DefaultConnection   | Verbindungs-String zur Datenbank                                                                                               | string   | "Host=database;Database=youji_db;Username=youji;Password=secret"         |
 | DevAuth                               | Entwicklungsmodus für Authentifizierung                                                                                        | bool     | false                                                                    |
 | JWTKey                                | Schlüssel für JWT-Signatur                                                                                                     | string   | "my-secret-jwt-key"                                                      |
-| SessionLifeTime                       | Lebensdauer der Sitzung in Minuten. Kann mit refresh-token verlängert werden                                                   | int      | 720                                                                      |
+| SessionLifeTime                       | Lebensdauer der Sitzung in Minuten. Kann mit Refresh-Token verlängert werden                                                   | int      | 720                                                                      |
 | LDAP.Host                             | Host des LDAP-Servers                                                                                                          | string   | "ldap.example.com"                                                       |
 | LDAP.Port                             | Port des LDAP-Servers                                                                                                          | int      | 389                                                                      |
 | LDAP.BaseDN                           | Basis-DN für LDAP-Suche                                                                                                        | string   | "dc=example,dc=com"                                                      |
@@ -106,27 +106,27 @@ In den folgenden Dateien des `deployment` Verzeichnisses müssen folgende Konfig
 | CORS.AllowedHeaders                   | Erlaubte HTTP-Header (CORS)                                                                                                    | string[] | ["Authorization", "content-type"] (Diese sind zwingend benötigt)         |
 | CORS.AllowedMethods                   | Erlaubte HTTP-Methoden (CORS)                                                                                                  | string[] | ["GET", "POST", "PUT", "PATCH", "DELETE"] (Diese sind zwingend benötigt) |
 | Mail.SenderName                       | Anzeigename des Absenders                                                                                                      | string   | "Youji Hausmeister Ticketsystem"                                         |
-| Mail.SenderAddress                    | E-Mail-Adresse des Absenders                                                                                                   | string   | "no-repy@youji.com"                                                      |
+| Mail.SenderAddress                    | E-Mail-Adresse des Absenders                                                                                                   | string   | "no-reply@youji.com"                                                     |
 | Mail.SmtpAddress                      | Adresse des SMTP-Servers                                                                                                       | string   | "smtp.youji.com"                                                         |
 | Mail.SmtpPort                         | Port des SMTP-Servers                                                                                                          | int      | 587                                                                      |
 | Mail.UseSsl                           | Ob SSL für SMTP verwendet wird                                                                                                 | bool     | true                                                                     |
 | Mail.SubjectFormat                    | Format des E-Mail-Betreffs                                                                                                     | string   | "[Youji] {0}"                                                            |
 | Mail.SmtpUser                         | Benutzername für SMTP-Login                                                                                                    | string?  | "youji-smtp-user"                                                        |
 | Mail.SmtpPassword                     | Passwort für SMTP-Login                                                                                                        | string?  | "supersecretpassword"                                                    |
-| Mail.FrontendTicketBaseUri             | Uri zur Basis-Route der Ticket-Detailansicht, welche für die Generierung eines Links in E-Mails verwendet wird                 | string?  | "https://localhost:3000/tickets/"                                             |
+| Mail.FrontendTicketBaseUri            | URI zur Basis-Route der Ticket-Detailansicht, die für die Generierung eines Links in E-Mails verwendet wird                  | string?  | "https://localhost:3000/tickets/"                                        |
 | Images.UnrenderableMimeTypes          | Nicht darstellbare Bildformate. Für diese Formate wird kein BlurHash generiert und im Frontend keine Bilddarstellung angezeigt | string   | "image/svg+xml"                                                          |
 
 > [!CAUTION]
-> Der Wert `DevAuth` sollte in Produktiv Umgebungen **IMMER** auf `false` sein. Ist dieser aktiv werden Login Mechaniken effektiv ausgehebelt. Dann ist ein Login mit einem beliebigen Nutzer und Passwort immer möglich. Nicht bekannte Nutzer werden angelegt
+> Der Wert `DevAuth` sollte in Produktivumgebungen **IMMER** auf `false` sein. Ist dieser aktiv, werden Login-Mechaniken effektiv ausgehebelt. Dann ist ein Login mit einem beliebigen Nutzer und Passwort immer möglich. Unbekannte Nutzer werden angelegt.
 
 > [!TIP]
 > Für die Generierung des `JWTKey` kann [jwtsecret](https://jwtsecret.com/generate) verwendet werden.
 
 > [!TIP]
-> In dem Wert `Mail.SubjectFormat` wird `{0}` mit dem einem Betreff Text ersetzt. Aus "[Youji] {0}" wird z.B "[Youji] New comment on ticket 'Defekte Heizung im Keller'"
+> In dem Wert `Mail.SubjectFormat` wird `{0}` mit einem Betrefftext ersetzt. Aus "[Youji] {0}" wird z. B. "[Youji] New comment on ticket 'Defekte Heizung im Keller'".
 
 > [!TIP]
-> Wenn `Mail.SmtpUser` und `Mail.SmtpPassword` beide `null` sind, wird sich ohne Authentifizierung an dem SMTP Server angemeldet
+> Wenn `Mail.SmtpUser` und `Mail.SmtpPassword` beide `null` sind, wird sich ohne Authentifizierung am SMTP-Server angemeldet.
 
 ## Maintainer & Contributors
 

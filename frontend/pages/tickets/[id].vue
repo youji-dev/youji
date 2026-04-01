@@ -278,7 +278,8 @@
    * Fetches the ticket with the given ID or initializes a new ticket if the ID is 'new'.
    * @param id The ID of the ticket to fetch.
    * @returns The fetched or initialized ticket.
-   * @throws TicketNotFoundError if the ticket is not found.
+   * @throws {TicketNotFoundError} if the ticket is not found.
+   * @throws {Error} if there is an error fetching the ticket.
    */
   async function fetchOrInitializeTicket(id: string): Promise<ticket> {
     if (id === 'new') {

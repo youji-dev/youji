@@ -67,7 +67,6 @@ export interface EditableNullableStringProperty {
 }
 
 export const useSettingsStore = defineStore('settingsStore', {
-
   state: () => ({
     priorities: [] as EditablePriority[],
     states: [] as EditableState[],

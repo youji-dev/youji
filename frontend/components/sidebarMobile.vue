@@ -59,6 +59,7 @@
         <div>
           <el-divider />
           <el-menu-item
+            index="4"
             class="menu-item"
             @click="
               router.push(localeRoute('/logout')?.fullPath as string);

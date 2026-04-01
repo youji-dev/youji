@@ -4,8 +4,6 @@ WORKDIR /build
 
 COPY package*.json ./
 RUN npm install
-# Install dependencies for building on linux
-RUN npm install sass-embedded-linux-x64
 
 COPY . .
 RUN npm run build

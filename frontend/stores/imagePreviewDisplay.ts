@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 
-export const useImagePreviewDisplayStore = defineStore({
-  id: 'ImagePreviewDisplayStore',
+export const useImagePreviewDisplayStore = defineStore('ImagePreviewDisplayStore', {
   state: () => ({
     imagePreviewDisplay: false,
     imagePreviewSrc: '',

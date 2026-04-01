@@ -66,8 +66,8 @@ export interface EditableNullableStringProperty {
   value: string | null;
 }
 
-export const useSettingsStore = defineStore({
-  id: 'settingsStore',
+export const useSettingsStore = defineStore('settingsStore', {
+
   state: () => ({
     priorities: [] as EditablePriority[],
     states: [] as EditableState[],
@@ -229,7 +229,8 @@ export const useSettingsStore = defineStore({
         isDefault: updatedState.isDefault.value,
         name: updatedState.name.value,
       } as state;
-      const currentState = this.states.filter(s => stateObj.id === s.id.value)[0];
+      const currentState = this.states.find(s => stateObj.id === s.id.value);
+      if (!currentState) return;
       if (
         (currentState.isDefault.value && stateObj.isDefault && operation === 'U' && !setDefaultState) ||
         (currentState.isDefault.value && operation === 'D')

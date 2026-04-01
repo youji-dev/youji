@@ -32,7 +32,6 @@ class TicketRepository {
         take,
         useOr,
       },
-      key: JSON.stringify({ filters, orderByColumn, orderDesc, skip, take }),
     });
   }
 

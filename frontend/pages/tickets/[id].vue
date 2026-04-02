@@ -147,19 +147,14 @@
         alt="Preview Image"
         class="w-full" />
     </el-dialog>
-    <TicketDeleteConfirmationDialog
-      :ticket="ticketModel"
-      :visible="deleteDialogVisible"
-      @closed="
-        () => {
-          deleteDialogVisible = false;
-        }
-      "
-      @deleted="
-        () => {
-          router.push(localePath('/tickets')?.fullPath as string);
-        }
-      " />
+    <DeleteConfirmationDialog
+      v-model:visible="deleteDialogVisible"
+      :title="$t('deleteTicketTitle')"
+      :description="$t('deleteTicketDescription')"
+      :item-name="ticketModel?.title"
+      :loading="deleteLoading"
+      @confirm="deleteTicket()"
+      @closed="deleteDialogVisible = false" />
   </div>
 </template>
 
@@ -199,6 +194,7 @@
   const loading = ref(true);
   const loadingText = ref(i18n.t('loadingData'));
   const deleteDialogVisible = ref(false);
+  const deleteLoading = ref(false);
   const availableStates: Ref<state[]> = ref([] as state[]);
   const availablePriorities: Ref<priority[]> = ref([] as priority[]);
   const availableBuildings: Ref<building[]> = ref([] as building[]);
@@ -446,6 +442,51 @@
       });
     } finally {
       loading.value = false;
+    }
+  }
+
+  /**
+   * Deletes the current ticket and navigates back to the ticket list.
+   */
+  async function deleteTicket() {
+    deleteLoading.value = true;
+    try {
+      if (!ticketModel.value?.id) {
+        throw new Error(i18n.t('error'));
+      }
+      const deleteResult = await $api.ticket.delete(ticketModel.value.id);
+
+      if (deleteResult.error.value) {
+        if (deleteResult.error.value.statusCode === 403) {
+          throw new Error(i18n.t('forbidden'));
+        }
+        if (deleteResult.error.value.statusCode === 500) {
+          throw new Error('serverError');
+        }
+        if (deleteResult.error.value.message) {
+          throw new Error(deleteResult.error.value.message);
+        }
+        if (deleteResult.error.value.data) {
+          throw new Error(deleteResult.error.value.data);
+        } else {
+          throw new Error(i18n.t('error'));
+        }
+      }
+
+      if (deleteResult.data.value) {
+        ElMessage({ message: i18n.t('deleted'), type: 'success', duration: 5000 });
+        deleteDialogVisible.value = false;
+        router.push(localePath('/tickets')?.fullPath as string);
+      }
+    } catch (error) {
+      ElNotification({
+        title: i18n.t('error'),
+        message: (error as Error).message,
+        type: 'error',
+        duration: 5000,
+      });
+    } finally {
+      deleteLoading.value = false;
     }
   }
 

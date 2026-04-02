@@ -87,6 +87,10 @@ export default defineI18nConfig(() => ({
       deleteTicketTitle: 'Do you really want to delete this Ticket?',
       deleteTicketDescription:
         'Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action.',
+      deleteCommentTitle: 'Do you really want to delete this comment?',
+      deleteCommentDescription: 'Warning! Deleting this comment is permanent and cannot be undone.',
+      deleteAttachmentTitle: 'Do you really want to delete this attachment?',
+      deleteAttachmentDescription: 'Warning! Deleting this attachment is permanent and cannot be undone.',
       stateChangeNotAllowed: "You can't change the state because a default state is set.",
       default: 'Default',
       autoPurge: 'Delete automatically',
@@ -218,6 +222,10 @@ export default defineI18nConfig(() => ({
       deleteTicketTitle: 'Wollen Sie dieses Ticket wirklich löschen?',
       deleteTicketDescription:
         'Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.',
+      deleteCommentTitle: 'Möchten Sie diesen Kommentar wirklich löschen?',
+      deleteCommentDescription: 'Achtung! Das Löschen dieses Kommentars ist endgültig und kann nicht rückgängig gemacht werden.',
+      deleteAttachmentTitle: 'Möchten Sie diese Anlage wirklich löschen?',
+      deleteAttachmentDescription: 'Achtung! Das Löschen dieser Anlage ist endgültig und kann nicht rückgängig gemacht werden.',
       stateChangeNotAllowed: 'Sie können den Status nicht ändern, weil ein Standardstatus festgelegt ist.',
       default: 'Standard',
       autoPurge: 'Automatisch löschen',

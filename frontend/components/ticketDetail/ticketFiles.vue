@@ -65,6 +65,7 @@
     :description="$t('deleteAttachmentDescription')"
     :item-name="fileToDelete?.name"
     :loading="loading"
+    append-to-body
     @confirm="deleteFile()"
     @closed="deleteDialogVisible = false" />
   </el-card>

@@ -136,6 +136,7 @@ export default defineI18nConfig(() => ({
         'After starting the backend, the token is printed in the console. Make sure to check the console immediately after startup, as the token is only valid for a short period.',
       promotionSuccess: 'Successfully assigned admin role. You will be logged out now.',
       promotionFailed: 'Failed to assign admin role.',
+      shiftClickToSkip: 'Tip: Hold ⇧ Shift while clicking delete to skip this dialog.',
     },
     'de-DE': {
       username: 'Benutzername',
@@ -221,7 +222,7 @@ export default defineI18nConfig(() => ({
       receiveEmailNotifications: 'E-Mail Benachrichtigungen erhalten',
       deleteTicketTitle: 'Wollen Sie dieses Ticket wirklich löschen?',
       deleteTicketDescription:
-        'Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.',
+        'Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden.',
       deleteCommentTitle: 'Möchten Sie diesen Kommentar wirklich löschen?',
       deleteCommentDescription: 'Achtung! Das Löschen dieses Kommentars ist endgültig und kann nicht rückgängig gemacht werden.',
       deleteAttachmentTitle: 'Möchten Sie diese Anlage wirklich löschen?',
@@ -271,6 +272,7 @@ export default defineI18nConfig(() => ({
         'Nach dem Start des Backends wird der Token in der Konsole ausgegeben. Achten sie darauf, die Konsole direkt nach dem Start zu überprüfen, da der Token nur für kurze Zeit gültig ist.',
       promotionSuccess: 'Erfolgreich admin rolle zugewiesen. Sie werden nun automatisch abgemeldet.',
       promotionFailed: 'Fehler beim Zuweisen der admin rolle.',
+      shiftClickToSkip: 'Tipp: ⇧ Shift gedrückt halten beim Klicken auf Löschen, um diesen Dialog zu überspringen.',
     },
   },
 }));

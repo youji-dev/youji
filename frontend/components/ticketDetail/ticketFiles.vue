@@ -60,14 +60,14 @@
       </el-icon>
     </el-upload>
     <DeleteConfirmationDialog
-    v-model:visible="deleteDialogVisible"
-    :title="$t('deleteAttachmentTitle')"
-    :description="$t('deleteAttachmentDescription')"
-    :item-name="fileToDelete?.name"
-    :loading="loading"
-    append-to-body
-    @confirm="deleteFile()"
-    @closed="deleteDialogVisible = false" />
+      v-model:visible="deleteDialogVisible"
+      :title="$t('deleteAttachmentTitle')"
+      :description="$t('deleteAttachmentDescription')"
+      :item-name="fileToDelete?.name"
+      :loading="loading"
+      append-to-body
+      @confirm="deleteFile()"
+      @closed="deleteDialogVisible = false" />
   </el-card>
 </template>
 

@@ -15,13 +15,13 @@
     </div>
     <el-text size="default">{{ commentModel.content }}</el-text>
     <DeleteConfirmationDialog
-    v-model:visible="deleteDialogVisible"
-    :title="$t('deleteCommentTitle')"
-    :description="$t('deleteCommentDescription')"
-    :loading="loading"
-    append-to-body 
-    @confirm="deleteComment()"
-    @closed="deleteDialogVisible = false"/>
+      v-model:visible="deleteDialogVisible"
+      :title="$t('deleteCommentTitle')"
+      :description="$t('deleteCommentDescription')"
+      :loading="loading"
+      append-to-body
+      @confirm="deleteComment()"
+      @closed="deleteDialogVisible = false" />
   </el-card>
 </template>
 

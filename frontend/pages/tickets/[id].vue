@@ -201,20 +201,28 @@
 
   const ticketFormInstance = ref<FormInstance>();
   const ticketModel: Ref<ticket | null> = ref(null);
+  const originalStateId: Ref<string | null> = ref(null);
+
+  /**
+   * Rejects non-default state selections when the user lacks permission to change state and the state was actually changed.
+   * @param _rule - The validation rule (unused).
+   * @param _value - The field value (unused).
+   * @param callback - Call with no args to pass, or with an Error to fail.
+   */
+  function validateState(_rule: any, _value: any, callback: any) {
+    const stateChanged = ticketModel.value?.state.id !== originalStateId.value;
+    const stateIsNonDefault = !ticketModel.value?.state.isDefault;
+
+    if (stateChanged && !canUserChangeStateCheck() && stateIsNonDefault) {
+      callback(new Error(i18n.t('defaultStateForced')));
+    } else {
+      callback();
+    }
+  }
+
   const ticketFormRules = reactive<FormRules<ticket>>({
     title: [{ required: true, message: i18n.t('titleRequired'), trigger: 'blur' }],
-    state: [
-      { required: true, message: i18n.t('stateRequired'), trigger: 'blur' },
-      {
-        validator: (rule: any, value: any, callback: any) => {
-          if (!canUserChangeStateCheck() && !ticketModel.value?.state.isDefault) {
-            callback(new Error(i18n.t('defaultStateForced')));
-          } else {
-            callback();
-          }
-        },
-      },
-    ],
+    state: [{ required: true, message: i18n.t('stateRequired'), trigger: 'blur' }, { validator: validateState }],
     priority: [{ required: true, message: i18n.t('priorityRequired'), trigger: 'blur' }],
   });
 
@@ -230,6 +238,7 @@
         availablePriorities.value = priorities.data.value ?? [];
         availableBuildings.value = buildings.data.value ?? [];
         ticketModel.value = ticketData;
+        originalStateId.value = ticketData?.state?.id ?? null;
         is404.value = false;
 
         const defaultState = availableStates.value.find(state => state.isDefault);
@@ -376,6 +385,7 @@
         // no data is returned when nothing was changed
         if (ticketResult.data.value) {
           ticketModel.value = ticketResult.data.value;
+          originalStateId.value = ticketResult.data.value.state?.id ?? null;
         }
       }
     } catch (error) {

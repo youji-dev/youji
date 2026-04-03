@@ -224,9 +224,11 @@ export default defineI18nConfig(() => ({
       deleteTicketDescription:
         'Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden.',
       deleteCommentTitle: 'Möchten Sie diesen Kommentar wirklich löschen?',
-      deleteCommentDescription: 'Achtung! Das Löschen dieses Kommentars ist endgültig und kann nicht rückgängig gemacht werden.',
+      deleteCommentDescription:
+        'Achtung! Das Löschen dieses Kommentars ist endgültig und kann nicht rückgängig gemacht werden.',
       deleteAttachmentTitle: 'Möchten Sie diese Anlage wirklich löschen?',
-      deleteAttachmentDescription: 'Achtung! Das Löschen dieser Anlage ist endgültig und kann nicht rückgängig gemacht werden.',
+      deleteAttachmentDescription:
+        'Achtung! Das Löschen dieser Anlage ist endgültig und kann nicht rückgängig gemacht werden.',
       stateChangeNotAllowed: 'Sie können den Status nicht ändern, weil ein Standardstatus festgelegt ist.',
       default: 'Standard',
       autoPurge: 'Automatisch löschen',

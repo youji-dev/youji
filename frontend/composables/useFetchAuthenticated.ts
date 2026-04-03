@@ -1,7 +1,7 @@
 /* eslint-disable no-async-promise-executor */
-import type { UseFetchOptions } from '#app';
+import type { FetchOptions } from 'ofetch';
 
-const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?: UseFetchOptions<T>) => {
+const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?: FetchOptions) => {
   const {
     public: { BACKEND_URL, ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME },
   } = useRuntimeConfig();
@@ -22,16 +22,16 @@ const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?
 
   const refreshAccessToken = async () => {
     if (!refreshPromise) {
-      refreshPromise = new Promise(async (resolve, reject) => {
+      refreshPromise = new Promise<void>(async (resolve, reject) => {
         try {
-          const { data }: any = await useFetch(`${BACKEND_URL}/Auth/Refresh`, {
+          const data = await $fetch<{ accessToken: string; refreshToken: string }>(`${BACKEND_URL}/Auth/Refresh`, {
             body: { refreshToken: refreshToken.value },
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
           });
 
-          accessToken.value = data.value.accessToken;
-          refreshToken.value = data.value.refreshToken;
+          accessToken.value = data.accessToken;
+          refreshToken.value = data.refreshToken;
 
           resolve();
         } catch (error) {
@@ -69,7 +69,10 @@ const useFetchAuthenticated = <T>(url: string | (() => string), providedOptions?
     },
   });
 
-  return useFetch(url, { ...providedOptions, $fetch: customFetch });
+  const resolvedUrl = typeof url === 'function' ? url() : url;
+  return customFetch<T>(resolvedUrl, providedOptions)
+    .then(data => ({ data: { value: data as T }, error: { value: null } }))
+    .catch(err => ({ data: { value: null as T | null }, error: { value: err } }));
 };
 
 export default useFetchAuthenticated;

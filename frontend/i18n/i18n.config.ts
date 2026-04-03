@@ -87,6 +87,10 @@ export default defineI18nConfig(() => ({
       deleteTicketTitle: 'Do you really want to delete this Ticket?',
       deleteTicketDescription:
         'Warning! Deleting this ticket is permanent and cannot be undone. Please ensure you want to proceed before confirming this action.',
+      deleteCommentTitle: 'Do you really want to delete this comment?',
+      deleteCommentDescription: 'Warning! Deleting this comment is permanent and cannot be undone.',
+      deleteAttachmentTitle: 'Do you really want to delete this attachment?',
+      deleteAttachmentDescription: 'Warning! Deleting this attachment is permanent and cannot be undone.',
       stateChangeNotAllowed: "You can't change the state because a default state is set.",
       default: 'Default',
       autoPurge: 'Delete automatically',
@@ -112,6 +116,8 @@ export default defineI18nConfig(() => ({
       duplicateTickets: 'Similar Tickets',
       noDuplicatesFound: 'No similar tickets found. Your ticket is truly unique!',
       openInNewTab: 'Open in new tab',
+      usernameRequired: 'Username is required',
+      passwordRequired: 'Password is required',
       titleRequired: 'Title is required',
       stateRequired: 'State is required',
       defaultStateForced: 'A default state is configured and cannot be changed',
@@ -130,6 +136,7 @@ export default defineI18nConfig(() => ({
         'After starting the backend, the token is printed in the console. Make sure to check the console immediately after startup, as the token is only valid for a short period.',
       promotionSuccess: 'Successfully assigned admin role. You will be logged out now.',
       promotionFailed: 'Failed to assign admin role.',
+      shiftClickToSkip: 'Tip: Hold ⇧ Shift while clicking delete to skip this dialog.',
     },
     'de-DE': {
       username: 'Benutzername',
@@ -215,7 +222,13 @@ export default defineI18nConfig(() => ({
       receiveEmailNotifications: 'E-Mail Benachrichtigungen erhalten',
       deleteTicketTitle: 'Wollen Sie dieses Ticket wirklich löschen?',
       deleteTicketDescription:
-        'Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden. Stellen Sie sicher, dass Sie fortfahren möchten, bevor Sie diesen Schritt bestätigen.',
+        'Achtung! Das Löschen dieses Tickets ist endgültig und kann nicht rückgängig gemacht werden.',
+      deleteCommentTitle: 'Möchten Sie diesen Kommentar wirklich löschen?',
+      deleteCommentDescription:
+        'Achtung! Das Löschen dieses Kommentars ist endgültig und kann nicht rückgängig gemacht werden.',
+      deleteAttachmentTitle: 'Möchten Sie diese Anlage wirklich löschen?',
+      deleteAttachmentDescription:
+        'Achtung! Das Löschen dieser Anlage ist endgültig und kann nicht rückgängig gemacht werden.',
       stateChangeNotAllowed: 'Sie können den Status nicht ändern, weil ein Standardstatus festgelegt ist.',
       default: 'Standard',
       autoPurge: 'Automatisch löschen',
@@ -241,6 +254,8 @@ export default defineI18nConfig(() => ({
       duplicateTickets: 'Ähnliche Tickets',
       noDuplicatesFound: 'Keine Duplikate gefunden. Ihr Ticket ist wahrlich einzigartig!',
       openInNewTab: 'In neuem neuen Tab öffnen',
+      usernameRequired: 'Benutzername ist ein Pflichtfeld',
+      passwordRequired: 'Passwort ist ein Pflichtfeld',
       titleRequired: 'Titel ist ein Pflichtfeld',
       stateRequired: 'Status ist ein Pflichtfeld',
       defaultStateForced: 'Da ein Standardstatus festgelegt ist, können sie diesen nicht ändern',
@@ -259,6 +274,7 @@ export default defineI18nConfig(() => ({
         'Nach dem Start des Backends wird der Token in der Konsole ausgegeben. Achten sie darauf, die Konsole direkt nach dem Start zu überprüfen, da der Token nur für kurze Zeit gültig ist.',
       promotionSuccess: 'Erfolgreich admin rolle zugewiesen. Sie werden nun automatisch abgemeldet.',
       promotionFailed: 'Fehler beim Zuweisen der admin rolle.',
+      shiftClickToSkip: 'Tipp: ⇧ Shift gedrückt halten beim Klicken auf Löschen, um diesen Dialog zu überspringen.',
     },
   },
 }));

@@ -1,16 +1,14 @@
-FROM node:20.16.0-slim AS build
+FROM node:22.13-slim AS build
 
 WORKDIR /build
 
 COPY package*.json ./
 RUN npm install
-# Install dependencies for building on linux
-RUN npm install sass-embedded-linux-x64
 
 COPY . .
 RUN npm run build
 
-FROM node:20.16.0-slim AS base
+FROM node:22.13-slim AS base
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Berlin

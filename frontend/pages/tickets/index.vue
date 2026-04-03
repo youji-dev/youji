@@ -192,19 +192,14 @@
         :current-page="pageNumber"
         @current-change="fetchNewPage" />
     </div>
-    <TicketDeleteConfirmationDialog
-      :ticket="deleteTicket"
-      :visible="displayDeleteDialog"
-      @closed="
-        () => {
-          displayDeleteDialog = false;
-        }
-      "
-      @deleted="
-        () => {
-          fetchTicketsFromStart(true);
-        }
-      " />
+    <DeleteConfirmationDialog
+      v-model:visible="displayDeleteDialog"
+      :title="$t('deleteTicketTitle')"
+      :description="$t('deleteTicketDescription')"
+      :item-name="deleteTicket?.title"
+      :loading="deleteLoading"
+      @confirm="performDeleteTicket()"
+      @closed="displayDeleteDialog = false" />
   </div>
 </template>
 
@@ -234,6 +229,7 @@
   const { $api } = useNuxtApp();
 
   const displayDeleteDialog = ref(false);
+  const deleteLoading = ref(false);
   const deleteTicket: Ref<ticket | null> = ref(null);
   const tableDimensions = ref({
     width: 0,
@@ -254,6 +250,49 @@
     determineViewWidth();
     window.addEventListener('resize', determineViewWidth);
   });
+
+  /**
+   * Sends a request to delete the selected ticket and refreshes the list.
+   */
+  async function performDeleteTicket() {
+    if (!deleteTicket.value?.id) return;
+    deleteLoading.value = true;
+    try {
+      const deleteResult = await $api.ticket.delete(deleteTicket.value.id);
+
+      if (deleteResult.error.value) {
+        if (deleteResult.error.value.statusCode === 403) {
+          throw new Error(i18n.t('forbidden'));
+        }
+        if (deleteResult.error.value.statusCode === 500) {
+          throw new Error('serverError');
+        }
+        if (deleteResult.error.value.message) {
+          throw new Error(deleteResult.error.value.message);
+        }
+        if (deleteResult.error.value.data) {
+          throw new Error(deleteResult.error.value.data);
+        } else {
+          throw new Error(i18n.t('error'));
+        }
+      }
+
+      if (deleteResult.data.value) {
+        ElMessage({ message: i18n.t('deleted'), type: 'success', duration: 5000 });
+        displayDeleteDialog.value = false;
+        fetchTicketsFromStart(true);
+      }
+    } catch (error) {
+      ElNotification({
+        title: i18n.t('error'),
+        message: (error as Error).message,
+        type: 'error',
+        duration: 5000,
+      });
+    } finally {
+      deleteLoading.value = false;
+    }
+  }
 
   /**
    * Fetches the tickets from the API.

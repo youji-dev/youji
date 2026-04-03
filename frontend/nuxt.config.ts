@@ -86,7 +86,7 @@ export default defineNuxtConfig({
       },
     ],
     experimental: {
-      localeDetector: './localeDetector.ts',
+      localeDetector: 'localeDetector.ts',
     },
   },
   elementPlus: {

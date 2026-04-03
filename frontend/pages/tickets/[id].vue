@@ -147,19 +147,14 @@
         alt="Preview Image"
         class="w-full" />
     </el-dialog>
-    <TicketDeleteConfirmationDialog
-      :ticket="ticketModel"
-      :visible="deleteDialogVisible"
-      @closed="
-        () => {
-          deleteDialogVisible = false;
-        }
-      "
-      @deleted="
-        () => {
-          router.push(localePath('/tickets')?.fullPath as string);
-        }
-      " />
+    <DeleteConfirmationDialog
+      v-model:visible="deleteDialogVisible"
+      :title="$t('deleteTicketTitle')"
+      :description="$t('deleteTicketDescription')"
+      :item-name="ticketModel?.title"
+      :loading="deleteLoading"
+      @confirm="deleteTicket()"
+      @closed="deleteDialogVisible = false" />
   </div>
 </template>
 
@@ -199,26 +194,35 @@
   const loading = ref(true);
   const loadingText = ref(i18n.t('loadingData'));
   const deleteDialogVisible = ref(false);
+  const deleteLoading = ref(false);
   const availableStates: Ref<state[]> = ref([] as state[]);
   const availablePriorities: Ref<priority[]> = ref([] as priority[]);
   const availableBuildings: Ref<building[]> = ref([] as building[]);
 
   const ticketFormInstance = ref<FormInstance>();
   const ticketModel: Ref<ticket | null> = ref(null);
+  const originalStateId: Ref<string | null> = ref(null);
+
+  /**
+   * Rejects non-default state selections when the user lacks permission to change state and the state was actually changed.
+   * @param _rule - The validation rule (unused).
+   * @param _value - The field value (unused).
+   * @param callback - Call with no args to pass, or with an Error to fail.
+   */
+  function validateState(_rule: any, _value: any, callback: any) {
+    const stateChanged = ticketModel.value?.state.id !== originalStateId.value;
+    const stateIsNonDefault = !ticketModel.value?.state.isDefault;
+
+    if (stateChanged && !canUserChangeStateCheck() && stateIsNonDefault) {
+      callback(new Error(i18n.t('defaultStateForced')));
+    } else {
+      callback();
+    }
+  }
+
   const ticketFormRules = reactive<FormRules<ticket>>({
     title: [{ required: true, message: i18n.t('titleRequired'), trigger: 'blur' }],
-    state: [
-      { required: true, message: i18n.t('stateRequired'), trigger: 'blur' },
-      {
-        validator: (rule: any, value: any, callback: any) => {
-          if (!canUserChangeStateCheck() && !ticketModel.value?.state.isDefault) {
-            callback(new Error(i18n.t('defaultStateForced')));
-          } else {
-            callback();
-          }
-        },
-      },
-    ],
+    state: [{ required: true, message: i18n.t('stateRequired'), trigger: 'blur' }, { validator: validateState }],
     priority: [{ required: true, message: i18n.t('priorityRequired'), trigger: 'blur' }],
   });
 
@@ -234,6 +238,7 @@
         availablePriorities.value = priorities.data.value ?? [];
         availableBuildings.value = buildings.data.value ?? [];
         ticketModel.value = ticketData;
+        originalStateId.value = ticketData?.state?.id ?? null;
         is404.value = false;
 
         const defaultState = availableStates.value.find(state => state.isDefault);
@@ -278,7 +283,8 @@
    * Fetches the ticket with the given ID or initializes a new ticket if the ID is 'new'.
    * @param id The ID of the ticket to fetch.
    * @returns The fetched or initialized ticket.
-   * @throws TicketNotFoundError if the ticket is not found.
+   * @throws {TicketNotFoundError} if the ticket is not found.
+   * @throws {Error} if there is an error fetching the ticket.
    */
   async function fetchOrInitializeTicket(id: string): Promise<ticket> {
     if (id === 'new') {
@@ -379,6 +385,7 @@
         // no data is returned when nothing was changed
         if (ticketResult.data.value) {
           ticketModel.value = ticketResult.data.value;
+          originalStateId.value = ticketResult.data.value.state?.id ?? null;
         }
       }
     } catch (error) {
@@ -445,6 +452,51 @@
       });
     } finally {
       loading.value = false;
+    }
+  }
+
+  /**
+   * Deletes the current ticket and navigates back to the ticket list.
+   */
+  async function deleteTicket() {
+    deleteLoading.value = true;
+    try {
+      if (!ticketModel.value?.id) {
+        throw new Error(i18n.t('error'));
+      }
+      const deleteResult = await $api.ticket.delete(ticketModel.value.id);
+
+      if (deleteResult.error.value) {
+        if (deleteResult.error.value.statusCode === 403) {
+          throw new Error(i18n.t('forbidden'));
+        }
+        if (deleteResult.error.value.statusCode === 500) {
+          throw new Error('serverError');
+        }
+        if (deleteResult.error.value.message) {
+          throw new Error(deleteResult.error.value.message);
+        }
+        if (deleteResult.error.value.data) {
+          throw new Error(deleteResult.error.value.data);
+        } else {
+          throw new Error(i18n.t('error'));
+        }
+      }
+
+      if (deleteResult.data.value) {
+        ElMessage({ message: i18n.t('deleted'), type: 'success', duration: 5000 });
+        deleteDialogVisible.value = false;
+        router.push(localePath('/tickets')?.fullPath as string);
+      }
+    } catch (error) {
+      ElNotification({
+        title: i18n.t('error'),
+        message: (error as Error).message,
+        type: 'error',
+        duration: 5000,
+      });
+    } finally {
+      deleteLoading.value = false;
     }
   }
 

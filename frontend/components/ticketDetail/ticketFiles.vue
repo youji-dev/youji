@@ -47,7 +47,7 @@
             </span>
             <span
               class="el-upload-list__item-delete"
-              @click="deleteFile(file)">
+              @click="openDeleteDialog(file)">
               <el-icon>
                 <Delete />
               </el-icon>
@@ -59,6 +59,15 @@
         <Upload />
       </el-icon>
     </el-upload>
+    <DeleteConfirmationDialog
+      v-model:visible="deleteDialogVisible"
+      :title="$t('deleteAttachmentTitle')"
+      :description="$t('deleteAttachmentDescription')"
+      :item-name="fileToDelete?.name"
+      :loading="loading"
+      append-to-body
+      @confirm="deleteFile()"
+      @closed="deleteDialogVisible = false" />
   </el-card>
 </template>
 
@@ -129,6 +138,8 @@
   }
 
   const loading = ref(false);
+  const deleteDialogVisible = ref(false);
+  const fileToDelete = ref<ticketAttachment | null>(null);
 
   /**
    * Open the image preview
@@ -154,10 +165,20 @@
   }
 
   /**
-   * Sends a request to delete the file
+   * Opens the delete confirmation dialog for the given file
    * @param file File to delete
    */
-  async function deleteFile(file: ticketAttachment) {
+  function openDeleteDialog(file: ticketAttachment) {
+    fileToDelete.value = file;
+    deleteDialogVisible.value = true;
+  }
+
+  /**
+   * Sends a request to delete the selected file
+   */
+  async function deleteFile() {
+    if (!fileToDelete.value) return;
+    const file = fileToDelete.value;
     loading.value = true;
     try {
       const attachmentDeleteResult = await $api.attachment.delete(file.id);
@@ -179,6 +200,7 @@
         }
       }
 
+      deleteDialogVisible.value = false;
       props.ticket.attachments = props.ticket.attachments.filter(attachment => attachment.id !== file.id);
     } catch (error) {
       ElNotification({

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Common.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PersistenceLayer.DataAccess.Repositories;
 
@@ -25,14 +27,22 @@ namespace Application.WebApi.Controllers
             [FromServices] TicketCommentRepository commentRepo,
             [FromRoute] Guid commentId)
         {
-            var userClaim = this.User.FindFirst("username")?.Value;
+            var userName = this.User.FindFirst("username")?.Value;
+            var userRole = this.User.FindFirst(ClaimTypes.Role)?.Value;
+
+            if (!Enum.TryParse(userRole, out Roles role))
+                return this.Unauthorized();
 
             var comment = await commentRepo.GetAsync(commentId);
 
             if (comment is null)
                 return this.NotFound($"A comment with the id '{commentId}' doesn´t exist.");
 
-            if (!comment.Author.Equals(userClaim))
+            bool isAuthor = comment.Author.Equals(userName);
+            bool isAdmin = role.HasFlag(Roles.Admin);
+            bool isAuthorized = isAdmin || isAuthor;
+
+            if (!isAuthorized)
                 return this.Forbid();
 
             await commentRepo.DeleteAsync(comment);

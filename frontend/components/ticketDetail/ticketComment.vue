@@ -8,13 +8,20 @@
         >{{ commentModel.author }}</el-text
       >
       <el-button
-        :loading="loading"
         size="small"
         :icon="Delete"
         :hidden="!(userIsAuthor || isUserAdmin)"
-        @click="deleteComment()" />
+        @click="deleteDialogVisible = true" />
     </div>
     <el-text size="default">{{ commentModel.content }}</el-text>
+    <DeleteConfirmationDialog
+      v-model:visible="deleteDialogVisible"
+      :title="$t('deleteCommentTitle')"
+      :description="$t('deleteCommentDescription')"
+      :loading="loading"
+      append-to-body
+      @confirm="deleteComment()"
+      @closed="deleteDialogVisible = false" />
   </el-card>
 </template>
 
@@ -27,6 +34,7 @@
   const route = useRoute();
   const i18n = useI18n();
   const loading = ref(false);
+  const deleteDialogVisible = ref(false);
   const commentModel = defineModel<ticketComment>('comment', { required: true });
   const ticketModel = defineModel<ticket>('ticket', { required: true });
 
@@ -62,6 +70,7 @@
         }
       }
 
+      deleteDialogVisible.value = false;
       ticketModel.value.comments = (await $api.ticket.getComments(route.params.id as string)).data.value ?? [];
       ElNotification({
         title: i18n.t('success'),

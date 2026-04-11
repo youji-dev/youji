@@ -74,6 +74,14 @@
     loading.value = true;
     try {
       const { username, password } = form.value;
+      if (!username.trim()) {
+        notifyError(i18n.t('usernameRequired'));
+        return;
+      }
+      if (!password.trim()) {
+        notifyError(i18n.t('passwordRequired'));
+        return;
+      }
       const user = { name: username, password: password };
       await authenticateUser(user);
       if (authenticated.value) {

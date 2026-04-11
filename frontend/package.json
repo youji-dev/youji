@@ -16,34 +16,34 @@
     "lintfix:eslint": "eslint . --fix"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.3.1",
-    "@element-plus/nuxt": "^1.0.9",
-    "@nuxt/eslint": "^1.2.0",
-    "@nuxt/icon": "^1.5.1",
-    "@nuxtjs/color-mode": "^3.4.2",
-    "@nuxtjs/i18n": "^8.3.3",
-    "@nuxtjs/tailwindcss": "^6.12.1",
-    "@pinia/nuxt": "^0.5.3",
-    "@vueuse/components": "^12.7.0",
-    "eslint": "^9.23.0",
-    "file-icons-vue": "^1.3.2",
+    "@element-plus/icons-vue": "^2.3.2",
+    "@element-plus/nuxt": "^1.1.5",
+    "@nuxt/eslint": "^1.15.2",
+    "@nuxt/icon": "^2.2.1",
+    "@nuxtjs/color-mode": "^4.0.0",
+    "@nuxtjs/i18n": "^10.2.3",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@vueuse/components": "^14.2.1",
+    "eslint": "^10.0.3",
+    "file-icons-vue": "^1.3.4",
     "jwt-decode": "^4.0.0",
-    "nuxt": "^3.12.4",
-    "pinia": "^2.1.7",
-    "prettier": "^3.5.3",
+    "nuxt": "^4.4.2",
+    "pinia": "latest",
+    "prettier": "^3.8.1",
     "vue": "^3.5"
   },
   "devDependencies": {
-    "@iconify-json/flag": "^1.1.54",
-    "@iconify-json/hugeicons": "^1.2.0",
-    "@iconify-json/material-symbols": "^1.1.87",
+    "@iconify-json/flag": "^1.2.11",
+    "@iconify-json/hugeicons": "^1.2.23",
+    "@iconify-json/material-symbols": "^1.2.62",
     "@types/contrast-color": "^1.0.3",
-    "@unlazy/nuxt": "^0.12.1",
-    "eslint-plugin-jsdoc": "^50.6.9",
-    "sass-embedded": "^1.77.8",
-    "typescript": "^5.8.2"
+    "@unlazy/nuxt": "^1.1.0",
+    "eslint-plugin-jsdoc": "^62.8.0",
+    "sass-embedded": "^1.98.0",
+    "typescript": "^5.9.3"
   },
   "volta": {
-    "node": "20.16.0"
+    "node": "22.13.0"
   }
 }
